@@ -10,7 +10,7 @@ export type Roster = {
 }
 
 export interface LeagueData {
-    players: Record<string, Player>,
+    players: Player[],
     positions: Record<string, PlayerPosition>,
     rosters: Record<string, Roster>,
     teams: Team[],
@@ -31,9 +31,10 @@ export async function leagueFetcher(): Promise<LeagueData> {
     ]);
 
     const teams = fetchedTeams.map((team) => new Team(team))
-    const players = Object.fromEntries(fetchedPlayers.map((player) => [player.entityId, new Player(player)]))
+    const players = fetchedPlayers.map((player) => new Player(player))
+
     const rosters = Object.fromEntries(teams.map((team) => {
-        let idToPlayerMapper = (id: string) => players[id];
+        let idToPlayerMapper = (id: string) => players.find((player) => player.id === id);
         let undefinedPlayerFilter = (player : Player | undefined): player is Player => player !== undefined;
         return [team.id, {
             lineup: team.data.lineup.map(idToPlayerMapper).filter(undefinedPlayerFilter),
@@ -71,13 +72,21 @@ export async function leagueFetcher(): Promise<LeagueData> {
     };
 }
 
-export const useChroniclerToFetchTeams = () => {
+/*export const useChroniclerToFetchTeams = () => {
     const { data, error } = useSWR("team", teamsFetcher)
     if(error) {
         console.error(error);
     }
-    return data?.map((entity) => new Team(entity)) ?? [];
+    return data?.map((entity: ChroniclerEntity<BlaseballTeam>) => new Team(entity)) ?? [];
 }
+
+export const useChroniclerToFetchPlayers = () => {
+    const { data, error } = useSWR("player", playersFetcher)
+    if(error) {
+        console.error(error);
+    }
+    return data?.map((entity: ChroniclerEntity<BlaseballPlayer>) => new Player(entity)) ?? [];
+}*/
 
 async function playersFetcher(): Promise<ChroniclerEntity<BlaseballPlayer>[]> {
     return await pagedFetcher<BlaseballPlayer>("player");

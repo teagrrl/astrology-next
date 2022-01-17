@@ -53,6 +53,7 @@ export interface BlaseballPlayer {
     blood: number;
     coffee: number;
     ritual: string;
+    evolution: number;
     leagueTeamId?: string;
     tournamentTeamId?: string;
     items?: PlayerItem[];

@@ -11,12 +11,12 @@ type TeamPageProps = PageProps & {
 	
 }
 
-export default function TeamPage({ canSeeFk, isItemApplied }: TeamPageProps) {
+export default function TeamPage({ isItemApplied, isShowSimplified }: TeamPageProps) {
     const router = useRouter()
     const { slugOrId } = router.query
 	const data = useChroniclerToFetchLeagueData()
 
-	const team = data?.teams.find((team) => [team.id, team.slug()].includes(slugOrId as string))
+	const team = data?.teams.find((team) => team.id === slugOrId || team.slug() === (slugOrId as string).toLowerCase())
 	if(!team) {
 		return (
 			<h1>Loading...</h1>
@@ -33,9 +33,9 @@ export default function TeamPage({ canSeeFk, isItemApplied }: TeamPageProps) {
 					<div className="text-xl italic before:content-[open-quote] after:content-[close-quote]">{team.data.slogan}</div>
 				</div>
 			</div>
-			<PlayerTable header="Lineup" players={rosters?.lineup} positions={data?.positions} canSeeFk={canSeeFk} isItemApplied={isItemApplied} />
-			<PlayerTable header="Rotation" players={rosters?.rotation} positions={data?.positions} canSeeFk={canSeeFk} isItemApplied={isItemApplied} />
-			<PlayerTable header="Shadows" players={rosters?.shadows} positions={data?.positions} canSeeFk={canSeeFk} isItemApplied={isItemApplied} />
+			<PlayerTable header="Lineup" players={rosters?.lineup} positions={data?.positions} isShowSimplified={isShowSimplified} isItemApplied={isItemApplied} />
+			<PlayerTable header="Rotation" players={rosters?.rotation} positions={data?.positions} isShowSimplified={isShowSimplified} isItemApplied={isItemApplied} />
+			<PlayerTable header="Shadows" players={rosters?.shadows} positions={data?.positions} isShowSimplified={isShowSimplified} isItemApplied={isItemApplied} />
         </section>
 	)
 }

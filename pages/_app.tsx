@@ -12,19 +12,19 @@ type AppPropsWithLayout = AppProps & {
 }
 
 export type PageProps = {
-	canSeeFk?: boolean,
 	isDarkMode?: boolean,
 	isItemApplied?: boolean,
-	toggleForbiddenKnowledge?: MouseEventHandler,
+	isShowSimplified?: boolean,
 	toggleItemAdjustments?: MouseEventHandler,
 	toggleLights?: MouseEventHandler,
+	toggleSimpleStats?: MouseEventHandler,
 }
 
 function Astrology({ Component, pageProps }: AppPropsWithLayout) {
 	// Use the layout defined at the page level, if available
 	const getLayout = Component.getLayout ?? ((page) => page)
 
-	const [canSeeFk, setCanSeeFk] = useState<boolean>(checkLocalStorage("canSeeFk", false));
+	const [isShowSimplified, setIsShowSimplified] = useState<boolean>(checkLocalStorage("isShowSimplified", true));
 	//const [canSeeRealStars, setCanSeeRealStars] = useState<boolean>(checkLocalStorage("canSeeRealStars", false));
 	const [isDarkMode, setIsDarkMode] = useState<boolean>(checkLocalStorage("isDarkMode", true));
 	const [isItemApplied, setIsItemApplied] = useState<boolean>(checkLocalStorage("isItemApplied", false));
@@ -36,13 +36,13 @@ function Astrology({ Component, pageProps }: AppPropsWithLayout) {
 			document.documentElement.classList.remove("dark")
 		}
 	})
-	pageProps.canSeeFk = canSeeFk
+	pageProps.isShowSimplified = isShowSimplified
 	//pageProps.canSeeRealStars = canSeeRealStars
 	pageProps.isDarkMode = isDarkMode
 	pageProps.isItemApplied = isItemApplied
-	pageProps.toggleForbiddenKnowledge = () => {
-		setInLocalStorage("setCanSeeFk", !canSeeFk)
-		setCanSeeFk(!canSeeFk)
+	pageProps.toggleSimpleStats = () => {
+		setInLocalStorage("isShowSimplified", !isShowSimplified)
+		setIsShowSimplified(!isShowSimplified)
 	}
 	pageProps.toggleItemAdjustments = () => {
 		setInLocalStorage("isItemApplied", !isItemApplied)

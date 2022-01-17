@@ -158,6 +158,14 @@ export default class PlayerStats {
             + (this.get("thwackability", isItemApplied) as number) * 0.35
             + (this.get("groundFriction", isItemApplied) as number) * 0.06;
     }
+
+    vibes(isItemApplied?: boolean) {
+        return {
+            maximum: this.get("pressurization", isItemApplied),
+            minimum: this.get("cinnamon", isItemApplied),
+            frequency: this.get("buoyancy", isItemApplied),
+        }
+    }
 }
 
 function isValidAttributeId(attribute: string): attribute is AttributeId {

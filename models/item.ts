@@ -23,9 +23,9 @@ export default class Item {
 
     status(): string {
         if(this.durability < 1) {
-            return "unbreakable"
+            return "Unbreakable"
         } else if(this.health < 1) {
-            return "broken"
+            return "Broken"
         } else {
             return this.health + "/" + this.durability
         }
