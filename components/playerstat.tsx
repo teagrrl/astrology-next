@@ -46,7 +46,7 @@ export default function PlayerStat({ player, stat, id, hasColorScale, isStarRati
     }
     if(typeof value === "number") {
         if(hasColorScale) {
-            classNames.push(getClassForValue(isReverse ? (1 - value) : id === "combined" ? value / 4 : value))
+            classNames.push(stats.getScaleClass(statId))
         }
         if(isStarRating) {
             value = Math.round(5000 * value) / 1000
@@ -72,26 +72,4 @@ export default function PlayerStat({ player, stat, id, hasColorScale, isStarRati
     return (
         <td className={classNames.join(" ")} title={title}>{value}</td>
     )
-}
-
-function getClassForValue(value: number) {
-    if(value > 1.45) {
-        return "bg-fuchsia-400/50";
-    } else if(value > 1.15) {
-        return "bg-violet-300/50";
-    } else if(value > 0.95) {
-        return "bg-blue-300/60";
-    } else if(value > 0.85) {
-        return "bg-teal-400/50";
-    } else if(value > 0.65) {
-        return "bg-green-300/60";
-    }  else if(value < 0.15) {
-        return "bg-red-500/60";
-    } else if(value < 0.25) {
-        return "bg-orange-400/60";
-    } else if(value < 0.45) {
-        return "bg-amber-300/60";
-    } else {
-        return "bg-lime-300/50";
-    };
 }

@@ -5,7 +5,6 @@ import TeamLink from './teamlink'
 import { PageProps } from '../pages/_app'
 
 export default function Navigation({ isDarkMode }: PageProps) {
-    console.log(isDarkMode)
     const data = useChroniclerToFetchLeagueData()
     const { special, groups, unknown } = groupTeams(data?.teams || [])
 

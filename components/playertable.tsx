@@ -4,10 +4,10 @@ import Emoji from "./emoji"
 import Link from "next/link"
 import { Fragment } from "react"
 import PlayerStat from "./playerstat"
-import Modification from "./modification"
+import ModificationList from "./modificationlist"
 
 type PlayerTableProps = {
-    header: string,
+    header?: string,
     players: Player[] | undefined,
     positions: Record<string, PlayerPosition> | undefined,
     isShowSimplified?: boolean,
@@ -27,7 +27,7 @@ export default function PlayerTable({ header, players, positions, isShowSimplifi
     }
     return (
         <>
-            <h1 className="my-2 text-center text-2xl font-bold">{header}</h1>
+            {!!header && <h1 className="my-2 text-center text-2xl font-bold">{header}</h1>}
             <div className="overflow-auto">
                 <table className="table-auto">
                     <colgroup span={(isShowSimplified ? columns.sibrmetrics.length : 0) + 7} className="border-r-2 border-black dark:border-white"></colgroup>
@@ -77,25 +77,16 @@ export default function PlayerTable({ header, players, positions, isShowSimplifi
                                 </td>
                                 <td className="px-1.5 py-1 whitespace-nowrap"><PlayerTableTeam id={player.id} positions={positions} /></td>
                                 <td className="px-1.5 py-1 text-center whitespace-nowrap"><PlayerTablePosition id={player.id} positions={positions} /></td>
-                                <td className="px-1.5 py-1 text-center whitespace-nowrap">
+                                <td className="px-1.5 py-1 text-center">
                                     {player.modifications().length > 0 
-                                        ? <>
-                                            {player.data.permAttr?.map((id) => 
-                                                <Modification key={`permanent_${id}`} id={id} duration="permanent" type="player" />
-                                            )}
-                                            {player.data.seasAttr?.map((id) => 
-                                                <Modification key={`season_${id}`} id={id} duration="season" type="player" />
-                                            )}
-                                            {player.data.weekAttr?.map((id) => 
-                                                <Modification key={`week_${id}`} id={id} duration="week" type="player" />
-                                            )}
-                                            {player.data.gameAttr?.map((id) => 
-                                                <Modification key={`game_${id}`} id={id} duration="game" type="player" />
-                                            )}
-                                            {player.data.itemAttr?.map((id) => 
-                                                <Modification key={`item_${id}`} id={id} duration="item" type="player" />
-                                            )}
-                                        </>
+                                        ? <ModificationList 
+                                            type="player" 
+                                            permanent={player.data.permAttr} 
+                                            season={player.data.seasAttr} 
+                                            week={player.data.weekAttr} 
+                                            game={player.data.gameAttr} 
+                                            item={player.data.itemAttr} 
+                                        />
                                         : <>-</>
                                     }
                                 </td>

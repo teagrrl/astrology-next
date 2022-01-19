@@ -1,3 +1,4 @@
+import Tippy from "@tippyjs/react";
 import Emoji from "./emoji";
 
 type ModificationProps = {
@@ -27,21 +28,35 @@ type Modifier = {
 export default function Modification({ id, duration, type }: ModificationProps) {
     const modifier = getModifierById(id);
     if(modifier.emoji) {
-        let title = modifier.title;
+        let description: string | undefined = modifier.title;
         if(type && modifier.descriptions && modifier.descriptions[type]) {
-            title += " - " + modifier.descriptions[type];
+            description = modifier.descriptions[type];
         } else if(modifier.description) {
-            title += " - " + modifier.description;
-        }
-        if(duration) {
-            if(duration === "item") {
-                title += " (Removed when the item is lost or broken)"
-            } else if(duration !== "permanent") {
-                title += " (Removed at the end of the " + duration + ")"
-            }
+            description = modifier.description;
         }
         return (
-            <span title={title}><Emoji emoji={modifier.emoji} emojiClass="inline min-w-[1em] h-4 m-0.5" /></span>
+            <Tippy 
+                className="max-w-sm px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100 transition-all" 
+                content={
+                    <div className="max-w-[200px] p-1">
+                        <span className="font-semibold"><Emoji emoji={modifier.emoji} emojiClass="inline w-4 h-4 mr-0.5 align-[-0.1em]" /> {modifier.title}</span>
+                        {!!description && <p className="text-sm">{description}</p>}
+                        {!!duration && 
+                            <p className="text-xs border-t-[1px] border-white dark:border-black mt-1 pt-1">
+                                {duration[0].toUpperCase() + duration.slice(1)} modifications are 
+                                {duration === "permanent"
+                                    ? " never removed automatically."
+                                    : duration === "item" 
+                                        ? " removed when the item is lost or broken."
+                                        : ` removed at the end of the ${duration}.`
+                                }
+                            </p>
+                        }
+                    </div>
+                }
+            >
+                <span><Emoji emoji={modifier.emoji} emojiClass="inline w-[1em] h-[1em] m-0.5" /></span>
+            </Tippy>
         );
     }
     return <></>

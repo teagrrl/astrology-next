@@ -28,25 +28,26 @@ export default class PlayerStats {
             return !!this.adjustments[key]
         }
         if(isValidCategoryId(key)) {
+            const attributesHasAdjustments = (attributes: string[]) => Object.keys(this.adjustments).filter((attribute) => attributes.includes(attribute) && this.adjustments[attribute] !== 0).length > 0
             switch(key) {
                 case "combined":
                     return this.hasItemAdjustment("baserunning") || this.hasItemAdjustment("batting") || this.hasItemAdjustment("defense") || this.hasItemAdjustment("pitching")
                 case "baserunning":
-                    return Object.keys(this.adjustments).filter((attribute) => ["baseThirst", "laserlikeness", "continuation", "indulgence", "groundFriction"].includes(attribute)).length > 0
+                    return attributesHasAdjustments(["baseThirst", "laserlikeness", "continuation", "indulgence", "groundFriction"])
                 case "batting":
-                    return Object.keys(this.adjustments).filter((attribute) => ["tragicness", "thwackability", "moxie", "divinity", "musclitude", "patheticism", "martyrdom"].includes(attribute)).length > 0
+                    return attributesHasAdjustments(["tragicness", "thwackability", "moxie", "divinity", "musclitude", "patheticism", "martyrdom"])
                 case "defense":
-                    return Object.keys(this.adjustments).filter((attribute) => ["omniscience", "tenaciousness", "watchfulness", "anticapitalism", "chasiness"].includes(attribute)).length > 0
+                    return attributesHasAdjustments(["omniscience", "tenaciousness", "watchfulness", "anticapitalism", "chasiness"])
                 case "pitching":
-                    return Object.keys(this.adjustments).filter((attribute) => ["shakespearianism", "unthwackability", "coldness", "overpowerment", "ruthlessness"].includes(attribute)).length > 0
+                    return attributesHasAdjustments(["shakespearianism", "unthwackability", "coldness", "overpowerment", "ruthlessness"])
                 case "bsrr":
-                    return Object.keys(this.adjustments).filter((attribute) => ["baseThirst", "continuation", "laserlikeness", "indulgence"].includes(attribute)).length > 0
+                    return attributesHasAdjustments(["baseThirst", "continuation", "laserlikeness", "indulgence"])
                 case "erpr":
-                    return Object.keys(this.adjustments).filter((attribute) => [ "unthwackability", "overpowerment", "ruthlessness"].includes(attribute)).length > 0
+                    return attributesHasAdjustments(["unthwackability", "overpowerment", "ruthlessness"])
                 case "slgbr":
-                    return Object.keys(this.adjustments).filter((attribute) => ["thwackability", "divinity", "musclitude", "patheticism", "groundFriction"].includes(attribute)).length > 0
+                    return attributesHasAdjustments(["thwackability", "divinity", "musclitude", "patheticism", "groundFriction"])
                 case "wobabr":
-                    return Object.keys(this.adjustments).filter((attribute) => ["thwackability", "divinity", "moxie", "musclitude", "martyrdom", "patheticism", "groundFriction"].includes(attribute)).length > 0
+                    return attributesHasAdjustments(["thwackability", "divinity", "moxie", "musclitude", "martyrdom", "patheticism", "groundFriction"])
             }
         }
         return false
@@ -60,6 +61,14 @@ export default class PlayerStats {
             return this.getRating(key, isItemApplied)
         }
         return 0;
+    }
+
+    getScaleClass(key: string, isItemApplied?: boolean) {
+        let value = this.get(key, isItemApplied) as number
+        if(key === "combined") {
+            value /= 4
+        }
+        return getColorClassForValue(reverseAttributes.includes(key) ? 1 - value : value)
     }
 
     getRating(key: string, isItemApplied?: boolean) {
@@ -179,7 +188,7 @@ function isValidCategoryId(category: string): category is CategoryId {
 function getItemAdjustments(items: Item[]) {
     return items.reduce((adjustments: Record<string, number>, item) => {
         for(const [attribute, value] of Object.entries(item.adjustments)) {
-            adjustments[attribute] = (adjustments[attribute] ?? 0) + value;
+            adjustments[attribute] = (adjustments[attribute] ?? 0) + (item.isBroken() ? 0 : value);
         }
         return adjustments
     }, {})
@@ -200,4 +209,26 @@ function getAdjustedStats(stats: Record<string, string | number | boolean | stri
         }
     }
     return adjusted
+}
+
+function getColorClassForValue(value: number) {
+    if(value > 1.45) {
+        return "bg-fuchsia-400/50";
+    } else if(value > 1.15) {
+        return "bg-violet-300/50";
+    } else if(value > 0.95) {
+        return "bg-blue-300/60";
+    } else if(value > 0.85) {
+        return "bg-teal-400/50";
+    } else if(value > 0.65) {
+        return "bg-green-300/60";
+    }  else if(value < 0.15) {
+        return "bg-red-500/60";
+    } else if(value < 0.25) {
+        return "bg-orange-400/60";
+    } else if(value < 0.45) {
+        return "bg-amber-300/60";
+    } else {
+        return "bg-lime-300/50";
+    };
 }
