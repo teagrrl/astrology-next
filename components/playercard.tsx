@@ -25,7 +25,7 @@ export function PlayerCard({ player, team, stats }: PlayerCardProps) {
                     <a className="font-semibold" href={`https://blaseball.com/player/${player.id}`}>{player.canonicalName()}</a>
                 </div>
                 <div className="flex flex-row flex-wrap items-center mt-1">
-                    <Emoji emoji={team?.data.emoji || "0x2753"} className="h-7 w-7 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: team?.data.secondaryColor ?? "#aaaaaa" }} emojiClass="w-4 h-4" />
+                    <Emoji emoji={team?.data.emoji ?? "0x2753"} className="h-7 w-7 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: team?.data.secondaryColor ?? "#aaaaaa" }} emojiClass="w-4 h-4" />
                     {team
                         ? <Link href={`/team/${team.slug()}`}><a className="font-semibold">{team.canonicalName()}</a></Link>
                         : <span className="font-semibold">Null Team</span>

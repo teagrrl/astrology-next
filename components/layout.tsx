@@ -8,11 +8,11 @@ type LayoutProps = PageProps & {
     hasFooter?: boolean, 
 }
 
-export default function Layout({ children, hasFooter, isDarkMode, isItemApplied, isShowSimplified, toggleItemAdjustments, toggleLights, toggleSimpleStats } : LayoutProps) {
+export default function Layout({ children, hasFooter, leagueData, isDarkMode, isItemApplied, isShowSimplified, toggleItemAdjustments, toggleLights, toggleSimpleStats } : LayoutProps) {
     return (
         <div className="flex flex-col h-screen w-screen bg-white dark:bg-zinc-900 text-black dark:text-white transition">
             <nav className="p-1">
-                <Navigation isDarkMode={isDarkMode} />
+                <Navigation leagueData={leagueData} isDarkMode={isDarkMode} />
             </nav>
             <main className="flex flex-col grow overflow-hidden">{children}</main>
             {hasFooter && <footer className="flex flex-row flex-wrap justify-end gap-1 p-2">

@@ -1,3 +1,5 @@
+import Player from './player'
+import { reverseAttributes } from './playerstats'
 import { ItemPart, PlayerItem } from './types'
 
 export default class Item {
@@ -26,6 +28,11 @@ export default class Item {
         this.weight = weight
     }
 
+    getScaleClass(key: string) {
+        let value = this.adjustments[key]
+        return getColorClassForValue(reverseAttributes.includes(key) ? -1 * value : value)
+    }
+
     healthRating(): number {
         return this.durability < 0 ? Infinity : (this.health + this.durability / 100)
     }
@@ -42,6 +49,45 @@ export default class Item {
         } else {
             return this.health + "/" + this.durability
         }
+    }
+}
+
+function getComparatorValue(item: Item, owners: number, attribute: string) {
+    if(adjustmentIndices.includes(attribute)) {
+        return item.adjustments[attribute] ?? 0
+    }
+    switch(attribute) {
+        case "durability":
+            return item.healthRating()
+        case "elements":
+            return item.weight
+        case "modifications":
+            return item.mods.length
+        case "name":
+            return item.name
+        case "owners":
+            return owners
+        default:
+            return item.id
+    }
+}
+
+export const ItemComparator = (owners: Record<string, Player[]> | undefined, column: string, direction?: "asc" | "desc") => {
+    return (item1: Item, item2: Item) => {
+        let comparison = 0;
+        let attribute1 = getComparatorValue(item1, owners && owners[item1.id] ? owners[item1.id].length : 0, column)
+        let attribute2 = getComparatorValue(item2, owners && owners[item2.id] ? owners[item2.id].length : 0, column)
+        if(attribute1 !== attribute2) {
+            if (attribute1 > attribute2 || attribute1 === void 0) comparison = 1;
+            if (attribute1 < attribute2 || attribute2 === void 0) comparison = -1;
+        }
+        comparison = attribute1 > attribute2 ? -1 : 1
+        if(reverseAttributes.includes(column) && direction !== "desc") {
+            comparison *= -1
+        } else if(direction === "asc") {
+            comparison *= -1
+        }
+        return comparison
     }
 }
 
@@ -65,7 +111,7 @@ function getAffixProperties(data: PlayerItem) {
         }
     }
     const elementCounts = elements
-        .reduce((count, element: string) => {
+        .reduceRight((count, element: string) => {
                 count.set(element, (count.get(element) ?? 0) + 1)
                 return count
         }, new Map<string, number>())
@@ -128,6 +174,30 @@ function emojiForRoot(root: string) {
         default:
             return "0x2753";
     }
+}
+
+function getColorClassForValue(value: number) {
+    if(value > 1) {
+        return "bg-fuchsia-400/50";
+    } else if(value > 0.8) {
+        return "bg-violet-300/50";
+    } else if(value > 0.6) {
+        return "bg-blue-300/60";
+    } else if(value > 0.4) {
+        return "bg-teal-400/50";
+    } else if(value > 0.2) {
+        return "bg-green-300/50";
+    } else if(value > 0) {
+        return "bg-lime-300/50";
+    }  else if(value < -0.5) {
+        return "bg-red-500/60";
+    } else if(value < -0.25) {
+        return "bg-orange-400/60";
+    } else if(value < 0) {
+        return "bg-amber-300/60";
+    } else {
+        return "";
+    };
 }
 
 const adjustmentIndices = ["tragicness", "buoyancy", "thwackability", "moxie", "divinity", "musclitude", "patheticism", "martyrdom", "cinnamon", "baseThirst", "laserlikeness", "continuation", "indulgence", "groundFriction", "shakespearianism", "suppression", "unthwackability", "coldness", "overpowerment", "ruthlessness", "pressurization", "omniscience", "tenaciousness", "watchfulness", "anticapitalism", "chasiness"]

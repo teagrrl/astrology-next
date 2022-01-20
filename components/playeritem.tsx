@@ -4,7 +4,8 @@ import Item from "../models/item"
 import Player from "../models/player"
 import Team from "../models/team"
 import Emoji from "./emoji"
-import Modification, { getModificationTitleById } from "./modification"
+import { getModificationTitleById } from "./modification"
+import ModificationList from "./modificationlist"
 
 type ItemOwner = {
     player: Player,
@@ -34,7 +35,7 @@ export default function PlayerItem({ item, owners, showDetails, showModEmojis, s
         <div className="flex flex-col">
             {showStats && owners && owners.length > 0 && 
                 <div className="grid grid-cols-3 items-center mb-4 pb-4 border-b-[1px] border-white dark:border-zinc-400">
-                    <div className="text-4xl font-bold">Owner(s)</div>
+                    <div className="text-4xl font-bold">{owners.length > 1 ? "Owners" : "Owner"}</div>
                     <div className="flex flex-col col-span-2">
                         {owners.map((owner) => 
                             <div key={owner.player.id} className="px-4 py-2 even:bg-zinc-200 dark:even:bg-zinc-800">
@@ -88,9 +89,7 @@ export default function PlayerItem({ item, owners, showDetails, showModEmojis, s
                         <span>
                             {item.mods.length > 0 
                                 ? showModEmojis 
-                                    ? item.mods.map((mod) => 
-                                        <Modification key={mod} id={mod} />
-                                    )
+                                    ? <ModificationList type="player" item={item.mods} />
                                     : item.mods.map((mod) => getModificationTitleById(mod)).join(", ")
                                 : "None"
                             }

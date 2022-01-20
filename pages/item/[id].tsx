@@ -2,24 +2,21 @@ import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import Layout from '../../components/layout'
 import PlayerItem from '../../components/playeritem'
-import { useChroniclerToFetchLeagueData } from '../api/chronicler'
 import { PageProps } from '../_app'
 
 type ItemPageProps = PageProps & {
 	
 }
 
-export default function ItemPage({}: ItemPageProps) {
+export default function ItemPage({ leagueData }: ItemPageProps) {
     const router = useRouter()
     const { id } = router.query
-	const data = useChroniclerToFetchLeagueData()
-
     
-	const item = data?.items[id as string]
-    const owners = data?.armory[id as string].map((player) => {
+	const item = leagueData?.items[id as string]
+    const owners = leagueData?.armory[id as string].map((player) => {
         return {
             player: player,
-            team: data?.positions[player.id].team,
+            team: leagueData?.positions[player.id].team,
         }
     })
 	if(!item) {

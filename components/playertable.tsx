@@ -7,11 +7,14 @@ import PlayerStat from "./playerstat"
 import ModificationList from "./modificationlist"
 import Tippy from "@tippyjs/react"
 import PlayerItem from "./playeritem"
+import TableHeader from "./tableheader"
 
 type PlayerTableProps = {
     header?: string,
     players: Player[] | undefined,
     positions: Record<string, PlayerPosition> | undefined,
+    sort?: string,
+    direction?: "asc" | "desc",
     isShowSimplified?: boolean,
     isItemApplied?: boolean,
 }
@@ -21,7 +24,7 @@ type PlayerPositionProps = {
     positions: Record<string, PlayerPosition> | undefined,
 }
 
-export default function PlayerTable({ header, players, positions, isShowSimplified, isItemApplied }: PlayerTableProps) {
+export default function PlayerTable({ header, players, positions, direction, sort, isShowSimplified, isItemApplied }: PlayerTableProps) {
     if(!players || !players.length) {
         return (
             <h1>Loading...</h1>
@@ -40,28 +43,28 @@ export default function PlayerTable({ header, players, positions, isShowSimplifi
                     )}
                     <thead>
                         <tr className="border-b-[1px] border-black dark:border-zinc-500">
-                            <th colSpan={(isShowSimplified ? 0 : columns.sibrmetrics.length) + 7} className="duration-300 hover:bg-zinc-400/20">General</th>
+                            <TableHeader colSpan={(isShowSimplified ? 0 : columns.sibrmetrics.length) + 7}>General</TableHeader>
                             {columns.categories.map((category) =>
                                 isShowSimplified 
-                                    ? category.hasRating && <th key={`header_${category.id}`} className="duration-300 hover:bg-zinc-400/20">{category.name}</th>
-                                    : <th key={`header_${category.id}`} colSpan={category.attributes.length + (category.hasRating ? 1 : 0)} className="hover:bg-zinc-400/20">{category.name}</th>
+                                    ? category.hasRating && <TableHeader key={`header_${category.id}`}>{category.name}</TableHeader>
+                                    : <TableHeader key={`header_${category.id}`} colSpan={category.attributes.length + (category.hasRating ? 1 : 0)}>{category.name}</TableHeader>
                             )}
                         </tr>
                         <tr className="border-b-[1px] border-black dark:border-zinc-500">
-                            <th colSpan={2} className="px-1.5 py-1 text-center duration-300 hover:bg-zinc-400/20" title="Player Name">Name</th>
-                            <th className="px-1.5 py-1 text-center duration-300 hover:bg-zinc-400/20" title="Player Team">Team</th>
-                            <th className="px-1.5 py-1 text-center duration-300 hover:bg-zinc-400/20" title="Player Position">Position</th>
-                            <th className="px-1.5 py-1 text-center duration-300 hover:bg-zinc-400/20" title="Player Modifications">Modifications</th>
-                            <th className="px-1.5 py-1 text-center duration-300 hover:bg-zinc-400/20" title="Player Items" >Items</th>
+                            <TableHeader colSpan={2} title="Player Name">Name</TableHeader>
+                            <TableHeader title="Player Team">Team</TableHeader>
+                            <TableHeader title="Player Position">Position</TableHeader>
+                            <TableHeader title="Player Modifications">Modifications</TableHeader>
+                            <TableHeader title="Player Items">Items</TableHeader>
                             {!isShowSimplified && columns.sibrmetrics.map((sibrmetric) => 
-                                <th key={sibrmetric.id} className="px-1.5 py-1 text-center duration-300 hover:bg-zinc-400/20" title={sibrmetric.name}>{sibrmetric.shorthand}</th>
+                                <TableHeader key={sibrmetric.id} title={sibrmetric.name}>{sibrmetric.shorthand}</TableHeader>
                             )}
-                            <th className="px-1.5 py-1 text-center duration-300 hover:bg-zinc-400/20" title="Combined Stars"><Emoji emoji="0x1F31F" emojiClass="inline w-4 h-4" /></th>
+                            <TableHeader title="Combined Stars"><Emoji emoji="0x1F31F" emojiClass="inline w-4 h-4" /></TableHeader>
                             {columns.categories.map((category) =>
                                 <Fragment key={`subheader_${category.id}`}>
-                                    {category.hasRating && <th className="px-1.5 py-1 text-center duration-300 hover:bg-zinc-400/20" title={`${category.name} Stars`}><Emoji emoji="0x2B50" emojiClass="inline w-4 h-4" /></th>}
+                                    {category.hasRating && <TableHeader title={`${category.name} Stars`}><Emoji emoji="0x2B50" emojiClass="inline w-4 h-4" /></TableHeader>}
                                     {!isShowSimplified && category.attributes.map((attribute) =>
-                                        <th key={`subheader_${attribute.id}`} className="px-1.5 py-1 text-center duration-300 hover:bg-zinc-400/20" title={attribute.name}>{attribute.shorthand}</th>
+                                        <TableHeader key={`subheader_${attribute.id}`} title={attribute.name}>{attribute.shorthand}</TableHeader>
                                     )}
                                 </Fragment>
                             )}

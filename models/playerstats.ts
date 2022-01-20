@@ -2,7 +2,7 @@ import Item from "./item"
 import Player from "./player"
 import { PlayerItem, PlayerState } from "./types"
 
-const reverseAttributes = ["patheticism", "tragicness", "pressurization"]
+export const reverseAttributes = ["name", "patheticism", "tragicness", "pressurization"]
 
 const attributeIds = ["buoyancy", "divinity", "martyrdom", "moxie", "musclitude", "patheticism", "thwackability", "tragicness", "coldness", "overpowerment", "ruthlessness", "shakespearianism", "suppression", "unthwackability", "totalFingers", "baseThirst", "continuation", "groundFriction", "indulgence", "laserlikeness", "anticapitalism", "chasiness", "omniscience", "tenaciousness", "watchfulness", "pressurization", "cinnamon", "deceased", "soul", "fate", "peanutAllergy", "blood", "coffee", "ritual"] as const
 type AttributeTuple = typeof attributeIds

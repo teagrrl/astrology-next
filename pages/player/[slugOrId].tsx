@@ -4,25 +4,23 @@ import Layout from '../../components/layout'
 import { PlayerCard } from '../../components/playercard'
 import { columns } from '../../models/columns'
 import PlayerStats from '../../models/playerstats'
-import { useChroniclerToFetchLeagueData } from '../api/chronicler'
 import { PageProps } from '../_app'
 
 type PlayerPageProps = PageProps & {
 	
 }
 
-export default function PlayerPage({ isItemApplied, isShowSimplified }: PlayerPageProps) {
+export default function PlayerPage({ leagueData }: PlayerPageProps) {
     const router = useRouter()
     const { slugOrId } = router.query
-	const data = useChroniclerToFetchLeagueData()
 
-	const player = data?.players.find((player) => player.id === slugOrId || player.slug() === (slugOrId as string).toLowerCase())
+	const player = leagueData?.players.find((player) => player.id === slugOrId || player.slug() === (slugOrId as string).toLowerCase())
 	if(!player) {
 		return (
 			<h1>Loading...</h1>
 		)
 	}
-    const team = data?.positions[player.id].team
+    const team = leagueData?.positions[player.id].team
     const stats = new PlayerStats(player)
 	
 	return (

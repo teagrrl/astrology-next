@@ -386,7 +386,7 @@ export const groupTeams = (teams: Team[]) => {
     unknownGroup.sort(shorthandComparator)
 
     return {
-        special: [AllPlayers, StatSqueezer, TheHall],
+        special: [AllPlayers, AllTeams, TheArmory, StatSqueezer, TheHall],
         groups: navGroups,
         unknown: unknownGroup,
     }
@@ -421,30 +421,50 @@ function getSpecialTeam(props: SpecialTeamProps) {
 
 export const AllPlayers = getSpecialTeam({
     emoji: "0x26BE",
-    fullName: "All Players",
+    fullName: "The Players",
     id: "players",
     mainColor: "#424242",
     secondaryColor: "#aaaaaa",
     shorthand: "All Players",
     slogan: "We are all love Blaseball.",
-});
+})
+
+export const AllTeams = getSpecialTeam({
+    emoji: "0x1FA78",
+    fullName: "Choose a team to begin",
+    id: "teams",
+    mainColor: "#a97070",
+    secondaryColor: "#a97070",
+    shorthand: "All Teams",
+    slogan: "Pick your favorite.",
+})
+
+export const TheArmory = getSpecialTeam({
+    emoji: "0x2694",
+    fullName: "The Armory & Bargain Bin",
+    id: "items",
+    mainColor: "#dd732e",
+    secondaryColor: "#dd732e",
+    shorthand: "The Armory",
+    slogan: "Remember to stop by the gift shop!",
+})
 
 export const StatSqueezer = getSpecialTeam({
     emoji: "0x1F9EE",
-    fullName: "Stat Squeezer",
+    fullName: "The Stat Squeezer",
     id: "squeezer",
     mainColor: "#885a84",
     secondaryColor: "#da94d4",
-    shorthand: "Squeezer",
-    slogan: "The Stat Squeezer.",
+    shorthand: "Stat Squeezer",
+    slogan: "Freshly squeezed stats.",
 })
 
 export const TheHall = getSpecialTeam({
     emoji: "0x1F3DB",
-    fullName: "Hall of Flame",
+    fullName: "The Hall of Flame",
     id: "tributes",
     mainColor: "#5988ff",
     secondaryColor: "#5988ff",
-    shorthand: "HoF",
+    shorthand: "Hall of Flame",
     slogan: "Pay tribute.",
 })

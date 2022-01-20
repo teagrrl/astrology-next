@@ -1,12 +1,10 @@
-import { useChroniclerToFetchLeagueData } from '../pages/api/chronicler'
 import { groupTeams } from '../models/team'
 import { Fragment } from 'react'
 import TeamLink from './teamlink'
 import { PageProps } from '../pages/_app'
 
-export default function Navigation({ isDarkMode }: PageProps) {
-    const data = useChroniclerToFetchLeagueData()
-    const { special, groups, unknown } = groupTeams(data?.teams || [])
+export default function Navigation({ leagueData, isDarkMode }: PageProps) {
+    const { special, groups, unknown } = groupTeams(leagueData?.teams || [])
 
     return (
 		<ul className="flex flex-row flex-wrap justify-center items-center gap-1">
