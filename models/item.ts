@@ -1,20 +1,33 @@
 import { ItemPart, PlayerItem } from './types'
 
 export default class Item {
+    public readonly adjustments
     public readonly durability: number
+    public readonly elements: string[]
     public readonly emoji: string
     public readonly health: number
     public readonly id: string
+    public readonly mods: string[]
     public readonly name: string
-    public readonly adjustments
+    public readonly type: string
+    public readonly weight: number
 
     constructor(data: PlayerItem) {
         this.id = data.id
         this.name = data.name
         this.health = data.health
         this.durability = data.durability
-        this.emoji = emojiForRoot(data.root.name)
-        this.adjustments = getAdjustments(data)
+        this.type = data.root.name
+        this.emoji = emojiForRoot(this.type)
+        const { adjustments, elements, mods, weight } = getAffixProperties(data)
+        this.adjustments = adjustments
+        this.elements = elements
+        this.mods = mods
+        this.weight = weight
+    }
+
+    healthRating(): number {
+        return this.durability < 0 ? Infinity : (this.health + this.durability / 100)
     }
 
     isBroken(): boolean {
@@ -32,18 +45,36 @@ export default class Item {
     }
 }
 
-function getAdjustments(data: PlayerItem) {
+function getAffixProperties(data: PlayerItem) {
     const adjustments: Record<string, number> = {}
+    const elements: string[] = []
+    const mods: string[] = []
     const affixes = [data.prePrefix, data.postPrefix, data.root, data.suffix].concat(data.prefixes).filter((affix): affix is ItemPart => !!affix)
     for(const affix of affixes) {
+        if(affix.name !== data.root.name) {
+            elements.push(affix.name)
+        }
         for(const adjustment of affix.adjustments) {
+            if(adjustment.type === 0) {
+                mods.push(adjustment.mod)
+            }
             if(adjustment.type === 1) {
                 let statName = adjustmentIndices[adjustment.stat]
                 adjustments[statName] = (adjustments[statName] ?? 0) + adjustment.value;
             }
         }
     }
-    return adjustments;
+    const elementCounts = elements
+        .reduce((count, element: string) => {
+                count.set(element, (count.get(element) ?? 0) + 1)
+                return count
+        }, new Map<string, number>())
+    return {
+        adjustments: adjustments, 
+        elements: Array.from(elementCounts.entries()).map(([element, count]) => element + (count > 1 ? (" x" + count) : "")),
+        mods: mods,
+        weight: elements.length,
+    };
 }
     
 function emojiForRoot(root: string) {

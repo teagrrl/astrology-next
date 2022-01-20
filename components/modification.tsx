@@ -25,6 +25,10 @@ type Modifier = {
     descriptions?: ModifierDescriptions,
 }
 
+export function getModificationTitleById(id: string) {
+    return getModifierById(id).title
+}
+
 export default function Modification({ id, duration, type }: ModificationProps) {
     const modifier = getModifierById(id);
     if(modifier.emoji) {
@@ -36,13 +40,15 @@ export default function Modification({ id, duration, type }: ModificationProps) 
         }
         return (
             <Tippy 
-                className="max-w-sm px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100 transition-all" 
+                className="px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100" 
+                duration={[200, 0]}
+                maxWidth={200}
                 content={
-                    <div className="max-w-[200px] p-1">
+                    <div className="p-1">
                         <span className="font-semibold"><Emoji emoji={modifier.emoji} emojiClass="inline w-4 h-4 mr-0.5 align-[-0.1em]" /> {modifier.title}</span>
                         {!!description && <p className="text-sm">{description}</p>}
                         {!!duration && 
-                            <p className="text-xs border-t-[1px] border-white dark:border-black mt-1 pt-1">
+                            <p className="text-xs border-t-[1px] border-white dark:border-zinc-400 mt-1 pt-1">
                                 {duration[0].toUpperCase() + duration.slice(1)} modifications are 
                                 {duration === "permanent"
                                     ? " never removed automatically."
@@ -55,7 +61,7 @@ export default function Modification({ id, duration, type }: ModificationProps) 
                     </div>
                 }
             >
-                <span><Emoji emoji={modifier.emoji} emojiClass="inline w-[1em] h-[1em] m-0.5" /></span>
+                <span><Emoji emoji={modifier.emoji} className="justify-center" emojiClass="inline w-[1em] h-[1em] m-0.5" /></span>
             </Tippy>
         );
     }

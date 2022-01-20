@@ -1,7 +1,8 @@
 import useSWR from 'swr'
-import Player, { PlayerPosition } from './models/player';
-import Team from './models/team';
-import { BlaseballPlayer, BlaseballTeam, ChroniclerEntities, ChroniclerEntity } from './models/types';
+import Item from '../../models/item';
+import Player, { PlayerPosition } from '../../models/player';
+import Team from '../../models/team';
+import { BlaseballPlayer, BlaseballTeam, ChroniclerEntities, ChroniclerEntity, PlayerItem } from '../../models/types';
 
 export type Roster = {
     lineup: Player[],
@@ -14,6 +15,8 @@ export interface LeagueData {
     positions: Record<string, PlayerPosition>,
     rosters: Record<string, Roster>,
     teams: Team[],
+    items: Record<string, Item>,
+    armory: Record<string, Player[]>,
 }
 
 export const useChroniclerToFetchLeagueData = (): LeagueData | null => {
@@ -25,13 +28,15 @@ export const useChroniclerToFetchLeagueData = (): LeagueData | null => {
 }
 
 export async function leagueFetcher(): Promise<LeagueData> {
-    const [fetchedTeams, fetchedPlayers] = await Promise.all([
+    const [fetchedTeams, fetchedPlayers, fetchedItems] = await Promise.all([
         teamsFetcher(),
         playersFetcher(),
+        itemsFetcher(),
     ]);
 
     const teams = fetchedTeams.map((team) => new Team(team))
     const players = fetchedPlayers.map((player) => new Player(player))
+    const items = Object.fromEntries(fetchedItems.map((item) => [item.entityId, new Item(item.data)]))
 
     const rosters = Object.fromEntries(teams.map((team) => {
         let idToPlayerMapper = (id: string) => players.find((player) => player.id === id);
@@ -64,7 +69,17 @@ export async function leagueFetcher(): Promise<LeagueData> {
         return [player.id, playerPosition]
     }))
 
+    const armory: Record<string, Player[]> = {}
+    for(const id in players) {
+        const player = players[id]
+        for(const item of player.items) {
+            armory[item.id] = (armory[item.id] ?? []).concat(player)
+        }
+    }
+
     return {
+        armory: armory,
+        items: items,
         players: players,
         positions: positions,
         rosters: rosters,
@@ -72,28 +87,16 @@ export async function leagueFetcher(): Promise<LeagueData> {
     };
 }
 
-/*export const useChroniclerToFetchTeams = () => {
-    const { data, error } = useSWR("team", teamsFetcher)
-    if(error) {
-        console.error(error);
-    }
-    return data?.map((entity: ChroniclerEntity<BlaseballTeam>) => new Team(entity)) ?? [];
-}
-
-export const useChroniclerToFetchPlayers = () => {
-    const { data, error } = useSWR("player", playersFetcher)
-    if(error) {
-        console.error(error);
-    }
-    return data?.map((entity: ChroniclerEntity<BlaseballPlayer>) => new Player(entity)) ?? [];
-}*/
-
 async function playersFetcher(): Promise<ChroniclerEntity<BlaseballPlayer>[]> {
     return await pagedFetcher<BlaseballPlayer>("player");
 }
 
 async function teamsFetcher(): Promise<ChroniclerEntity<BlaseballTeam>[]> {
     return await pagedFetcher<BlaseballTeam>("team");
+}
+
+async function itemsFetcher(): Promise<ChroniclerEntity<PlayerItem>[]> {
+    return await pagedFetcher<PlayerItem>("item");
 }
 
 async function pagedFetcher<T>(type : string) : Promise<ChroniclerEntity<T>[]> {

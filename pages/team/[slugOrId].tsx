@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import Emoji from '../../components/emoji'
 import Layout from '../../components/layout'
-import { useChroniclerToFetchLeagueData } from '../../useChronicler'
+import { useChroniclerToFetchLeagueData } from '../api/chronicler'
 import PlayerTable from '../../components/playertable'
 import { PageProps } from '../_app'
 

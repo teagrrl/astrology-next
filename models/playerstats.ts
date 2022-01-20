@@ -6,7 +6,7 @@ const reverseAttributes = ["patheticism", "tragicness", "pressurization"]
 
 const attributeIds = ["buoyancy", "divinity", "martyrdom", "moxie", "musclitude", "patheticism", "thwackability", "tragicness", "coldness", "overpowerment", "ruthlessness", "shakespearianism", "suppression", "unthwackability", "totalFingers", "baseThirst", "continuation", "groundFriction", "indulgence", "laserlikeness", "anticapitalism", "chasiness", "omniscience", "tenaciousness", "watchfulness", "pressurization", "cinnamon", "deceased", "soul", "fate", "peanutAllergy", "blood", "coffee", "ritual"] as const
 type AttributeTuple = typeof attributeIds
-type AttributeId = AttributeTuple[number]
+export type AttributeId = AttributeTuple[number]
 
 const categoryIds = ["combined", "baserunning", "batting", "defense", "pitching", "bsrr", "erpr", "slgbr", "wobabr"] as const
 type CategoryTuple = typeof categoryIds
@@ -221,7 +221,7 @@ function getColorClassForValue(value: number) {
     } else if(value > 0.85) {
         return "bg-teal-400/50";
     } else if(value > 0.65) {
-        return "bg-green-300/60";
+        return "bg-green-300/50";
     }  else if(value < 0.15) {
         return "bg-red-500/60";
     } else if(value < 0.25) {

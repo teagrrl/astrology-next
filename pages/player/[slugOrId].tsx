@@ -4,7 +4,7 @@ import Layout from '../../components/layout'
 import { PlayerCard } from '../../components/playercard'
 import { columns } from '../../models/columns'
 import PlayerStats from '../../models/playerstats'
-import { useChroniclerToFetchLeagueData } from '../../useChronicler'
+import { useChroniclerToFetchLeagueData } from '../api/chronicler'
 import { PageProps } from '../_app'
 
 type PlayerPageProps = PageProps & {

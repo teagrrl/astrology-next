@@ -5,7 +5,8 @@ import PlayerStats from "../models/playerstats"
 import Team from "../models/team"
 import Emoji from "./emoji"
 import ModificationList from "./modificationlist"
-import PlayerCardItem from "./playercarditem"
+import PlayerItem from "./playeritem"
+import PlayerCardItem from "./playeritem"
 import PlayerStars from "./playerstars"
 import PlayerVibes from "./playervibes"
 
@@ -24,7 +25,7 @@ export function PlayerCard({ player, team, stats }: PlayerCardProps) {
                     <a className="font-semibold" href={`https://blaseball.com/player/${player.id}`}>{player.canonicalName()}</a>
                 </div>
                 <div className="flex flex-row flex-wrap items-center mt-1">
-                    <Emoji emoji={team?.data.emoji || "0x2753"} className="h-7 w-7 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: team?.data.secondaryColor }} emojiClass="w-4 h-4" />
+                    <Emoji emoji={team?.data.emoji || "0x2753"} className="h-7 w-7 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: team?.data.secondaryColor ?? "#aaaaaa" }} emojiClass="w-4 h-4" />
                     {team
                         ? <Link href={`/team/${team.slug()}`}><a className="font-semibold">{team.canonicalName()}</a></Link>
                         : <span className="font-semibold">Null Team</span>
@@ -51,10 +52,10 @@ export function PlayerCard({ player, team, stats }: PlayerCardProps) {
             }
             <div>
                 <PlayerStatRow title="Vibes"><PlayerVibes stats={stats} /></PlayerStatRow>
-                <PlayerStatRow title="Batting"><PlayerStars baseRating={stats.battingRating(false)} adjustedRating={stats.battingRating(true)} /></PlayerStatRow>
-                <PlayerStatRow title="Pitching"><PlayerStars baseRating={stats.pitchingRating(false)} adjustedRating={stats.pitchingRating(true)} /></PlayerStatRow>
-                <PlayerStatRow title="Baserunning"><PlayerStars baseRating={stats.baserunningRating(false)} adjustedRating={stats.baserunningRating(true)} /></PlayerStatRow>
-                <PlayerStatRow title="Defense"><PlayerStars baseRating={stats.defenseRating(false)} adjustedRating={stats.defenseRating(true)} /></PlayerStatRow>
+                <PlayerStatRow title="Batting"><PlayerStars baseRating={stats.battingRating(false)} adjustedRating={stats.battingRating(true)} evolution={player.data.evolution} /></PlayerStatRow>
+                <PlayerStatRow title="Pitching"><PlayerStars baseRating={stats.pitchingRating(false)} adjustedRating={stats.pitchingRating(true)} evolution={player.data.evolution} /></PlayerStatRow>
+                <PlayerStatRow title="Baserunning"><PlayerStars baseRating={stats.baserunningRating(false)} adjustedRating={stats.baserunningRating(true)} evolution={player.data.evolution} /></PlayerStatRow>
+                <PlayerStatRow title="Defense"><PlayerStars baseRating={stats.defenseRating(false)} adjustedRating={stats.defenseRating(true)} evolution={player.data.evolution} /></PlayerStatRow>
                 <PlayerStatRow title="Combined Rating">
                     <div title={`${5 * stats.combinedRating(true)} Total Stars`}>
                         <span className="font-semibold">{Math.round(500 * stats.combinedRating(false)) / 100}</span>
@@ -67,7 +68,15 @@ export function PlayerCard({ player, team, stats }: PlayerCardProps) {
                 </PlayerStatRow>
                 <div className="grid grid-cols-2 gap-5 px-5">
                     {Array.from(Array(4).keys()).map((index) => 
-                        <PlayerCardItem key={`${player.id}_item${index}`} item={player.items[index]} isLocked={index > player.data.evolution} />
+                        <div key={`${player.id}_item${index}`} className="flex flex-col justify-center items-center rounded-md px-2 py-4 bg-zinc-200 dark:bg-zinc-800">
+                            {player.items[index]
+                                ? <PlayerItem item={player.items[index]} hasLink={true} />
+                                : <>
+                                    <Emoji emoji={index > player.data.evolution ? "0x1F512" : "0x1F513"} emojiClass="inline w-12 h-12 mb-2" />
+                                    <span className="text-center">{index > player.data.evolution ? "Locked" : "Empty"} Slot</span>
+                                </>
+                            }
+                        </div>
                     )}
                 </div>
                 <PlayerStatRow title="Evolution">

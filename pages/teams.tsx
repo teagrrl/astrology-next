@@ -2,7 +2,7 @@ import type { ReactElement } from 'react'
 import Layout from '../components/layout'
 import TeamLink from '../components/teamlink'
 import { groupTeams } from '../models/team'
-import { useChroniclerToFetchLeagueData } from '../useChronicler'
+import { useChroniclerToFetchLeagueData } from './api/chronicler'
 import { PageProps } from './_app'
 
 export default function TeamsPage({ isDarkMode }: PageProps) {

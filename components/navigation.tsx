@@ -1,4 +1,4 @@
-import { useChroniclerToFetchLeagueData } from '../useChronicler'
+import { useChroniclerToFetchLeagueData } from '../pages/api/chronicler'
 import { groupTeams } from '../models/team'
 import { Fragment } from 'react'
 import TeamLink from './teamlink'

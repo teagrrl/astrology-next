@@ -82,7 +82,8 @@ function VibeTooltip({ x, y, radius, day, vibe }: VibeTooltipProps) {
 
     return (
         <Tippy 
-            className="px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100 transition-all" 
+            className="px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100" 
+            duration={[200, 0]}
             content={
                 <>
                     <span className="font-semibold">Day {day}: </span>

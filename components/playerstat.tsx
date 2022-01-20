@@ -1,5 +1,6 @@
+import Tippy from "@tippyjs/react";
 import Player from "../models/player"
-import PlayerStats from "../models/playerstats";
+import PlayerStats, { AttributeId } from "../models/playerstats";
 import Emoji from "./emoji";
 
 type PlayerStatProps = {
@@ -19,16 +20,14 @@ type StatProps = {
 
 export default function PlayerStat({ player, stat, id, hasColorScale, isStarRating, isItemApplied }: PlayerStatProps) {
     const stats = new PlayerStats(player)
-    const classNames = ["px-1.5", "py-1", "text-center", "whitespace-nowrap"]
-    let statId
+    const classNames = ["whitespace-nowrap"]
+    let statId: AttributeId | undefined
     let statName
-    let isReverse = false
     if(stat) {
-        statId = stat.id
+        statId = stat.id as AttributeId
         statName = stat.name
-        isReverse = stat.direction === "desc"
     } else if(id) {
-        statId = id
+        statId = id as AttributeId
         statName = id[0].toUpperCase() + id.slice(1)
     }
     if(!statId) {
@@ -36,40 +35,81 @@ export default function PlayerStat({ player, stat, id, hasColorScale, isStarRati
     }
 
     const hasItemAdjustment = stats.hasItemAdjustment(statId) && isItemApplied
-    let value 
-    let title
-    value = stats.get(statId, isItemApplied)
+    const itemAdjustments = player.items.map((item) => {
+        return {
+            id: item.id,
+            name: item.name,
+            adjustment: (statId !== undefined ? item.adjustments[statId] : 0) ?? 0,
+        }
+    }).filter((item) => item.adjustment !== 0)
+    let effectiveStat: any = stats.get(statId, isItemApplied)
+    let baseStat = stats.get(statId, false)
+    let starDifference = 0
+    
     if(statId === "peanutAllergy") {
-        title = value ? "Allergic" : "Not Allergic"
-        classNames.push(value ? "bg-red-500/50" : "bg-blue-400/60")
-        value = <Emoji emoji={value ? "0x1F922" : "0x1F60B"} emojiClass="inline w-4 h-4" />
+        classNames.push(effectiveStat ? "bg-red-500/50" : "bg-blue-400/60")
+        effectiveStat = <Emoji emoji={effectiveStat ? "0x1F922" : "0x1F60B"} emojiClass="inline w-4 h-4" />
     }
-    if(typeof value === "number") {
+    if(typeof baseStat === "number" && typeof effectiveStat === "number") {
         if(hasColorScale) {
-            classNames.push(stats.getScaleClass(statId))
+            classNames.push(stats.getScaleClass(statId, isItemApplied))
         }
         if(isStarRating) {
-            value = Math.round(5000 * value) / 1000
+            baseStat *= 5
+            effectiveStat *= 5
+            starDifference = Math.round(1000 * (effectiveStat - baseStat)) / 1000
         }
     }
-    if(!title) {
-        title = statName + ": "
-        if(hasItemAdjustment && typeof value === "number") {
-            let base = stats.get(statId, false) as number
-            if(isStarRating) {
-                base *= 5
-            }
-            let difference = value - base
-            title += (Math.round(1000 * base) / 1000) + (difference > 0 ? " + " : " - ") + Math.abs(Math.round(1000 * difference) / 1000) + (isStarRating ? " Stars" : "")
-            classNames.push("italic")
-        } else {
-            title += value + (isStarRating ? " Stars" : "")
-        }
+    if(hasItemAdjustment) {
+        classNames.push("italic")
     }
-    if(typeof value === "number") {
-        value = Math.round(1000 * value) / 1000
-    }
+    
     return (
-        <td className={classNames.join(" ")} title={title}>{value}</td>
+        <td className={classNames.join(" ")}>
+            <Tippy 
+                className="px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100" 
+                duration={[200, 0]}
+                content={
+                    <div className="flex flex-col justify-center items-center">
+                        <h3 className="font-bold">{player.canonicalName()}</h3>
+                        {
+                            statId === "peanutAllergy" 
+                                ? <div className="font-semibold">{baseStat ? "Allergic" : "Not Allergic"}</div>
+                                : <div className="flex flex-col justify-center items-center ">
+                                    <div>
+                                        <span className="font-semibold">{statName}: </span><span>{isStarRating ? Math.round(1000 * effectiveStat) / 1000 : effectiveStat} {isStarRating ? "Stars" : ""}</span>
+                                    </div>
+                                    {hasItemAdjustment && 
+                                        <div className="flex flex-col justify-center items-center w-full mt-2 pt-2 border-t-[1px] border-white dark:border-zinc-500">
+                                            {isStarRating 
+                                                ? <>
+                                                    <div>
+                                                        <span className="font-semibold">Base: </span>
+                                                        <span>{baseStat}</span>
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-semibold">Items: </span>
+                                                        <span className={starDifference > 0 ? "text-sky-300 dark:text-sky-500" : "text-red-400 dark:text-red-600"}>{starDifference > 0 ? "+" : "-"}{Math.abs(starDifference)}</span>
+                                                    </div>
+                                                </>
+                                                : <>
+                                                    <div>
+                                                        <span className="font-semibold">Base: </span><span>{baseStat}</span>
+                                                    </div>
+                                                    {itemAdjustments.map((item) => 
+                                                        <div key={item.id}><span className="font-semibold">{item.name}: </span><span className={item.adjustment > 0 ? "text-sky-300 dark:text-sky-500" : "text-red-400 dark:text-red-600"}>{item.adjustment > 0 ? "+" : "-"}{Math.abs(Math.round(1000 * item.adjustment) / 1000)}</span></div>
+                                                    )}
+                                                </> 
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                        }
+                    </div>
+                }
+            >
+                <div className="px-1.5 py-1 text-center">{typeof effectiveStat === "number" ? Math.round(1000 * effectiveStat) / 1000 : effectiveStat}</div>
+            </Tippy>
+        </td>
     )
 }
