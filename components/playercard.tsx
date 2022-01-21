@@ -6,7 +6,6 @@ import Team from "../models/team"
 import Emoji from "./emoji"
 import ModificationList from "./modificationlist"
 import PlayerItem from "./playeritem"
-import PlayerCardItem from "./playeritem"
 import PlayerStars from "./playerstars"
 import PlayerVibes from "./playervibes"
 
@@ -27,7 +26,14 @@ export function PlayerCard({ player, team, stats }: PlayerCardProps) {
                 <div className="flex flex-row flex-wrap items-center mt-1">
                     <Emoji emoji={team?.data.emoji ?? "0x2753"} className="h-7 w-7 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: team?.data.secondaryColor ?? "#aaaaaa" }} emojiClass="w-4 h-4" />
                     {team
-                        ? <Link href={`/team/${team.slug()}`}><a className="font-semibold">{team.canonicalName()}</a></Link>
+                        ? <Link href={{
+                            pathname: "/team/[idOrSlug]",
+                            query: {
+                                idOrSlug: team.slug()
+                            }
+                        }}>
+                            <a className="font-semibold">{team.canonicalName()}</a>
+                        </Link>
                         : <span className="font-semibold">Null Team</span>
                     }
                 </div>

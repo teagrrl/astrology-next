@@ -82,6 +82,11 @@ export interface BlaseballTeam {
     bench?: string[];
     bullpen?: string[];
 
+    permAttr?: string[];
+    seasAttr?: string[];
+    weekAttr?: string[];
+    gameAttr?: string[];
+
     stadium: string | null;
 
     state?: TeamState;

@@ -18,7 +18,6 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
 
     const currentPage = page ? parseInt(page.toString()) : 0
     const currentSort = sort ? sort.toString() : undefined
-    console.log(direction && ["asc", "desc"].includes(direction.toString()), currentSort && reverseAttributes.includes(currentSort))
     const currentDirection = direction 
         ? (direction.toString() as "asc" | "desc") 
         : currentSort 
@@ -27,15 +26,65 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
     const allItems = leagueData?.items ? Object.values(leagueData.items) : []
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
     const filteredItems = allItems
-    const sortedItems = currentSort ? filteredItems.sort(ItemComparator(leagueData?.armory, currentSort, currentDirection)) : filteredItems
+    const sortedItems = currentSort ? Array.from(filteredItems).sort(ItemComparator(leagueData?.armory, currentSort, currentDirection)) : filteredItems
     const pageItems = sortedItems.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedItems.length))
     const numPages = Math.ceil(sortedItems.length / pageLimit)
+
+    const sortItems = (newSort: string) => {
+        let newDirection: "asc" | "desc" | null = null;
+        if(newSort === currentSort) {
+            switch(currentDirection) {
+                case "asc":
+                    newDirection = reverseAttributes.includes(newSort) ? "desc" : null
+                    break;
+                case "desc":
+                    newDirection = reverseAttributes.includes(newSort) ? null : "asc"
+                    break;
+            }
+        } else {
+            router.query.sort = newSort
+            newDirection = reverseAttributes.includes(newSort) ? "asc" : "desc"
+        }
+        if(newDirection) {
+            router.push({
+                query: {
+                    sort: newSort,
+                    direction: newDirection,
+                }
+            }, undefined, { shallow: true })
+        } else {
+            router.push({}, undefined, { shallow: true })
+        }
+    }
 	
 	return (
         <section className="overflow-auto">
             <TeamHeader team={TheArmory} />
-            <Pagination basePath={`/items?${currentSort ? `sort=${currentSort}&` : ""}${currentDirection ? `direction=${currentDirection}&` : ""}`} currentPage={currentPage} numPages={numPages} />
-            <ItemTable items={pageItems} armory={leagueData?.armory} positions={leagueData?.positions} sort={currentSort} direction={currentDirection} isShowSimplified={isShowSimplified} />
+            <Pagination href={{
+                pathname: "/items",
+                query: {
+                    sort: currentSort,
+                    direction: currentSort ? currentDirection : undefined,
+                }
+            }} currentPage={currentPage} numPages={numPages} />
+            <div className="overflow-auto">
+                <ItemTable 
+                    items={pageItems} 
+                    armory={leagueData?.armory} 
+                    positions={leagueData?.positions} 
+                    sort={currentSort} 
+                    direction={currentDirection} 
+                    triggerSort={sortItems}
+                    isShowSimplified={isShowSimplified} 
+                />
+            </div>
+            <Pagination href={{
+                pathname: "/items",
+                query: {
+                    sort: currentSort,
+                    direction: currentSort ? currentDirection : undefined,
+                }
+            }} currentPage={currentPage} numPages={numPages} />
         </section>
 	)
 }

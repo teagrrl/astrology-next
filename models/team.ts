@@ -1,4 +1,3 @@
-import Player from "./player";
 import { BlaseballTeam, ChroniclerEntity } from "./types"
 
 type SpecialTeamProps = {
@@ -19,7 +18,7 @@ const groups = [
     },
     {
         id: "beta",
-        name: "ILB",
+        name: "Beta",
         teams: [
             "adc5b394-8f76-416d-9ce9-813706877b84",
             "8d87c468-699a-47a8-b40d-cfb73a5660ad",
@@ -357,6 +356,15 @@ export default class Team {
 
     canonicalNickname() : string {
         return this.data.state?.scattered?.nickname ?? this.data.nickname;
+    }
+
+    modifications() {
+        return [
+            ...(this.data.gameAttr ?? []),
+            ...(this.data.weekAttr ?? []),
+            ...(this.data.seasAttr ?? []),
+            ...(this.data.permAttr ?? []),
+        ]
     }
 
     slug() : string {

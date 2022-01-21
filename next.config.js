@@ -22,6 +22,11 @@ module.exports = {
 				destination: '/items',
 				permanent: true,
 			},
+			{
+				source: '/squeezer',
+				destination: '/squeezer/beta',
+				permanent: true,
+			},
 		]
 	},
 }

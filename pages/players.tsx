@@ -5,6 +5,8 @@ import Layout from '../components/layout'
 import Pagination from '../components/pagination'
 import PlayerTable from '../components/playertable'
 import TeamHeader from '../components/teamheader'
+import { PlayerComparator } from '../models/player'
+import { reverseAttributes } from '../models/playerstats'
 import { AllPlayers } from '../models/team'
 import { PageProps } from './_app'
 
@@ -15,18 +17,72 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
     const { page, sort, direction } = router.query
 
     const currentPage = page ? parseInt(page.toString()) : 0
+    const currentSort = sort ? sort.toString() : undefined
+    const currentDirection = direction 
+        ? (direction.toString() as "asc" | "desc") 
+        : currentSort 
+            ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
+            : "desc"
     const allPlayers = leagueData?.players ?? []
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
     const filteredPlayers = allPlayers
-    const sortedPlayers = filteredPlayers
+    const sortedPlayers = currentSort ? Array.from(filteredPlayers).sort(PlayerComparator(leagueData?.positions, currentSort, currentDirection)) : filteredPlayers
     const pagePlayers = sortedPlayers.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedPlayers.length))
     const numPages = Math.ceil(sortedPlayers.length / pageLimit)
+
+    const sortPlayers = (newSort: string) => {
+        let newDirection: "asc" | "desc" | null = null;
+        if(newSort === currentSort) {
+            switch(currentDirection) {
+                case "asc":
+                    newDirection = reverseAttributes.includes(newSort) ? "desc" : null
+                    break;
+                case "desc":
+                    newDirection = reverseAttributes.includes(newSort) ? null : "asc"
+                    break;
+            }
+        } else {
+            router.query.sort = newSort
+            newDirection = reverseAttributes.includes(newSort) ? "asc" : "desc"
+        }
+        if(newDirection) {
+            router.push({
+                query: {
+                    sort: newSort,
+                    direction: newDirection,
+                }
+            }, undefined, { shallow: true })
+        } else {
+            router.push({}, undefined, { shallow: true })
+        }
+    }
 	
 	return (
         <section className="overflow-auto">
             <TeamHeader team={AllPlayers} />
-            <Pagination basePath="/players?" currentPage={currentPage} numPages={numPages} />
-            <PlayerTable players={pagePlayers} positions={leagueData?.positions} isShowSimplified={isShowSimplified} isItemApplied={isItemApplied} />
+            <Pagination href={{ 
+                pathname: "/players",
+                query: {
+                    sort: currentSort,
+                    direction: currentSort ? currentDirection : undefined,
+                },
+            }} currentPage={currentPage} numPages={numPages} />
+            <PlayerTable 
+                players={pagePlayers} 
+                positions={leagueData?.positions} 
+                sort={currentSort} 
+                direction={currentDirection} 
+                triggerSort={sortPlayers}
+                isShowSimplified={isShowSimplified} 
+                isItemApplied={isItemApplied} 
+            />
+            <Pagination href={{ 
+                pathname: "/players",
+                query: {
+                    sort: currentSort,
+                    direction: currentSort ? currentDirection : undefined,
+                },
+            }} currentPage={currentPage} numPages={numPages} />
         </section>
 	)
 }

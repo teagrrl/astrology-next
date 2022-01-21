@@ -2,13 +2,13 @@ import Item from "./item"
 import Player from "./player"
 import { PlayerItem, PlayerState } from "./types"
 
-export const reverseAttributes = ["name", "patheticism", "tragicness", "pressurization"]
+export const reverseAttributes = ["name", "rank", "team", "patheticism", "tragicness", "pressurization"]
 
-const attributeIds = ["buoyancy", "divinity", "martyrdom", "moxie", "musclitude", "patheticism", "thwackability", "tragicness", "coldness", "overpowerment", "ruthlessness", "shakespearianism", "suppression", "unthwackability", "totalFingers", "baseThirst", "continuation", "groundFriction", "indulgence", "laserlikeness", "anticapitalism", "chasiness", "omniscience", "tenaciousness", "watchfulness", "pressurization", "cinnamon", "deceased", "soul", "fate", "peanutAllergy", "blood", "coffee", "ritual"] as const
+export const attributeIds = ["buoyancy", "divinity", "martyrdom", "moxie", "musclitude", "patheticism", "thwackability", "tragicness", "coldness", "overpowerment", "ruthlessness", "shakespearianism", "suppression", "unthwackability", "totalFingers", "baseThirst", "continuation", "groundFriction", "indulgence", "laserlikeness", "anticapitalism", "chasiness", "omniscience", "tenaciousness", "watchfulness", "pressurization", "cinnamon", "deceased", "soul", "fate", "peanutAllergy", "blood", "coffee", "ritual"] as const
 type AttributeTuple = typeof attributeIds
-export type AttributeId = AttributeTuple[number]
+type AttributeId = AttributeTuple[number]
 
-const categoryIds = ["combined", "baserunning", "batting", "defense", "pitching", "bsrr", "erpr", "slgbr", "wobabr"] as const
+export const categoryIds = ["combined", "baserunning", "batting", "defense", "pitching", "bsrr", "erpr", "slgbr", "wobabr"] as const
 type CategoryTuple = typeof categoryIds
 type CategoryId = CategoryTuple[number]
 
@@ -153,7 +153,7 @@ export default class PlayerStats {
     SLGBR(isItemApplied?: boolean): number {
         return (this.get("divinity", isItemApplied) as number) * 0.25
             + (this.get("musclitude", isItemApplied) as number) * 0.13
-            + (this.get("patheticism", isItemApplied) as number) * 0.11
+            + (1 - (this.get("patheticism", isItemApplied) as number)) * 0.11
             + (this.get("thwackability", isItemApplied) as number) * 0.37
             + (this.get("groundFriction", isItemApplied) as number) * 0.15;
     }
@@ -163,7 +163,7 @@ export default class PlayerStats {
             + (this.get("martyrdom", isItemApplied) as number) * 0.07
             + (this.get("moxie", isItemApplied) as number) * 0.09
             + (this.get("musclitude", isItemApplied) as number) * 0.04
-            + (this.get("patheticism", isItemApplied) as number) * 0.17
+            + (1 - (this.get("patheticism", isItemApplied) as number)) * 0.17
             + (this.get("thwackability", isItemApplied) as number) * 0.35
             + (this.get("groundFriction", isItemApplied) as number) * 0.06;
     }
@@ -211,7 +211,7 @@ function getAdjustedStats(stats: Record<string, string | number | boolean | stri
     return adjusted
 }
 
-function getColorClassForValue(value: number) {
+export function getColorClassForValue(value: number) {
     if(value > 1.45) {
         return "bg-fuchsia-400/50";
     } else if(value > 1.15) {

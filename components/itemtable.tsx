@@ -14,6 +14,7 @@ type ItemTableProps = {
     positions?: Record<string, PlayerPosition> | undefined,
     sort?: string,
     direction?: "asc" | "desc",
+    triggerSort?: Function,
     isShowSimplified?: boolean,
 }
 
@@ -27,7 +28,7 @@ type ItemStatProps = {
     attribute: ColumnAttribute,
 }
 
-export default function ItemTable({ items, armory, positions, direction, sort, isShowSimplified }: ItemTableProps) {
+export default function ItemTable({ items, armory, positions, sort, direction, triggerSort, isShowSimplified }: ItemTableProps) {
     if(!items || !armory || !positions) {
         return (
             <h1>Loading...</h1>
@@ -35,7 +36,7 @@ export default function ItemTable({ items, armory, positions, direction, sort, i
     }
     return (
         <table className="table-auto">
-            <colgroup span={6} className="border-r-2 border-black dark:border-white"></colgroup>
+            <colgroup span={6} className="border-r-2 border-black dark:border-white last-of-type:border-0"></colgroup>
             {!isShowSimplified && columns.categories.map((category) => 
                 category.id !== "misc" && <colgroup key={`colgroup_${category.id}`} span={category.attributes.length} className="border-r-2 border-black dark:border-white last-of-type:border-0"></colgroup>
             )}
@@ -48,15 +49,15 @@ export default function ItemTable({ items, armory, positions, direction, sort, i
                     )}
                 </tr>
                 <tr className="border-b-[1px] border-black dark:border-zinc-500">
-                    <TableHeader colSpan={2} title="Item Name" sort={sort === "name" ? direction : undefined}>Name</TableHeader>
-                    <TableHeader title="Item Owner(s)" sort={sort === "owners" ? direction : undefined}>Owner(s)</TableHeader>
-                    <TableHeader title="Item Durability" sort={sort === "durability" ? direction : undefined}>Durability</TableHeader>
-                    <TableHeader title="Item Modifications" sort={sort === "modifications" ? direction : undefined}>Modifications</TableHeader>
-                    <TableHeader title="Item Elements" sort={sort === "elements" ? direction : undefined}>Elements</TableHeader>
+                    <TableHeader colSpan={2} title="Item Name" sortId="name" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}>Name</TableHeader>
+                    <TableHeader title="Item Owners" sortId="owners" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}>Owners</TableHeader>
+                    <TableHeader title="Item Durability" sortId="durability" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}>Durability</TableHeader>
+                    <TableHeader title="Item Modifications" sortId="modifications" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}>Modifications</TableHeader>
+                    <TableHeader title="Item Elements" sortId="elements" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}>Elements</TableHeader>
                     {!isShowSimplified && columns.categories.map((category) =>
                         category.id !== "misc" && <Fragment key={`subheader_${category.id}`}>
                             {category.attributes.map((attribute) =>
-                                <TableHeader key={`subheader_${attribute.id}`} title={attribute.name} sort={sort === attribute.id ? direction : undefined}>{attribute.shorthand}</TableHeader>
+                                <TableHeader key={`subheader_${attribute.id}`} title={attribute.name} sortId={attribute.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}>{attribute.shorthand}</TableHeader>
                             )}
                         </Fragment>
                     )}
@@ -64,11 +65,16 @@ export default function ItemTable({ items, armory, positions, direction, sort, i
             </thead>
             <tbody>
                 {items.map((item) => 
-                    <tr key={item.id} className="duration-300 hover:bg-zinc-400/20">
+                    <tr key={item.id} className="duration-300 even:bg-zinc-300/20 dark:even:bg-zinc-600/20 hover:bg-zinc-400/20 dark:hover:bg-zinc-400/20">
                         <td>
                             <div className="flex flex-row flex-nowrap items-center px-1.5 py-1">
                                 <Emoji emoji={item.emoji} emojiClass="inline min-w-[1em] h-4 mr-1 align-[-0.1em]" />
-                                <Link href={`/item/${item.id}`}>
+                                <Link href={{
+                                    pathname: "/item/[id]",
+                                    query: {
+                                        id: item.id
+                                    }
+                                }}>
                                     <a className="inline-block max-w-[200px] font-bold whitespace-nowrap overflow-hidden text-ellipsis">
                                         <Tippy 
                                             className="px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100" 
@@ -82,14 +88,19 @@ export default function ItemTable({ items, armory, positions, direction, sort, i
                             </div>
                         </td>
                         <td className="px-1.5 py-1">
-                            <Link href={`https://blaseball.com/item/${item.id}`}><a title={`Go to official item page for ${item.name}`}><Emoji emoji="0x1F517" emojiClass="min-w-[1em] h-4" /></a></Link>
+                            <a href={`https://blaseball.com/item/${item.id}`} title={`Go to official item page for ${item.name}`}><Emoji emoji="0x1F517" emojiClass="min-w-[1em] h-4" /></a>
                         </td>
                         <td className="px-1.5 py-1">
                             <div className="flex flex-col">
                                 {armory[item.id] 
                                     ? armory[item.id].map((player) => 
                                         <span key={`${item.id}_${player.id}`} className="whitespace-nowrap">
-                                            <Link key={player.id} href={`/player/${player.slug()}`}>
+                                            <Link key={player.id} href={{
+                                                pathname: "/player/[idOrSlug]",
+                                                query: {
+                                                    idOrSlug: player.slug()
+                                                }
+                                            }}>
                                                 <a className="font-semibold">
                                                     <Emoji emoji={positions[player.id].team?.data.emoji ?? "0x2753"} emojiClass="inline min-w-[1em] h-4 mr-1 align-[-0.1em]" /> 
                                                     {player.canonicalName()}

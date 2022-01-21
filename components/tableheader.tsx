@@ -1,37 +1,53 @@
 import Tippy from "@tippyjs/react";
 import { ReactNode } from "react";
 
+type SortProps = {
+    id?: string,
+    direction?: "asc" | "desc",
+}
+
 type TableHeaderProps = {
     children: ReactNode,
     colSpan?: number,
     title?: string,
-    sort?: "asc" | "desc",
+    sortId?: string,
+    sortBy?: SortProps,
+    triggerSort?: Function,
 }
 
-export default function TableHeader({ children, colSpan, title, sort }: TableHeaderProps) {
+export default function TableHeader({ children, colSpan, title, sortId, sortBy, triggerSort }: TableHeaderProps) {
+    const isSortHeader = sortBy ? sortId === sortBy.id : false
+
+    function sortItems() {
+        if(triggerSort) {
+            triggerSort(sortId)
+        }
+    }
+
     return (
-        <th colSpan={colSpan} className="duration-300 hover:bg-zinc-400/20">
+        <th colSpan={colSpan} className="duration-300 hover:bg-zinc-400/20" onClick={sortItems}>
             {title
                 ? <Tippy 
                     className="p-2 rounded-md font-semibold text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100"
                     duration={[200, 0]}
-                    content={title}
+                    content={(isSortHeader ? "Sorted by " : "") + title}
                 >
                     <div className="px-1.5 py-1 text-center cursor-default">
                         <span>{children}</span>
-                        {getSortSymbolForDirection(sort)}
+                        {getSortSymbolForDirection(sortId, sortBy)}
                     </div>
                 </Tippy>
                 : <div className="px-1.5 py-1 text-center cursor-default">
                     <span>{children}</span>
-                    {getSortSymbolForDirection(sort)}
+                    {getSortSymbolForDirection(sortId, sortBy)}
                 </div>
             }
         </th>
     )
 }
 
-function getSortSymbolForDirection(direction: "asc" | "desc" | undefined) {
+function getSortSymbolForDirection(sortId?: string, sortBy?: SortProps) {
+    const direction = sortBy && sortId === sortBy.id ? sortBy.direction : undefined
     switch(direction) {
         case "asc":
             return <span className="ml-1">{"\u25B2"}</span>

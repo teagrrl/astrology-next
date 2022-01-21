@@ -40,12 +40,26 @@ export default function PlayerItem({ item, owners, showDetails, showModEmojis, s
                         {owners.map((owner) => 
                             <div key={owner.player.id} className="px-4 py-2 even:bg-zinc-200 dark:even:bg-zinc-800">
                                 <div className="text-2xl">
-                                    <Link href={`/player/${owner.player.slug()}`}><a className="font-semibold">{owner.player.canonicalName()}</a></Link>
+                                    <Link href={{
+                                        pathname: "/player/[idOrSlug]",
+                                        query: {
+                                            idOrSlug: owner.player.slug()
+                                        }
+                                    }}>
+                                        <a className="font-semibold">{owner.player.canonicalName()}</a>
+                                    </Link>
                                 </div>
                                 <div className="flex flex-row flex-wrap items-center mt-1">
                                     <Emoji emoji={owner.team?.data.emoji || "0x2753"} className="h-7 w-7 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: owner.team?.data.secondaryColor ?? "#aaaaaa" }} emojiClass="w-4 h-4" />
                                     {owner.team
-                                        ? <Link href={`/team/${owner.team.slug()}`}><a className="font-semibold">{owner.team.canonicalName()}</a></Link>
+                                        ? <Link href={{
+                                            pathname: "/team/[idOrSlug]",
+                                            query: {
+                                                idOrSlug: owner.team.slug()
+                                            }
+                                        }}>
+                                            <a className="font-semibold">{owner.team.canonicalName()}</a>
+                                        </Link>
                                         : <span className="font-semibold">Null Team</span>
                                     }
                                 </div>
@@ -59,7 +73,12 @@ export default function PlayerItem({ item, owners, showDetails, showModEmojis, s
                     <Emoji emoji={item.emoji} emojiClass="inline w-12 h-12 mb-2" />
                     <span className="text-center font-semibold">
                         {hasLink 
-                            ? <Link href={`/item/${item.id}`}>{item.name}</Link>
+                            ? <Link href={{
+                                pathname: "/item/[id]",
+                                query: {
+                                    id: item.id
+                                }
+                            }}>{item.name}</Link>
                             : <span>{item.name}</span>
                         }
                     </span>

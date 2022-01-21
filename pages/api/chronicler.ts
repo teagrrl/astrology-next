@@ -1,22 +1,31 @@
 import useSWR from 'swr'
 import Item from '../../models/item';
 import Player, { PlayerPosition } from '../../models/player';
+import PlayerStats, { attributeIds, categoryIds } from '../../models/playerstats';
 import Team from '../../models/team';
 import { BlaseballPlayer, BlaseballTeam, ChroniclerEntities, ChroniclerEntity, PlayerItem } from '../../models/types';
 
-export type Roster = {
+type Roster = {
     lineup: Player[],
     rotation: Player[],
     shadows: Player[],
 }
 
+export type Averages = {
+    lineup: Record<string, number>[],
+    rotation: Record<string, number>[],
+    shadows: Record<string, number>[],
+    roster: Record<string, number>[],
+}
+
 export interface LeagueData {
+    armory: Record<string, Player[]>,
+    averages: Record<string, Averages>,
+    items: Record<string, Item>,
     players: Player[],
     positions: Record<string, PlayerPosition>,
     rosters: Record<string, Roster>,
     teams: Team[],
-    items: Record<string, Item>,
-    armory: Record<string, Player[]>,
 }
 
 export const useChroniclerToFetchLeagueData = (): LeagueData | null => {
@@ -66,6 +75,9 @@ export async function leagueFetcher(): Promise<LeagueData> {
         if(playerTeam?.data.shadows?.includes(player.id)) {
             playerPosition.position = "shadows"
         }
+        if(!playerPosition.position && player.modifications().includes("STATIC")) {
+            playerPosition.position = "static"
+        }
         return [player.id, playerPosition]
     }))
 
@@ -77,14 +89,67 @@ export async function leagueFetcher(): Promise<LeagueData> {
         }
     }
 
+    const averages: Record<string, Averages> = {}
+    for(const id in rosters) {
+        averages[id] = {
+            lineup: getPlayerAverages(rosters[id].lineup),
+            rotation: getPlayerAverages(rosters[id].rotation),
+            shadows: getPlayerAverages(rosters[id].shadows),
+            roster: [{}, {}],
+        }
+    }
+    
+    for(const id in averages) {
+        for(const attribute of ["wobabr", "slgbr", "bsrr", "batting", "buoyancy", "divinity", "martyrdom", 
+                "moxie", "musclitude", "patheticism", "thwackability", "tragicness", "baserunning", 
+                "baseThirst", "continuation", "groundFriction", "indulgence", "laserlikeness"]) {
+            averages[id].roster[0][attribute] = averages[id].lineup[0][attribute]
+            averages[id].roster[1][attribute] = averages[id].lineup[1][attribute]
+        }
+        for(const attribute of ["erpr", "pitching", "coldness", "overpowerment", "ruthlessness", 
+                "shakespearianism", "suppression", "unthwackability", "musclitude"]) {
+            averages[id].roster[0][attribute] = averages[id].rotation[0][attribute]
+            averages[id].roster[1][attribute] = averages[id].rotation[1][attribute]
+        }
+        for(const attribute of ["combined", "defense", "anticapitalism", "chasiness", "omniscience", "tenaciousness", 
+                "watchfulness", "suppression", "pressurization", "cinnamon", "soul", "fate", "totalFingers", "peanutAllergy"]) {
+            averages[id].roster[0][attribute] = (averages[id].lineup[0][attribute] + averages[id].rotation[0][attribute]) / 2
+            averages[id].roster[1][attribute] = (averages[id].lineup[1][attribute] + averages[id].rotation[1][attribute]) / 2
+        }
+    }
+
     return {
         armory: armory,
+        averages: averages,
         items: items,
         players: players,
         positions: positions,
         rosters: rosters,
         teams: teams,
     };
+}
+
+function getPlayerAverages(players: Player[]) {
+    const baseAvg: Record<string, number> = {}
+    const itemAvg: Record<string, number> = {}
+    players.map((player) => {
+        const stats = new PlayerStats(player)
+        for(const id of attributeIds) {
+            baseAvg[id] = (baseAvg[id] ?? 0) + (stats.get(id, false) as number ?? 0)
+            itemAvg[id] = (itemAvg[id] ?? 0) + (stats.get(id, true) as number ?? 0)
+        }
+        for(const id of categoryIds) {
+            baseAvg[id] = (baseAvg[id] ?? 0) + (stats.getRating(id, false) ?? 0)
+            itemAvg[id] = (itemAvg[id] ?? 0) + (stats.getRating(id, true) ?? 0)
+        }
+    })
+    for(const id in baseAvg) {
+        baseAvg[id] = baseAvg[id] / players.length
+    }
+    for(const id in itemAvg) {
+        itemAvg[id] = itemAvg[id] / players.length
+    }
+    return [baseAvg, itemAvg]
 }
 
 async function playersFetcher(): Promise<ChroniclerEntity<BlaseballPlayer>[]> {

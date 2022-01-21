@@ -4,13 +4,25 @@ import { ReactNode } from "react";
 
 const { publicRuntimeConfig } = getConfig()
 
+type LinkHrefProps = {
+    pathname: string,
+    query?: Record<string, string | undefined>,
+}
+
 type PaginationProps = {
-    basePath: string,
+    href: LinkHrefProps,
     currentPage: number,
     numPages: number, 
 }
 
-export default function Pagination({ basePath, currentPage, numPages }: PaginationProps) {
+type PaginationLinkProps = {
+    children: ReactNode,
+    href: LinkHrefProps,
+    title?: string,
+    isCurrent?: boolean,
+}
+
+export default function Pagination({ href, currentPage, numPages }: PaginationProps) {
     const paginationPreview = publicRuntimeConfig.paginationPreview ?? 3;
     let previewStart = Math.max(currentPage - paginationPreview, 0);
     let previewEnd = numPages ? Math.min(currentPage + paginationPreview + 1, numPages) : currentPage + paginationPreview;
@@ -24,36 +36,56 @@ export default function Pagination({ basePath, currentPage, numPages }: Paginati
     return (
         <ul className="flex flex-row flex-nowrap justify-center my-2">
             {numPages > paginationPreview * 2 + 1 && previewStart !== 0 && 
-                <PaginationLink href={`${basePath}page=0`} title="Go to the first page">First</PaginationLink>
+                <PaginationLink 
+                    href={appendQueriesToHref(href, { page: "0" })} 
+                    title="Go to the first page"
+                >
+                    First
+                </PaginationLink>
             }
             {currentPage > 0 && 
-                <PaginationLink href={`${basePath}page=${currentPage - 1}`} title="Go to the previous page">Previous</PaginationLink>
+                <PaginationLink 
+                    href={appendQueriesToHref(href, { page: (currentPage - 1).toString() })} 
+                    title="Go to the previous page"
+                >
+                    Previous
+                </PaginationLink>
             }
             {numPages > paginationPreview * 2 + 1 && previewStart !== 0 && 
                 <li className="mx-px px-3 py-1 bg-zinc-200 dark:bg-zinc-600 cursor-default" title={`${previewStart} more pages`}>&hellip;</li>
             }
             {Array.from(Array(previewEnd - previewStart).keys()).map((index) => 
-                <PaginationLink key={`page_${previewStart + index + 1}`} href={`${basePath}page=${previewStart + index}`}  title={`Go to page ${previewStart + index + 1}`} isCurrent={previewStart + index === currentPage}><>{previewStart + index + 1}</></PaginationLink>
+                <PaginationLink 
+                    key={`page_${previewStart + index + 1}`} 
+                    href={appendQueriesToHref(href, { page: (previewStart + index).toString() })} 
+                    title={`Go to page ${previewStart + index + 1}`} 
+                    isCurrent={previewStart + index === currentPage}
+                >
+                    <>{previewStart + index + 1}</>
+                </PaginationLink>
             )}
             {numPages > paginationPreview * 2 + 1 && previewEnd !== numPages && 
                 <li className="mx-px px-3 py-1 bg-zinc-200 dark:bg-zinc-600 cursor-default" title={`${numPages - previewEnd} more pages`}>&hellip;</li>
             }
             {currentPage < numPages - 1 && 
-                <PaginationLink href={`${basePath}page=${currentPage + 1}`} title="Go to the next page">Next</PaginationLink>
+                <PaginationLink 
+                    href={appendQueriesToHref(href, { page: (currentPage + 1).toString() })} 
+                    title="Go to the next page"
+                >
+                    Next
+                </PaginationLink>
             }
             {numPages > paginationPreview * 2 + 1 && previewEnd !== numPages && 
-                <PaginationLink href={`${basePath}page=${numPages - 1}`} title="Go to the last page">Last</PaginationLink>
+                <PaginationLink 
+                    href={appendQueriesToHref(href, { page: (numPages - 1).toString() })} 
+                    title="Go to the last page"
+                >
+                    Last
+                </PaginationLink>
             }
             {/*props.handlePlayerSearch && <li className="player-search"><input type="search" placeholder="Search for a player..." onChange={props.handlePlayerSearch} /></li>*/}
         </ul>
     );
-}
-
-type PaginationLinkProps = {
-    children: ReactNode,
-    href: string,
-    title?: string,
-    isCurrent?: boolean,
 }
 
 function PaginationLink({ children, href, title, isCurrent }: PaginationLinkProps) {
@@ -65,4 +97,24 @@ function PaginationLink({ children, href, title, isCurrent }: PaginationLinkProp
             }
         </li>
     )
+}
+
+function appendQueriesToHref(href: LinkHrefProps, query: Record<string, string | undefined>) {
+    const mergedQueries: Record<string, string> = {}
+    for(const key in href.query) {
+        let value = href.query[key]
+        if(value !== undefined) {
+            mergedQueries[key] = value
+        }
+    }
+    for(const key in query) {
+        let value = query[key]
+        if(value !== undefined) {
+            mergedQueries[key] = value
+        }
+    }
+    return {
+        pathname: href.pathname,
+        query: mergedQueries,
+    }
 }

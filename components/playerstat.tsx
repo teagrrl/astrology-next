@@ -1,6 +1,6 @@
 import Tippy from "@tippyjs/react";
 import Player from "../models/player"
-import PlayerStats, { AttributeId } from "../models/playerstats";
+import PlayerStats from "../models/playerstats";
 import Emoji from "./emoji";
 
 type PlayerStatProps = {
@@ -21,13 +21,13 @@ type StatProps = {
 export default function PlayerStat({ player, stat, id, hasColorScale, isStarRating, isItemApplied }: PlayerStatProps) {
     const stats = new PlayerStats(player)
     const classNames = ["whitespace-nowrap"]
-    let statId: AttributeId | undefined
+    let statId: string | undefined
     let statName
     if(stat) {
-        statId = stat.id as AttributeId
+        statId = stat.id
         statName = stat.name
     } else if(id) {
-        statId = id as AttributeId
+        statId = id
         statName = id[0].toUpperCase() + id.slice(1)
     }
     if(!statId) {

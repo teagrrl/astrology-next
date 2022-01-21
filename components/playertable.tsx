@@ -15,6 +15,7 @@ type PlayerTableProps = {
     positions: Record<string, PlayerPosition> | undefined,
     sort?: string,
     direction?: "asc" | "desc",
+    triggerSort?: Function,
     isShowSimplified?: boolean,
     isItemApplied?: boolean,
 }
@@ -24,11 +25,12 @@ type PlayerPositionProps = {
     positions: Record<string, PlayerPosition> | undefined,
 }
 
-export default function PlayerTable({ header, players, positions, direction, sort, isShowSimplified, isItemApplied }: PlayerTableProps) {
-    if(!players || !players.length) {
-        return (
-            <h1>Loading...</h1>
-        )
+export default function PlayerTable({ header, players, positions, sort, direction, triggerSort, isShowSimplified, isItemApplied }: PlayerTableProps) {
+    if(!players) {
+        return <h1 className="flex justify-center text-xl">Loading...</h1>
+    }
+    if(!players.length) {
+        return <h1 className="flex justify-center text-xl">No players found</h1>
     }
     return (
         <>
@@ -51,20 +53,20 @@ export default function PlayerTable({ header, players, positions, direction, sor
                             )}
                         </tr>
                         <tr className="border-b-[1px] border-black dark:border-zinc-500">
-                            <TableHeader colSpan={2} title="Player Name">Name</TableHeader>
-                            <TableHeader title="Player Team">Team</TableHeader>
-                            <TableHeader title="Player Position">Position</TableHeader>
-                            <TableHeader title="Player Modifications">Modifications</TableHeader>
-                            <TableHeader title="Player Items">Items</TableHeader>
+                            <TableHeader colSpan={2} sortId="name" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title="Player Name">Name</TableHeader>
+                            <TableHeader sortId="team" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title="Player Team">Team</TableHeader>
+                            <TableHeader sortId="position" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title="Player Position">Position</TableHeader>
+                            <TableHeader sortId="modifications" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title="Player Modifications">Modifications</TableHeader>
+                            <TableHeader sortId="items" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title="Player Items">Items</TableHeader>
                             {!isShowSimplified && columns.sibrmetrics.map((sibrmetric) => 
-                                <TableHeader key={sibrmetric.id} title={sibrmetric.name}>{sibrmetric.shorthand}</TableHeader>
+                                <TableHeader key={sibrmetric.id} sortId={sibrmetric.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title={sibrmetric.name}>{sibrmetric.shorthand}</TableHeader>
                             )}
-                            <TableHeader title="Combined Stars"><Emoji emoji="0x1F31F" emojiClass="inline w-4 h-4" /></TableHeader>
+                            <TableHeader sortId="combined" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title="Combined Stars"><Emoji emoji="0x1F31F" emojiClass="inline w-4 h-4" /></TableHeader>
                             {columns.categories.map((category) =>
                                 <Fragment key={`subheader_${category.id}`}>
-                                    {category.hasRating && <TableHeader title={`${category.name} Stars`}><Emoji emoji="0x2B50" emojiClass="inline w-4 h-4" /></TableHeader>}
+                                    {category.hasRating && <TableHeader sortId={category.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title={`${category.name} Stars`}><Emoji emoji="0x2B50" emojiClass="inline w-4 h-4" /></TableHeader>}
                                     {!isShowSimplified && category.attributes.map((attribute) =>
-                                        <TableHeader key={`subheader_${attribute.id}`} title={attribute.name}>{attribute.shorthand}</TableHeader>
+                                        <TableHeader key={`subheader_${attribute.id}`} sortId={attribute.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title={attribute.name}>{attribute.shorthand}</TableHeader>
                                     )}
                                 </Fragment>
                             )}
@@ -75,10 +77,19 @@ export default function PlayerTable({ header, players, positions, direction, sor
                             <tr key={player.id} className="duration-300 hover:bg-zinc-400/20">
                                 <td className="px-1.5 py-1 whitespace-nowrap">
                                     {player.data.deceased && <Emoji emoji="0x1F480" emojiClass="inline min-w-[1em] h-4 mr-1" />}
-                                    <Link href={`/player/${player.slug()}`}><a className="font-bold">{player.canonicalName()}</a></Link>
+                                    <Link href={{
+                                        pathname: "/player/[idOrSlug]",
+                                        query: {
+                                            idOrSlug: player.slug()
+                                        }
+                                    }}>
+                                        <a className="font-bold">{player.canonicalName()}</a>
+                                    </Link>
                                 </td>
                                 <td className="px-1.5 py-1">
-                                    <Link href={`https://blaseball.com/player/${player.id}`}><a title={`Go to official player page for ${player.canonicalName()}`}><Emoji emoji="0x1F517" emojiClass="min-w-[1em] h-4" /></a></Link>
+                                    <a href={`https://blaseball.com/player/${player.id}`} title={`Go to official player page for ${player.canonicalName()}`}>
+                                        <Emoji emoji="0x1F517" emojiClass="min-w-[1em] h-4" />
+                                    </a>
                                 </td>
                                 <td className="px-1.5 py-1 whitespace-nowrap"><PlayerTableTeam id={player.id} positions={positions} /></td>
                                 <td className="px-1.5 py-1 text-center whitespace-nowrap"><PlayerTablePosition id={player.id} positions={positions} /></td>
@@ -106,7 +117,12 @@ export default function PlayerTable({ header, players, positions, direction, sor
                                                     content={<PlayerItem item={item} showDetails={true} />}
                                                 >
                                                     <span>
-                                                        <Link href={`/item/${item.id}`}>
+                                                        <Link href={{
+                                                            pathname: "/item/[id]",
+                                                            query: {
+                                                                id: item.id
+                                                            }
+                                                        }}>
                                                             <a><Emoji emoji={item.isBroken() ? "0x274C" : item.emoji} emojiClass="inline min-w-[1em] h-4 m-0.5" /></a>
                                                         </Link>
                                                     </span>
@@ -142,7 +158,12 @@ function PlayerTableTeam({ id, positions }: PlayerPositionProps) {
         const team = positions[id].team
         if(team) {
             return (
-                <Link href={`/team/${team.slug()}`}>
+                <Link href={{
+                    pathname: "/team/[idOrSlug]",
+                    query: {
+                        idOrSlug: team.slug()
+                    }
+                }}>
                     <a><Emoji emoji={team.data.emoji} emojiClass="inline min-w-[1em] h-4 mr-1" />
                     {team.canonicalNickname()}</a>
                 </Link>

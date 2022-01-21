@@ -1,4 +1,3 @@
-import Link from "next/link"
 import Team from "../models/team"
 import Emoji from "./emoji"
 
@@ -13,7 +12,7 @@ export default function TeamHeader({ team }: TeamHeaderProps) {
             <div>
                 {team.type === "special"
                     ? <div className="text-3xl font-bold">{team.canonicalName()}</div>
-                    : <Link href={`https://blaseball.com/team/${team.id}`}><a className="text-3xl font-bold">{team.canonicalName()}</a></Link>
+                    : <a className="text-3xl font-bold" href={`https://blaseball.com/team/${team.id}`}>{team.canonicalName()}</a>
                 }
                 <div className="text-xl italic before:content-[open-quote] after:content-[close-quote]">{team.data.slogan}</div>
             </div>
