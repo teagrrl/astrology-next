@@ -31,9 +31,9 @@ export default class Player {
         return coffeeStyles[this.data.coffee] ?? "Coffee?";
     }
 
-    modifications() {
+    modifications(isSignificant?: boolean) {
         return [
-            ...(this.data.gameAttr ?? []),
+            ...(isSignificant ? [] : this.data.gameAttr ?? []),
             ...(this.data.weekAttr ?? []),
             ...(this.data.seasAttr ?? []),
             ...(this.data.permAttr ?? []),

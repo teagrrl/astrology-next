@@ -1,7 +1,9 @@
 import getConfig from 'next/config'
 import { useRouter } from 'next/router'
 import type { ReactElement } from 'react'
+import AstrologyError from '../components/error'
 import Layout from '../components/layout'
+import AstrologyLoader from '../components/loader'
 import Pagination from '../components/pagination'
 import PlayerTable from '../components/playertable'
 import TeamHeader from '../components/teamheader'
@@ -23,10 +25,18 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         : currentSort 
             ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
             : "desc"
-    const allPlayers = leagueData?.players ?? []
+
+            
+	if(!leagueData) {
+		return <AstrologyLoader />
+	}
+    if(leagueData.error) {
+        return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
+    }
+    const allPlayers = leagueData.players ?? []
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
     const filteredPlayers = allPlayers
-    const sortedPlayers = currentSort ? Array.from(filteredPlayers).sort(PlayerComparator(leagueData?.positions, currentSort, currentDirection)) : filteredPlayers
+    const sortedPlayers = currentSort ? Array.from(filteredPlayers).sort(PlayerComparator(leagueData.positions, currentSort, currentDirection)) : filteredPlayers
     const pagePlayers = sortedPlayers.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedPlayers.length))
     const numPages = Math.ceil(sortedPlayers.length / pageLimit)
 
@@ -42,7 +52,6 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
                     break;
             }
         } else {
-            router.query.sort = newSort
             newDirection = reverseAttributes.includes(newSort) ? "asc" : "desc"
         }
         if(newDirection) {
@@ -69,7 +78,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
             }} currentPage={currentPage} numPages={numPages} />
             <PlayerTable 
                 players={pagePlayers} 
-                positions={leagueData?.positions} 
+                positions={leagueData.positions} 
                 sort={currentSort} 
                 direction={currentDirection} 
                 triggerSort={sortPlayers}

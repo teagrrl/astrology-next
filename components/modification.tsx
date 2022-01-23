@@ -1,5 +1,5 @@
-import Tippy from "@tippyjs/react";
 import Emoji from "./emoji";
+import Tooltip from "./tooltip";
 
 type ModificationProps = {
     id: string,
@@ -39,9 +39,7 @@ export default function Modification({ id, duration, type }: ModificationProps) 
             description = modifier.description;
         }
         return (
-            <Tippy 
-                className="px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100" 
-                duration={[200, 0]}
+            <Tooltip 
                 maxWidth={200}
                 content={
                     <div className="p-1">
@@ -62,7 +60,7 @@ export default function Modification({ id, duration, type }: ModificationProps) 
                 }
             >
                 <span><Emoji emoji={modifier.emoji} className="justify-center" emojiClass="inline w-[1em] h-[1em] m-0.5" /></span>
-            </Tippy>
+            </Tooltip>
         );
     }
     return <></>

@@ -1,5 +1,5 @@
-import Tippy from "@tippyjs/react";
 import { ReactNode } from "react";
+import Tooltip from "./tooltip";
 
 type SortProps = {
     id?: string,
@@ -27,16 +27,14 @@ export default function TableHeader({ children, colSpan, title, sortId, sortBy, 
     return (
         <th colSpan={colSpan} className="duration-300 hover:bg-zinc-400/20" onClick={sortItems}>
             {title
-                ? <Tippy 
-                    className="p-2 rounded-md font-semibold text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100"
-                    duration={[200, 0]}
+                ? <Tooltip 
                     content={(isSortHeader ? "Sorted by " : "") + title}
                 >
                     <div className="px-1.5 py-1 text-center cursor-default">
                         <span>{children}</span>
                         {getSortSymbolForDirection(sortId, sortBy)}
                     </div>
-                </Tippy>
+                </Tooltip>
                 : <div className="px-1.5 py-1 text-center cursor-default">
                     <span>{children}</span>
                     {getSortSymbolForDirection(sortId, sortBy)}

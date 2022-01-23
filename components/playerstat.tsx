@@ -1,7 +1,7 @@
-import Tippy from "@tippyjs/react";
 import Player from "../models/player"
 import PlayerStats from "../models/playerstats";
 import Emoji from "./emoji";
+import Tooltip from "./tooltip";
 
 type PlayerStatProps = {
     player: Player,
@@ -46,7 +46,18 @@ export default function PlayerStat({ player, stat, id, hasColorScale, isStarRati
     let baseStat = stats.get(statId, false)
     let starDifference = 0
     
-    if(statId === "peanutAllergy") {
+    switch(statId) {
+        case "blood":
+            effectiveStat = player.blood()
+            break;
+        case "coffee":
+            effectiveStat = player.coffee()
+            break;
+    }
+    if(effectiveStat === undefined) {
+        effectiveStat = "N/A"
+    }
+    if(statId === "peanutAllergy" && typeof effectiveStat === "boolean") {
         classNames.push(effectiveStat ? "bg-red-500/50" : "bg-blue-400/60")
         effectiveStat = <Emoji emoji={effectiveStat ? "0x1F922" : "0x1F60B"} emojiClass="inline w-4 h-4" />
     }
@@ -66,14 +77,12 @@ export default function PlayerStat({ player, stat, id, hasColorScale, isStarRati
     
     return (
         <td className={classNames.join(" ")}>
-            <Tippy 
-                className="px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100" 
-                duration={[200, 0]}
+            <Tooltip 
                 content={
                     <div className="flex flex-col justify-center items-center">
                         <h3 className="font-bold">{player.canonicalName()}</h3>
                         {
-                            statId === "peanutAllergy" 
+                            statId === "peanutAllergy" && baseStat !== undefined
                                 ? <div className="font-semibold">{baseStat ? "Allergic" : "Not Allergic"}</div>
                                 : <div className="flex flex-col justify-center items-center ">
                                     <div>
@@ -109,7 +118,7 @@ export default function PlayerStat({ player, stat, id, hasColorScale, isStarRati
                 }
             >
                 <div className="px-1.5 py-1 text-center">{typeof effectiveStat === "number" ? Math.round(1000 * effectiveStat) / 1000 : effectiveStat}</div>
-            </Tippy>
+            </Tooltip>
         </td>
     )
 }

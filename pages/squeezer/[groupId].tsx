@@ -2,7 +2,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import { averageReverseAttributes } from '../../components/averagestat'
+import AstrologyError from '../../components/error'
 import Layout from '../../components/layout'
+import AstrologyLoader from '../../components/loader'
 import SqueezerTable from '../../components/squeezertable'
 import TeamHeader from '../../components/teamheader'
 import Team, { groupTeams, StatSqueezer } from '../../models/team'
@@ -45,7 +47,13 @@ export default function SqueezerPage({ leagueData, isItemApplied, isShowSimplifi
     const router = useRouter()
     const { groupId, sort, direction } = router.query
 
-    const { groups } = groupTeams(leagueData?.teams || [])
+	if(!leagueData) {
+		return <AstrologyLoader />
+	}
+    if(leagueData.error) {
+        return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
+    }
+    const { groups } = groupTeams(leagueData.teams || [])
     const currentSort = sort ? sort.toString() : undefined
     const currentDirection = direction 
         ? (direction.toString() as "asc" | "desc") 
@@ -54,8 +62,8 @@ export default function SqueezerPage({ leagueData, isItemApplied, isShowSimplifi
             : "desc"
     const currentGroup = groups.find((group) => groupId === group.id)
     const filteredTeams = currentGroup?.teams.filter((team) => team.data.lineup.length + team.data.rotation.length > 0) ?? []
-    const groupRanks = getSqueezerRanks(currentGroup?.teams ?? [], leagueData?.averages ?? {}, isItemApplied)
-    const sortedTeams = currentSort ? Array.from(filteredTeams).sort(AverageComparator(leagueData?.averages ?? {}, groupRanks, currentSort, currentDirection, isItemApplied)) : filteredTeams
+    const groupRanks = getSqueezerRanks(currentGroup?.teams ?? [], leagueData.averages ?? {}, isItemApplied)
+    const sortedTeams = currentSort ? Array.from(filteredTeams).sort(AverageComparator(leagueData.averages ?? {}, groupRanks, currentSort, currentDirection, isItemApplied)) : filteredTeams
 
     const sortTeams = (newSort: string) => {
         let newDirection: "asc" | "desc" | null = null;
@@ -69,12 +77,10 @@ export default function SqueezerPage({ leagueData, isItemApplied, isShowSimplifi
                     break;
             }
         } else {
-            router.query.sort = newSort
             newDirection = averageReverseAttributes.includes(newSort) ? "asc" : "desc"
         }
         if(newDirection) {
             router.push({
-                pathname: "[groupId]",
                 query: {
                     groupId: groupId,
                     sort: newSort,
@@ -83,19 +89,18 @@ export default function SqueezerPage({ leagueData, isItemApplied, isShowSimplifi
             }, undefined, { shallow: true })
         } else {
             router.push({
-                pathname: "[groupId]",
                 query: {
                     groupId: groupId,
                 }
             }, undefined, { shallow: true })
         }
     }
-	
+
 	return (
         <section className="overflow-auto">
             <TeamHeader team={StatSqueezer} />
             <ul className="flex flex-row flex-wrap gap-2 justify-center px-4 pb-2">
-                {groups.map((group) =>
+                {groups.map((group) => 
                     <li key={group.id} className="flex">
                         <Link href={{
                             pathname: "[groupId]",
@@ -111,7 +116,7 @@ export default function SqueezerPage({ leagueData, isItemApplied, isShowSimplifi
             {currentGroup && <h1 className="my-2 text-center text-2xl font-bold">{currentGroup.name}</h1>}
             <SqueezerTable 
                 teams={sortedTeams}
-                averages={leagueData?.averages}
+                averages={leagueData.averages}
                 ranks={groupRanks}
                 sort={currentSort} 
                 direction={currentDirection} 

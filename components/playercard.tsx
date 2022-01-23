@@ -20,16 +20,24 @@ export function PlayerCard({ player, team, stats }: PlayerCardProps) {
     return (
         <div className="m-2 overflow-auto text-black dark:text-white border-[1px] border-black dark:border-white ">
             <div className="border-b-[1px] border-black dark:border-white p-5">
-                <div className="text-2xl">
+                <div className="flex flex-row items-center text-2xl">
                     <a className="font-semibold" href={`https://blaseball.com/player/${player.id}`}>{player.canonicalName()}</a>
+                    <Link href={{
+                        pathname: "[slugOrId]/history",
+                        query: {
+                            slugOrId: player.slug()
+                        }
+                    }}>
+                        <a title={`See the history of changes for ${player.canonicalName()}`}><Emoji emoji="0x1F4CA" emojiClass="h-6 h-6 ml-2" /></a>
+                    </Link>
                 </div>
                 <div className="flex flex-row flex-wrap items-center mt-1">
-                    <Emoji emoji={team?.data.emoji ?? "0x2753"} className="h-7 w-7 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: team?.data.secondaryColor ?? "#aaaaaa" }} emojiClass="w-4 h-4" />
+                    <Emoji emoji={team?.data.emoji ?? "0x2753"} className="h-7 w-7 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: team?.data.mainColor ?? "#aaaaaa" }} emojiClass="w-4 h-4" />
                     {team
                         ? <Link href={{
-                            pathname: "/team/[idOrSlug]",
+                            pathname: "/team/[slugOrId]",
                             query: {
-                                idOrSlug: team.slug()
+                                slugOrId: team.slug()
                             }
                         }}>
                             <a className="font-semibold">{team.canonicalName()}</a>

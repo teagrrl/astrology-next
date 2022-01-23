@@ -1,11 +1,10 @@
-import Tippy from "@tippyjs/react";
 import { getColorClassForValue, reverseAttributes } from "../models/playerstats";
-import Team from "../models/team";
+import Tooltip from "./tooltip";
 
 export const averageReverseAttributes = [...reverseAttributes, "peanutAllergy"]
 
 type AverageStatProps = {
-    team: Team,
+    header?: string,
     averages: Record<string, number>[],
     stat?: StatProps,
     id?: string,
@@ -20,7 +19,7 @@ type StatProps = {
     name: string,
 }
 
-export default function AverageStat({ team, averages, stat, id, hasColorScale, isStarRating, isItemApplied }: AverageStatProps) {
+export default function AverageStat({ header, averages, stat, id, hasColorScale, isStarRating, isItemApplied }: AverageStatProps) {
     const stats = averages[isItemApplied? 1 : 0]
     const classNames = ["whitespace-nowrap"]
     let statId: string | undefined
@@ -57,12 +56,10 @@ export default function AverageStat({ team, averages, stat, id, hasColorScale, i
 
     return (
         <td className={classNames.join(" ")}>
-            <Tippy 
-                className="px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100" 
-                duration={[200, 0]}
+            <Tooltip
                 content={
                     <div className="flex flex-col justify-center items-center">
-                        <h3 className="font-bold">{team.canonicalName()}</h3>
+                        {!!header && <h3 className="font-bold">{header}</h3>}
                         <div className="flex flex-col justify-center items-center">
                             {statId === "peanutAllergy"
                                 ? <div>{Math.round(1000000 * effectiveStat) / 10000}% Allergic</div>
@@ -93,7 +90,7 @@ export default function AverageStat({ team, averages, stat, id, hasColorScale, i
                         : typeof effectiveStat === "number" ? Math.round(1000 * effectiveStat) / 1000 : effectiveStat
                     }
                 </div>
-            </Tippy>
+            </Tooltip>
         </td>
     )
 }

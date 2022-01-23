@@ -14,7 +14,32 @@ const groups = [
     {
         id: "gamma10",
         name: "Current Short Circuit",
-        teams: [],
+        teams: [
+            "4ac1b94f-a3f6-4650-ade9-1fd8ced20e18",
+            "e09e5d91-dd07-4551-abb8-e527f59361a8",
+            "af191af8-f0c1-4aac-9fb5-aed18f39a126",
+            "51acdb7f-7cb9-44a0-8045-28c0d4b93c97",
+            "2447e81d-aa1f-4085-a236-a332dc6cc852",
+            "db2dee1e-9f7c-4b08-a30d-3d31286122df",
+            "43a27ded-3229-49b5-9e44-2213d946588e",
+            "47eab5f7-f0bc-4c8a-8064-adcae710c8e4",
+            "2f90c5e3-21fe-4842-b89a-c00c14bc4d5a",
+            "266c8526-9961-4679-883a-6f14b40b1fc3",
+            "7e89ab0c-e63e-44e2-8c9d-689ad30cc5b3",
+            "5ca18590-fa0e-4d48-ba83-499807627175",
+            "fa3b11e7-5321-485f-bdbd-355af10cce11",
+            "8300554b-15cc-467f-bfa5-28e02024d59f",
+            "537cf346-533e-4f8d-92e6-54a43b285e18",
+            "ffd22be8-35a9-4424-95ea-4287798fa9f9",
+            "b9e5f7df-1455-44b0-a659-65fa96bee48e",
+            "d5ba891d-5c45-4580-bbbc-9df0a98828e8",
+            "232bce91-2309-428e-94e1-b8db04ac21dc",
+            "c151c964-3d5c-41b6-8416-2a97f913742e",
+            "4ad4b645-80eb-4375-80cd-6ab227c5894b",
+            "5cd141a6-3885-47f1-9e76-3ac108e51578",
+            "745ff28d-c557-4862-8f66-9775de881b67",
+            "2036a676-afd7-4693-91e0-d1839f23089a",
+        ],
     },
     {
         id: "beta",
@@ -390,13 +415,13 @@ export const groupTeams = (teams: Team[]) => {
             }
         })
         .filter((group) => group.teams.length)
-    const unknownGroup = teams.filter((team) => team.type === "unknown")
-    unknownGroup.sort(shorthandComparator)
+    const ungroupedTeams = teams.filter((team) => team.type === "unknown")
+    ungroupedTeams.sort(shorthandComparator)
 
     return {
-        special: [AllPlayers, AllTeams, TheArmory, StatSqueezer, TheHall],
+        special: [AllPlayers, AllTeams, TheArmory, StatSqueezer, /*TheHall,*/],
         groups: navGroups,
-        unknown: unknownGroup,
+        ungrouped: ungroupedTeams,
     }
 }
 
@@ -441,8 +466,8 @@ export const AllTeams = getSpecialTeam({
     emoji: "0x1FA78",
     fullName: "Choose a team to begin",
     id: "teams",
-    mainColor: "#a97070",
-    secondaryColor: "#a97070",
+    mainColor: "#8f3232",
+    secondaryColor: "#c58585",
     shorthand: "All Teams",
     slogan: "Pick your favorite.",
 })
@@ -451,8 +476,8 @@ export const TheArmory = getSpecialTeam({
     emoji: "0x2694",
     fullName: "The Armory & Bargain Bin",
     id: "items",
-    mainColor: "#dd732e",
-    secondaryColor: "#dd732e",
+    mainColor: "#e9e837",
+    secondaryColor: "#ede47b",
     shorthand: "The Armory",
     slogan: "Remember to stop by the gift shop!",
 })

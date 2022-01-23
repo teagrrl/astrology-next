@@ -41,21 +41,21 @@ export default function PlayerItem({ item, owners, showDetails, showModEmojis, s
                             <div key={owner.player.id} className="px-4 py-2 even:bg-zinc-200 dark:even:bg-zinc-800">
                                 <div className="text-2xl">
                                     <Link href={{
-                                        pathname: "/player/[idOrSlug]",
+                                        pathname: "/player/[slugOrId]",
                                         query: {
-                                            idOrSlug: owner.player.slug()
+                                            slugOrId: owner.player.slug()
                                         }
                                     }}>
                                         <a className="font-semibold">{owner.player.canonicalName()}</a>
                                     </Link>
                                 </div>
                                 <div className="flex flex-row flex-wrap items-center mt-1">
-                                    <Emoji emoji={owner.team?.data.emoji || "0x2753"} className="h-7 w-7 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: owner.team?.data.secondaryColor ?? "#aaaaaa" }} emojiClass="w-4 h-4" />
+                                    <Emoji emoji={owner.team?.data.emoji || "0x2753"} className="h-7 w-7 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: owner.team?.data.mainColor ?? "#aaaaaa" }} emojiClass="w-4 h-4" />
                                     {owner.team
                                         ? <Link href={{
-                                            pathname: "/team/[idOrSlug]",
+                                            pathname: "/team/[slugOrId]",
                                             query: {
-                                                idOrSlug: owner.team.slug()
+                                                slugOrId: owner.team.slug()
                                             }
                                         }}>
                                             <a className="font-semibold">{owner.team.canonicalName()}</a>
@@ -69,7 +69,7 @@ export default function PlayerItem({ item, owners, showDetails, showModEmojis, s
                 </div>
             }
             <div className="flex flex-row justify-center">
-                <div className="flex flex-col justify-center items-center">
+                <div className="flex flex-col grow justify-center items-center">
                     <Emoji emoji={item.emoji} emojiClass="inline w-12 h-12 mb-2" />
                     <span className="text-center font-semibold">
                         {hasLink 
@@ -99,11 +99,11 @@ export default function PlayerItem({ item, owners, showDetails, showModEmojis, s
                     </span>
                 </div>
                 {showDetails && 
-                    <div className="grid grid-cols-2 gap-2 ml-2.5 pl-2.5 border-l-[1px] border-white dark:border-zinc-400">
+                    <div className="grid grid-cols-2 grow gap-2 ml-2.5 pl-2.5 border-l-[1px] border-white dark:border-zinc-400">
                         <span className="font-semibold">Type</span>
                         <span>{item.type}</span>
                         <span className="font-semibold">Elements</span>
-                        <span>{item.elements.join(", ") ?? "None"}</span>
+                        <span>{item.elements.length > 0 ? item.elements.join(", ") : "None"}</span>
                         <span className="font-semibold">Mods</span>
                         <span>
                             {item.mods.length > 0 

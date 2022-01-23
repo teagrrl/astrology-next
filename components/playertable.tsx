@@ -5,14 +5,16 @@ import Link from "next/link"
 import { Fragment } from "react"
 import PlayerStat from "./playerstat"
 import ModificationList from "./modificationlist"
-import Tippy from "@tippyjs/react"
-import PlayerItem from "./playeritem"
 import TableHeader from "./tableheader"
+import AstrologyLoader from "./loader"
+import AverageStat from "./averagestat"
+import PlayerTableItems from "./playertableitems"
 
 type PlayerTableProps = {
     header?: string,
-    players: Player[] | undefined,
-    positions: Record<string, PlayerPosition> | undefined,
+    players: Player[],
+    positions?: Record<string, PlayerPosition>,
+    averages?: Record<string, number>[],
     sort?: string,
     direction?: "asc" | "desc",
     triggerSort?: Function,
@@ -25,12 +27,12 @@ type PlayerPositionProps = {
     positions: Record<string, PlayerPosition> | undefined,
 }
 
-export default function PlayerTable({ header, players, positions, sort, direction, triggerSort, isShowSimplified, isItemApplied }: PlayerTableProps) {
+export default function PlayerTable({ header, players, positions, averages, sort, direction, triggerSort, isShowSimplified, isItemApplied }: PlayerTableProps) {
     if(!players) {
-        return <h1 className="flex justify-center text-xl">Loading...</h1>
+        return <AstrologyLoader />
     }
     if(!players.length) {
-        return <h1 className="flex justify-center text-xl">No players found</h1>
+        return <></>
     }
     return (
         <>
@@ -78,18 +80,28 @@ export default function PlayerTable({ header, players, positions, sort, directio
                                 <td className="px-1.5 py-1 whitespace-nowrap">
                                     {player.data.deceased && <Emoji emoji="0x1F480" emojiClass="inline min-w-[1em] h-4 mr-1" />}
                                     <Link href={{
-                                        pathname: "/player/[idOrSlug]",
+                                        pathname: "/player/[slugOrId]",
                                         query: {
-                                            idOrSlug: player.slug()
+                                            slugOrId: player.slug()
                                         }
                                     }}>
                                         <a className="font-bold">{player.canonicalName()}</a>
                                     </Link>
                                 </td>
                                 <td className="px-1.5 py-1">
-                                    <a href={`https://blaseball.com/player/${player.id}`} title={`Go to official player page for ${player.canonicalName()}`}>
-                                        <Emoji emoji="0x1F517" emojiClass="min-w-[1em] h-4" />
-                                    </a>
+                                    <div className="flex flex-row">
+                                        <Link href={{
+                                            pathname: "/player/[slugOrId]/history",
+                                            query: {
+                                                slugOrId: player.slug()
+                                            }
+                                        }}>
+                                            <a title={`See the history of changes for ${player.canonicalName()}`}><Emoji emoji="0x1F4CA" emojiClass="min-w-[1em] h-4 m-0.5" /></a>
+                                        </Link>
+                                        <a href={`https://blaseball.com/player/${player.id}`} title={`Go to official player page for ${player.canonicalName()}`}>
+                                            <Emoji emoji="0x1F517" emojiClass="min-w-[1em] h-4 m-0.5" />
+                                        </a>
+                                    </div>
                                 </td>
                                 <td className="px-1.5 py-1 whitespace-nowrap"><PlayerTableTeam id={player.id} positions={positions} /></td>
                                 <td className="px-1.5 py-1 text-center whitespace-nowrap"><PlayerTablePosition id={player.id} positions={positions} /></td>
@@ -107,30 +119,7 @@ export default function PlayerTable({ header, players, positions, sort, directio
                                     }
                                 </td>
                                 <td className="px-1.5 py-1 text-center whitespace-nowrap">
-                                    {player.items.length > 0 
-                                        ? <>
-                                            {player.items.map((item) => 
-                                                <Tippy 
-                                                    key={item.id}
-                                                    className="p-2 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100"
-                                                    duration={[200, 0]}
-                                                    content={<PlayerItem item={item} showDetails={true} />}
-                                                >
-                                                    <span>
-                                                        <Link href={{
-                                                            pathname: "/item/[id]",
-                                                            query: {
-                                                                id: item.id
-                                                            }
-                                                        }}>
-                                                            <a><Emoji emoji={item.isBroken() ? "0x274C" : item.emoji} emojiClass="inline min-w-[1em] h-4 m-0.5" /></a>
-                                                        </Link>
-                                                    </span>
-                                                </Tippy>
-                                            )}
-                                        </>
-                                        : <>-</>
-                                    }
+                                    <PlayerTableItems items={player.items} />
                                 </td>
                                 {!isShowSimplified && columns.sibrmetrics.map((sibrmetric) =>
                                     <PlayerStat key={`${player.id}_${sibrmetric.id}`} player={player} stat={sibrmetric} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
@@ -146,6 +135,21 @@ export default function PlayerTable({ header, players, positions, sort, directio
                                 )}
                             </tr>
                         )}
+                        {players.length > 1 && averages && <tr className="duration-300 border-t-2 border-black dark:border-zinc-500 hover:bg-zinc-400/20">      
+                            <td colSpan={6} className="px-1.5 py-1 font-bold">{header} Average</td>
+                            {!isShowSimplified && columns.sibrmetrics.map((sibrmetric) =>
+                                <AverageStat key={`average_${sibrmetric.id}`} averages={averages} stat={sibrmetric} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
+                            )}
+                            <AverageStat averages={averages} id="combined" hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
+                            {columns.categories.map((category) =>
+                                <Fragment key={`average_${category.id}`}>
+                                    {category.hasRating && <AverageStat averages={averages} stat={category} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />}
+                                    {!isShowSimplified && category.attributes.map((attribute) => 
+                                        <AverageStat key={`average_${attribute.id}`} averages={averages} stat={attribute} hasColorScale={attribute.id === "peanutAllergy" || category.id !== "misc"} isItemApplied={isItemApplied} />
+                                    )}
+                                </Fragment>
+                            )}
+                        </tr>}
                     </tbody>
                 </table>
             </div>
@@ -159,9 +163,9 @@ function PlayerTableTeam({ id, positions }: PlayerPositionProps) {
         if(team) {
             return (
                 <Link href={{
-                    pathname: "/team/[idOrSlug]",
+                    pathname: "/team/[slugOrId]",
                     query: {
-                        idOrSlug: team.slug()
+                        slugOrId: team.slug()
                     }
                 }}>
                     <a><Emoji emoji={team.data.emoji} emojiClass="inline min-w-[1em] h-4 mr-1" />

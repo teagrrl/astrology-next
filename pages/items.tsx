@@ -1,8 +1,10 @@
 import getConfig from 'next/config'
 import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
+import AstrologyError from '../components/error'
 import ItemTable from '../components/itemtable'
 import Layout from '../components/layout'
+import AstrologyLoader from '../components/loader'
 import Pagination from '../components/pagination'
 import TeamHeader from '../components/teamheader'
 import { ItemComparator } from '../models/item'
@@ -23,10 +25,17 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
         : currentSort 
             ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
             : "desc"
-    const allItems = leagueData?.items ? Object.values(leagueData.items) : []
+            
+	if(!leagueData) {
+		return <AstrologyLoader />
+	}
+    if(leagueData.error) {
+        return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
+    }
+    const allItems = leagueData.items ? Object.values(leagueData.items) : []
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
     const filteredItems = allItems
-    const sortedItems = currentSort ? Array.from(filteredItems).sort(ItemComparator(leagueData?.armory, currentSort, currentDirection)) : filteredItems
+    const sortedItems = currentSort ? Array.from(filteredItems).sort(ItemComparator(leagueData.armory, currentSort, currentDirection)) : filteredItems
     const pageItems = sortedItems.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedItems.length))
     const numPages = Math.ceil(sortedItems.length / pageLimit)
 
@@ -42,7 +51,6 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
                     break;
             }
         } else {
-            router.query.sort = newSort
             newDirection = reverseAttributes.includes(newSort) ? "asc" : "desc"
         }
         if(newDirection) {
@@ -70,8 +78,8 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
             <div className="overflow-auto">
                 <ItemTable 
                     items={pageItems} 
-                    armory={leagueData?.armory} 
-                    positions={leagueData?.positions} 
+                    armory={leagueData.armory} 
+                    positions={leagueData.positions} 
                     sort={currentSort} 
                     direction={currentDirection} 
                     triggerSort={sortItems}

@@ -7,7 +7,7 @@ type IndexProps = PageProps & {
 
 }
 
-export default function IndexPage(props?: IndexProps) {
+export default function IndexPage({}: IndexProps) {
 	return (
 		<section className="flex flex-col grow justify-center text-center">
 			<h1 className="text-8xl font-bold mb-4">Astrology</h1>

@@ -6,7 +6,7 @@ export const reverseAttributes = ["name", "rank", "team", "patheticism", "tragic
 
 export const attributeIds = ["buoyancy", "divinity", "martyrdom", "moxie", "musclitude", "patheticism", "thwackability", "tragicness", "coldness", "overpowerment", "ruthlessness", "shakespearianism", "suppression", "unthwackability", "totalFingers", "baseThirst", "continuation", "groundFriction", "indulgence", "laserlikeness", "anticapitalism", "chasiness", "omniscience", "tenaciousness", "watchfulness", "pressurization", "cinnamon", "deceased", "soul", "fate", "peanutAllergy", "blood", "coffee", "ritual"] as const
 type AttributeTuple = typeof attributeIds
-type AttributeId = AttributeTuple[number]
+export type AttributeId = AttributeTuple[number]
 
 export const categoryIds = ["combined", "baserunning", "batting", "defense", "pitching", "bsrr", "erpr", "slgbr", "wobabr"] as const
 type CategoryTuple = typeof categoryIds

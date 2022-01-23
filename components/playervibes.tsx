@@ -1,5 +1,5 @@
-import Tippy from "@tippyjs/react"
 import PlayerStats from "../models/playerstats"
+import Tooltip from "./tooltip"
 
 type PlayerVibesProps = {
     stats: PlayerStats,
@@ -81,9 +81,7 @@ function VibeTooltip({ x, y, radius, day, vibe }: VibeTooltipProps) {
     }
 
     return (
-        <Tippy 
-            className="px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100" 
-            duration={[200, 0]}
+        <Tooltip 
             content={
                 <>
                     <span className="font-semibold">Day {day}: </span>
@@ -92,6 +90,6 @@ function VibeTooltip({ x, y, radius, day, vibe }: VibeTooltipProps) {
             }
         >
             <circle className={`cursor-pointer fill-neutral-900 dark:fill-neutral-100 stroke-[4] stroke-transparent hover:stroke-neutral-100/50 transition`} cx={x} cy={y} r={radius} />
-        </Tippy>
+        </Tooltip>
     )
 }

@@ -106,10 +106,11 @@ export interface ChroniclerEntities<T> {
 }
 
 export interface ChroniclerEntity<T> {
+    data: T;
     entityId: string;
+    hash: string;
     validFrom: string;
     validTo: string | null;
-    data: T;
 }
 
 export interface ChroniclerPlayer {

@@ -1,10 +1,12 @@
 import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
-import Layout from '../../components/layout'
-import { PlayerCard } from '../../components/playercard'
-import { columns } from '../../models/columns'
-import PlayerStats from '../../models/playerstats'
-import { PageProps } from '../_app'
+import AstrologyError from '../../../components/error'
+import Layout from '../../../components/layout'
+import AstrologyLoader from '../../../components/loader'
+import { PlayerCard } from '../../../components/playercard'
+import { columns } from '../../../models/columns'
+import PlayerStats from '../../../models/playerstats'
+import { PageProps } from '../../_app'
 
 type PlayerPageProps = PageProps & {
 	
@@ -14,13 +16,19 @@ export default function PlayerPage({ leagueData }: PlayerPageProps) {
     const router = useRouter()
     const { slugOrId } = router.query
 
-	const player = leagueData?.players.find((player) => player.id === slugOrId || player.slug() === (slugOrId as string).toLowerCase())
+	if(!leagueData) {
+		return <AstrologyLoader />
+	}
+    if(leagueData.error) {
+        return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
+    }
+	const player = leagueData.players.find((player) => player.id === slugOrId || player.slug() === (slugOrId as string).toLowerCase())
 	if(!player) {
 		return (
-			<h1>Loading...</h1>
+			<AstrologyError code={404} message="Astrology was unable to find data about any such player" />
 		)
 	}
-    const team = leagueData?.positions[player.id].team
+    const team = leagueData.positions[player.id].team
     const stats = new PlayerStats(player)
 	
 	return (

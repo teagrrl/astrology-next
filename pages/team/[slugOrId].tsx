@@ -6,6 +6,8 @@ import { PageProps } from '../_app'
 import TeamHeader from '../../components/teamheader'
 import { reverseAttributes } from '../../models/playerstats'
 import { PlayerComparator } from '../../models/player'
+import AstrologyLoader from '../../components/loader'
+import AstrologyError from '../../components/error'
 
 type TeamPageProps = PageProps & {
 	
@@ -15,11 +17,15 @@ export default function TeamPage({ leagueData, isItemApplied, isShowSimplified }
     const router = useRouter()
     const { slugOrId, sort, direction } = router.query
 
-	const team = leagueData?.teams.find((team) => team.id === slugOrId || team.slug() === (slugOrId as string).toLowerCase())
+	if(!leagueData) {
+		return <AstrologyLoader />
+	}
+    if(leagueData.error) {
+        return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
+    }
+	const team = leagueData.teams.find((team) => team.id === slugOrId || team.slug() === (slugOrId as string).toLowerCase())
 	if(!team) {
-		return (
-			<h1>Loading...</h1>
-		)
+		return <AstrologyError code={404} message="Astrology was unable to find data about any such team" />
 	}
     const currentSort = sort ? sort.toString() : undefined
     const currentDirection = direction 
@@ -27,20 +33,27 @@ export default function TeamPage({ leagueData, isItemApplied, isShowSimplified }
         : currentSort 
             ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
             : "desc"
-	const rosters = leagueData?.rosters[team.id]
-	const comparator = currentSort ? PlayerComparator(leagueData?.positions, currentSort, currentDirection) : undefined
+	const rosters = leagueData.rosters[team.id]
+	const averages = leagueData.averages[team.id]
+	const comparator = currentSort ? PlayerComparator(leagueData.positions, currentSort, currentDirection) : undefined
 	const sortedRosters = [
 		{
+			id: "lineup",
 			header: "Lineup",
-			players: comparator ? Array.from(rosters?.lineup ?? []).sort(comparator) : rosters?.lineup
+			players: comparator ? Array.from(rosters?.lineup ?? []).sort(comparator) : rosters?.lineup,
+			averages: averages.lineup,
 		},
 		{
+			id: "rotation",
 			header: "Rotation",
-			players: comparator ? Array.from(rosters?.rotation ?? []).sort(comparator) : rosters?.rotation
+			players: comparator ? Array.from(rosters?.rotation ?? []).sort(comparator) : rosters?.rotation,
+			averages: averages.rotation,
 		},
 		{
+			id: "shadows",
 			header: "Shadows",
-			players: comparator ? Array.from(rosters?.shadows ?? []).sort(comparator) : rosters?.shadows
+			players: comparator ? Array.from(rosters?.shadows ?? []).sort(comparator) : rosters?.shadows,
+			averages: averages.shadows,
 		},
 	]
 
@@ -56,12 +69,10 @@ export default function TeamPage({ leagueData, isItemApplied, isShowSimplified }
                     break;
             }
         } else {
-            router.query.sort = newSort
             newDirection = reverseAttributes.includes(newSort) ? "asc" : "desc"
         }
         if(newDirection) {
             router.push({
-				pathname: "[slugOrId]",
                 query: {
 					slugOrId: slugOrId,
                     sort: newSort,
@@ -70,7 +81,6 @@ export default function TeamPage({ leagueData, isItemApplied, isShowSimplified }
             }, undefined, { shallow: true })
         } else {
             router.push({
-				pathname: "[slugOrId]",
                 query: {
 					slugOrId: slugOrId,
 				}
@@ -83,10 +93,11 @@ export default function TeamPage({ leagueData, isItemApplied, isShowSimplified }
 			<TeamHeader team={team} />
 			{sortedRosters.map((roster) => 
 				<PlayerTable 
-					key={roster.header}
+					key={roster.id}
 					header={roster.header}
 					players={roster.players} 
-					positions={leagueData?.positions} 
+					positions={leagueData.positions} 
+					averages={roster.averages}
 					sort={currentSort} 
 					direction={currentDirection} 
 					triggerSort={sortPlayers}

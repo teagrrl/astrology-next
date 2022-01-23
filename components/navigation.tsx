@@ -4,7 +4,7 @@ import TeamLink from './teamlink'
 import { PageProps } from '../pages/_app'
 
 export default function Navigation({ leagueData, isDarkMode }: PageProps) {
-    const { special, groups, unknown } = groupTeams(leagueData?.teams || [])
+    const { special, groups, ungrouped } = groupTeams(leagueData?.teams || [])
 
     return (
 		<ul className="flex flex-row flex-wrap justify-center items-center gap-1">

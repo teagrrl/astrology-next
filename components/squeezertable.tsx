@@ -68,9 +68,9 @@ export default function SqueezerTable({teams, averages, ranks, sort, direction, 
                                 <td className="px-1.5 py-1 whitespace-nowrap">
                                     {false && <Emoji emoji="0x1F480" emojiClass="inline min-w-[1em] h-4 mr-1" />}
                                     <Link href={{
-                                        pathname: "/team/[idOrSlug]",
+                                        pathname: "/team/[slugOrId]",
                                         query: {
-                                            idOrSlug: team.slug()
+                                            slugOrId: team.slug()
                                         }
                                     }}>
                                         <a className="font-bold">{team.canonicalName()}</a>
@@ -97,14 +97,14 @@ export default function SqueezerTable({teams, averages, ranks, sort, direction, 
                                     }
                                 </td>
                                 {!isShowSimplified && columns.sibrmetrics.map((sibrmetric) =>
-                                     <AverageStat key={`${team.id}_${sibrmetric.id}`} team={team} averages={averages[team.id].roster} stat={sibrmetric} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
+                                     <AverageStat key={`${team.id}_${sibrmetric.id}`} header={team.canonicalName()} averages={averages[team.id].roster} stat={sibrmetric} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
                                 )}
-                                <AverageStat team={team} averages={averages[team.id].roster} id="combined" hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
+                                <AverageStat header={team.canonicalName()} averages={averages[team.id].roster} id="combined" hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
                                 {columns.categories.map((category) =>
                                     <Fragment key={`${team.id}_${category.id}`}>
-                                        {category.hasRating && <AverageStat key={`${team.id}_${category.id}`} team={team} averages={averages[team.id].roster} stat={category} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />}
+                                        {category.hasRating && <AverageStat key={`${team.id}_${category.id}`} header={team.canonicalName()} averages={averages[team.id].roster} stat={category} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />}
                                         {!isShowSimplified && category.attributes.map((attribute) => 
-                                            <AverageStat key={`${team.id}_${attribute.id}`} team={team} averages={averages[team.id].roster} stat={attribute} hasColorScale={attribute.id === "peanutAllergy" || category.id !== "misc"} isItemApplied={isItemApplied} />
+                                            <AverageStat key={`${team.id}_${attribute.id}`} header={team.canonicalName()} averages={averages[team.id].roster} stat={attribute} hasColorScale={attribute.id === "peanutAllergy" || category.id !== "misc"} isItemApplied={isItemApplied} />
                                         )}
                                     </Fragment>
                                 )}

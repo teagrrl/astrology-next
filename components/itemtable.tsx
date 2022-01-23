@@ -1,4 +1,3 @@
-import Tippy from "@tippyjs/react"
 import Link from "next/link"
 import { Fragment } from "react"
 import { columns } from "../models/columns"
@@ -7,11 +6,12 @@ import Player, { PlayerPosition } from "../models/player"
 import Emoji from "./emoji"
 import ModificationList from "./modificationlist"
 import TableHeader from "./tableheader"
+import Tooltip from "./tooltip"
 
 type ItemTableProps = {
-    items: Item[] | undefined,
-    armory: Record<string, Player[]> | undefined,
-    positions?: Record<string, PlayerPosition> | undefined,
+    items?: Item[],
+    armory?: Record<string, Player[]>,
+    positions?: Record<string, PlayerPosition>,
     sort?: string,
     direction?: "asc" | "desc",
     triggerSort?: Function,
@@ -76,13 +76,7 @@ export default function ItemTable({ items, armory, positions, sort, direction, t
                                     }
                                 }}>
                                     <a className="inline-block max-w-[200px] font-bold whitespace-nowrap overflow-hidden text-ellipsis">
-                                        <Tippy 
-                                            className="px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100" 
-                                            duration={[200, 0]}
-                                            content={item.name}
-                                        >
-                                            <span>{item.name}</span>
-                                        </Tippy>
+                                        <Tooltip content={item.name}><span>{item.name}</span></Tooltip>
                                     </a>
                                 </Link>
                             </div>
@@ -96,9 +90,9 @@ export default function ItemTable({ items, armory, positions, sort, direction, t
                                     ? armory[item.id].map((player) => 
                                         <span key={`${item.id}_${player.id}`} className="whitespace-nowrap">
                                             <Link key={player.id} href={{
-                                                pathname: "/player/[idOrSlug]",
+                                                pathname: "/player/[slugOrId]",
                                                 query: {
-                                                    idOrSlug: player.slug()
+                                                    slugOrId: player.slug()
                                                 }
                                             }}>
                                                 <a className="font-semibold">
@@ -151,9 +145,7 @@ function ItemStat({ item, attribute }: ItemStatProps) {
         <td className={item.getScaleClass(attribute.id)}>
             {adjustment === 0 
                 ? <div className="px-1.5 py-1 text-center">0</div>
-                : <Tippy
-                    className="px-2 py-1 rounded-md text-white dark:text-black bg-zinc-600/90 dark:bg-zinc-100" 
-                    duration={[200, 0]}
+                : <Tooltip
                     content={
                         <div className="flex flex-col justify-center items-center">
                             <div>
@@ -167,7 +159,7 @@ function ItemStat({ item, attribute }: ItemStatProps) {
                     }
                 >
                     <div className="px-1.5 py-1 text-center">{Math.round(1000 * adjustment) / 1000}</div>
-                </Tippy>
+                </Tooltip>
             }
         </td>
     )

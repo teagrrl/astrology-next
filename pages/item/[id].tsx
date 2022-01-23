@@ -1,6 +1,8 @@
 import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
+import AstrologyError from '../../components/error'
 import Layout from '../../components/layout'
+import AstrologyLoader from '../../components/loader'
 import PlayerItem from '../../components/playeritem'
 import { PageProps } from '../_app'
 
@@ -12,19 +14,23 @@ export default function ItemPage({ leagueData }: ItemPageProps) {
     const router = useRouter()
     const { id } = router.query
     
-	const item = leagueData?.items[id as string]
-    const owners = leagueData?.armory[id as string].map((player) => {
+	if(!leagueData) {
+		return <AstrologyLoader />
+	}
+    if(leagueData.error) {
+        return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
+    }
+    
+	const item = id ? leagueData.items[id.toString()] : null
+    if(!item) {
+        return <AstrologyError code={404} message="Astrology was unable to find data about any such item" />
+    }
+    const owners = (leagueData.armory[item.id] ?? []).map((player) => {
         return {
             player: player,
-            team: leagueData?.positions[player.id].team,
+            team: leagueData.positions[player.id].team,
         }
     })
-	if(!item) {
-		return (
-			<h1>Loading...</h1>
-		)
-	}
-    
 	return (
         <section className="flex grow justify-center items-center">
             <div className="p-4 border-[1px] border-zinc-500 dark:border-white rounded-md overflow-auto max-h-[70vh]">
