@@ -12,12 +12,14 @@ export type MetadataProps = {
 
 export default function Metadata({ title, description, image }: MetadataProps) {
     const { asPath } = useRouter()
+    //const absoluteUrl = (process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.VERCEL_URL)
+    const absoluteUrl = process.env.VERCEL_URL ?? "http://localhost:3000"
+
     const siteName = "Astrology - A quick look at Blaseball star charts."
     const siteTitle = title ?? siteName
     const socialDescription = description ?? "A quick look at Blaseball star charts."
-    const socialImage = image ?? "/astrology_preview.png"
+    const socialImage = image ?? absoluteUrl + "/astrology_preview.png"
     const twitterHandle = publicRuntimeConfig.twitterHandle
-    const absoluteUrl = (process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.NEXT_PUBLIC_VERCEL_URL)
     
     return (
         <Head>
