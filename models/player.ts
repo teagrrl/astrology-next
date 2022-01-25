@@ -42,8 +42,13 @@ export default class Player {
     }
 
     slug() : string {
-        if(this.id === "5d063a91-31b3-4688-97a7-e34a7181da30") {
-            return "baby-pitching-machine";
+        switch(this.id) { // this sucks but i don't wanna do a "good" solution
+            case "5d063a91-31b3-4688-97a7-e34a7181da30":
+                return "baby-pitching-machine"
+            case "82067351-3038-4001-bfac-9ecdae67d504":
+                return "bees-manhattan-of-hades"
+            case "a8399207-a19c-449e-a3bf-4311fbea8ebd":
+                return "taller-everts"
         }
         return this.canonicalName().toLowerCase().replace(/,/g, "-comma-").replace(/[.']+/g, "").replace(/[-\s]+/g, "-");
     }

@@ -132,7 +132,7 @@ const groups = [
     },
     {
         id: "gamma9",
-        name: "Short Circuit 3",
+        name: "Short Circuit 2",
         teams: [
             "a94de6ef-5fc9-4470-89a0-557072fe4daf",
             "6f9ff34d-825f-477b-8600-1cec4febaecf",
@@ -162,7 +162,7 @@ const groups = [
     },
     {
         id: "gamma8",
-        name: "Short Circuit 2",
+        name: "Short Circuit 1",
         teams: [
             "75667373-b350-499b-b86e-5518b6f9f6ab",
             "57d3f614-f8d3-4dfd-b486-075f823fdb0b",
@@ -192,7 +192,7 @@ const groups = [
     },
     {
         id: "gamma4",
-        name: "Short Circuit 1",
+        name: "Short Circuit 0",
         teams: [
             "29a5d00e-316f-4f35-b453-d893b6931c81",
             "19c73d98-224b-4080-96ab-090d85182e6f",

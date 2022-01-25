@@ -4,6 +4,7 @@ module.exports = {
 	publicRuntimeConfig: {
 		pageLimit: 50,
 		paginationPreview: 3,
+		twitterHandle: "yooridotblase",
 	},
 	async redirects() {
 		return [
