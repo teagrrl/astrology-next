@@ -19,7 +19,7 @@ export default function Metadata({ title, description, image }: MetadataProps) {
     const siteName = "Astrology - A quick look at Blaseball star charts."
     const siteTitle = title ?? siteName
     const socialDescription = description ?? "A quick look at Blaseball star charts."
-    const socialImage = image ?? absoluteUrl + "/astrology_preview.png"
+    const socialImage = image ?? (absoluteUrl ?? "") + "/astrology_preview.png"
     const twitterHandle = publicRuntimeConfig.twitterHandle
     
     return (
@@ -29,7 +29,7 @@ export default function Metadata({ title, description, image }: MetadataProps) {
             <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" key="viewport" />
             <meta name="description" content={socialDescription} key="description" />
             {/* Twitter */}
-            <meta property="twitter:card" content="summary" key="twsummary" />
+            <meta property="twitter:card" content="summary_large_image" key="twsummary" />
             {!!twitterHandle && <meta property="twitter:creator" content={twitterHandle} key="twcreator" />}
             <meta name="twitter:description" content={socialDescription} key="twdescription" />
             <meta name="twitter:title" content={siteTitle} key="twtitle" />
