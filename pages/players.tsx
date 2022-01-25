@@ -57,7 +57,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
     
     const allPlayers = leagueData.players ?? []
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
-    const filteredPlayers = currentUniversePlayers ?? allPlayers
+    const filteredPlayers = currentUniversePlayers.length > 0 ? currentUniversePlayers : allPlayers
     const sortedPlayers = currentSort ? Array.from(filteredPlayers).sort(PlayerComparator(leagueData.positions, currentSort, currentDirection)) : filteredPlayers
     const pagePlayers = sortedPlayers.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedPlayers.length))
     const numPages = Math.ceil(sortedPlayers.length / pageLimit)

@@ -8,7 +8,7 @@ export default function ModifiersPage({}: PageProps) {
     return (
         <section className="overflow-auto">
             <h1 className="font-bold text-3xl text-center my-5">Available Modifications</h1>
-            <ul className="flex flex-row flex-wrap justify-center gap-4">
+            <ul className="flex flex-row flex-wrap justify-center gap-4 mb-5">
                 {getAllModifications().map((modification) => 
                     <li key={modification.id} className="p-4 rounded-md bg-slate-400/20">
                         <div className="grid grid-flow-col items-center">
