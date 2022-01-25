@@ -11,11 +11,11 @@ export type MetadataProps = {
 }
 
 export default function Metadata({ title, description, image }: MetadataProps) {
-    const router = useRouter()
+    const { asPath } = useRouter()
     const siteName = "Astrology - A quick look at Blaseball star charts."
     const siteTitle = title ?? siteName
     const socialDescription = description ?? "A quick look at Blaseball star charts."
-    const socialImage = image ?? ""
+    const socialImage = image ?? "/astrology_preview.png"
     const twitterHandle = publicRuntimeConfig.twitterHandle
     const absoluteUrl = (process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.VERCEL_URL)
     
@@ -38,7 +38,7 @@ export default function Metadata({ title, description, image }: MetadataProps) {
             <meta property="og:title" content={siteTitle} key="ogtitle" />
             <meta property="og:image" content={socialImage} key="ogimage" />
             <meta property="og:image:alt" content={siteTitle} key="ogimagealt" />
-            {!!absoluteUrl && <meta property="og:url" content={absoluteUrl + router.pathname} key="ogurl" />}
+            {!!absoluteUrl && <meta property="og:url" content={absoluteUrl + asPath} key="ogurl" />}
         </Head>
     )
 }
