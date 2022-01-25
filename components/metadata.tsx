@@ -12,8 +12,9 @@ export type MetadataProps = {
 
 export default function Metadata({ title, description, image }: MetadataProps) {
     const { asPath } = useRouter()
-    //const absoluteUrl = (process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.VERCEL_URL)
-    const absoluteUrl = process.env.VERCEL_URL ?? "http://localhost:3000"
+    const absoluteUrl = process.env.NODE_ENV === "development" 
+        ? "http://localhost:3000" 
+        : process.env.VERCEL_URL ? ("https://" + process.env.VERCEL_URL) : undefined
 
     const siteName = "Astrology - A quick look at Blaseball star charts."
     const siteTitle = title ?? siteName
