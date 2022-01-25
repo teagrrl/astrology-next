@@ -2,9 +2,13 @@ import Player from './player'
 import { reverseAttributes } from './playerstats'
 import { ItemPart, ChroniclerItem } from './chronicler'
 
+type Affix = {
+    name: string,
+    adjustments: Record<string, number>,
+}
 export default class Item {
     public readonly adjustments: Record<string, number>
-    public readonly affixes: Record<string, Record<string, number>>
+    public readonly affixes: Affix[]
     public readonly durability: number
     public readonly elements: string[]
     public readonly emoji: string
@@ -95,12 +99,12 @@ export const ItemComparator = (owners: Record<string, Player[]> | undefined, col
 
 function getAffixProperties(data: ChroniclerItem) {
     const adjustments: Record<string, number> = {}
-    const partAdjustments: Record<string, Record<string, number>> = {}
+    const partAdjustments: Affix[] = []
     const elements: string[] = []
     const mods: string[] = []
     const affixes = [data.prePrefix, data.postPrefix, data.root, data.suffix].concat(data.prefixes).filter((affix): affix is ItemPart => !!affix)
     for(const affix of affixes) {
-        partAdjustments[affix.name] = partAdjustments[affix.name] ?? {}
+        const affixAdjustments: Record<string, number> = {}
         if(affix.name !== data.root.name) {
             elements.push(affix.name)
         }
@@ -111,9 +115,13 @@ function getAffixProperties(data: ChroniclerItem) {
             if(adjustment.type === 1) {
                 let statName = adjustmentIndices[adjustment.stat]
                 adjustments[statName] = (adjustments[statName] ?? 0) + adjustment.value;
-                partAdjustments[affix.name][statName] = (partAdjustments[affix.name][statName] ?? 0) + adjustment.value;
+                affixAdjustments[statName] = (affixAdjustments[statName] ?? 0) + adjustment.value;
             }
         }
+        partAdjustments.push({
+            name: affix.name,
+            adjustments: affixAdjustments,
+        })
     }
     const elementCounts = elements
         .reduceRight((count, element: string) => {

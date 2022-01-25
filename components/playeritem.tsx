@@ -6,6 +6,7 @@ import Team from "../models/team"
 import Emoji from "./emoji"
 import { getModificationTitleById } from "./modification"
 import ModificationList from "./modificationlist"
+import Tooltip from "./tooltip"
 
 type ItemOwner = {
     player: Player,
@@ -124,11 +125,26 @@ export default function PlayerItem({ item, owners, showDetails, showModEmojis, s
                             {category.attributes.map((attribute) => 
                                 <div 
                                     key={attribute.id} 
-                                    className="grid grid-cols-2 items-center px-4 py-2 even:bg-zinc-200 dark:even:bg-zinc-800" 
-                                    title={`${attribute.name}: ${item.adjustments[attribute.id]}`}
+                                    className="grid grid-flow-col items-center px-4 py-2 even:bg-zinc-200 dark:even:bg-zinc-800"
                                 >
                                     <span className="text-ellipsis font-semibold overflow-hidden">{attribute.name}</span>
-                                    <span className={`text-right ${item.adjustments[attribute.id] > 0 ? "text-sky-500" : "text-red-500"}`}>{item.adjustments[attribute.id] > 0 ? "+" : "-"}{Math.abs(Math.round(1000 * item.adjustments[attribute.id]) / 1000)}</span>
+                                    <Tooltip key={attribute.id} content={
+                                        <div>
+                                            <div>
+                                                <span className="font-semibold">{attribute.name}: </span><span>{item.adjustments[attribute.id] > 0 ? "+" : "-"}{item.adjustments[attribute.id]}</span>
+                                            </div>
+                                            {item.affixes.length > 0 && <div className="flex flex-col justify-center items-center w-full mt-2 pt-2 border-t-[1px] border-white dark:border-zinc-500">
+                                                {item.affixes.map((affix, index) => 
+                                                    affix.adjustments[attribute.id] && <div key={`${affix.name}_${index}`}>
+                                                        <span className="font-semibold">{affix.name}: </span>
+                                                        <span>{affix.adjustments[attribute.id] > 0 ? "+" : "-"}{Math.abs(affix.adjustments[attribute.id])}</span>
+                                                    </div>
+                                                )}
+                                            </div>}
+                                        </div>
+                                    }>
+                                        <span className={`text-right ${item.adjustments[attribute.id] > 0 ? "text-sky-500" : "text-red-500"}`}>{item.adjustments[attribute.id] > 0 ? "+" : "-"}{Math.abs(Math.round(1000 * item.adjustments[attribute.id]) / 1000)}</span>
+                                    </Tooltip>
                                 </div>
                             )}
                         </div>

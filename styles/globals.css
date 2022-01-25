@@ -7,6 +7,7 @@
 	--scroll-thumb: rgb(0 0 0);
 	--scroll-track-hover: rgb(228 228 231);
 	--scroll-thumb-hover: rgb(113 113 122);
+	--bg-tooltip: rgb(82 82 91 / 0.9);
 }
 
 .dark {
@@ -14,6 +15,7 @@
 	--scroll-thumb: rgb(255 255 255);
 	--scroll-track-hover: rgb(63, 63, 70);
 	--scroll-thumb-hover: rgb(212 212 216);
+	--bg-tooltip: rgb(244 244 245);
 }
 
 html,
@@ -60,4 +62,25 @@ a {
 
 ::-webkit-scrollbar-corner{
 	background: transparent;
+}
+
+.tippy-box[data-placement^='top'] > .tippy-arrow {
+	border-width: 6px 8px 0px 8px;
+	border-color: var(--bg-tooltip) transparent transparent transparent;
+	bottom: -6px;
+}
+.tippy-box[data-placement^='bottom'] > .tippy-arrow {
+	top: -6px;
+	border-width: 0px 8px 6px 8px;
+	border-color: transparent transparent var(--bg-tooltip) transparent;
+}
+.tippy-box[data-placement^='left'] > .tippy-arrow {
+	right: -6px;
+	border-width: 8px 0px 8px 6px;
+	border-color: transparent transparent transparent var(--bg-tooltip) ;
+}
+.tippy-box[data-placement^='right'] > .tippy-arrow {
+	left: -6px;
+	border-width: 8px 6px 8px 0px;
+	border-color: transparent var(--bg-tooltip) transparent transparent;
 }
