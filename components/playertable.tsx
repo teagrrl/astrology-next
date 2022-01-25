@@ -135,7 +135,7 @@ export default function PlayerTable({ header, players, positions, averages, sort
                                 )}
                             </tr>
                         )}
-                        {players.length > 1 && averages && <tr className="duration-300 border-t-2 border-black dark:border-zinc-500 hover:bg-zinc-400/20">      
+                        {players.length > 1 && averages && <tr className="duration-300 border-t-2 border-black dark:border-zinc-200 hover:bg-zinc-400/20">      
                             <td colSpan={6} className="px-1.5 py-1 font-bold">{header} Average</td>
                             {!isShowSimplified && columns.sibrmetrics.map((sibrmetric) =>
                                 <AverageStat key={`average_${sibrmetric.id}`} averages={averages} stat={sibrmetric} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />

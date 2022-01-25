@@ -54,7 +54,7 @@ export default function PlayerStat({ player, stat, id, hasColorScale, isStarRati
             effectiveStat = player.coffee()
             break;
     }
-    if(effectiveStat === undefined) {
+    if(effectiveStat === undefined || effectiveStat === null) {
         effectiveStat = "N/A"
     }
     if(statId === "peanutAllergy" && typeof effectiveStat === "boolean") {
@@ -82,7 +82,7 @@ export default function PlayerStat({ player, stat, id, hasColorScale, isStarRati
                     <div className="flex flex-col justify-center items-center">
                         <h3 className="font-bold">{player.canonicalName()}</h3>
                         {
-                            statId === "peanutAllergy" && baseStat !== undefined
+                            statId === "peanutAllergy" && baseStat !== undefined && baseStat !== null
                                 ? <div className="font-semibold">{baseStat ? "Allergic" : "Not Allergic"}</div>
                                 : <div className="flex flex-col justify-center items-center ">
                                     <div>

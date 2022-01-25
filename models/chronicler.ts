@@ -1,4 +1,4 @@
-export interface BlaseballPlayer {
+export interface ChroniclerPlayer {
     id: string;
     name: string;
 
@@ -56,7 +56,7 @@ export interface BlaseballPlayer {
     evolution: number;
     leagueTeamId?: string;
     tournamentTeamId?: string;
-    items?: PlayerItem[];
+    items?: ChroniclerItem[];
     state?: PlayerState;
 }
 
@@ -64,7 +64,7 @@ export interface PlayerState {
     unscatteredName?: string;
 }
 
-export interface BlaseballTeam {
+export interface ChroniclerTeam {
     id: string;
     location: string;
     fullName: string;
@@ -113,17 +113,7 @@ export interface ChroniclerEntity<T> {
     validTo: string | null;
 }
 
-export interface ChroniclerPlayer {
-    id: string;
-    data: BlaseballPlayer;
-}
-
-export interface ChroniclerTeam {
-    id: string;
-    data: BlaseballTeam;
-}
-
-export interface PlayerItem {
+export interface ChroniclerItem {
     id: string;
     name: string;
 
@@ -158,4 +148,19 @@ export interface ItemStatAdjustment {
     type: 1;
     stat: number;
     value: number;
+}
+
+export interface ChroniclerTributes {
+    teams: TeamTribute[];
+    players: PlayerTribute[];
+}
+
+export interface TeamTribute {
+    peanuts: number;
+    teamId: string;
+}
+
+export interface PlayerTribute {
+    peanuts: number;
+    playerId: string;
 }

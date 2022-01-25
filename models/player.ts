@@ -1,7 +1,7 @@
 import Item from "./item";
 import PlayerStats, { reverseAttributes } from "./playerstats";
 import Team from "./team";
-import { BlaseballPlayer, ChroniclerEntity } from "./types";
+import { ChroniclerPlayer, ChroniclerEntity } from "./chronicler";
 
 export type PlayerPosition = {
     position?: "lineup" | "rotation" | "shadows" | "static" | undefined,
@@ -10,10 +10,10 @@ export type PlayerPosition = {
 
 export default class Player {
     public readonly id: string
-    public readonly data: BlaseballPlayer
+    public readonly data: ChroniclerPlayer
     public readonly items: Item[]
 
-    constructor(data: ChroniclerEntity<BlaseballPlayer>) {
+    constructor(data: ChroniclerEntity<ChroniclerPlayer>) {
         this.id = data.entityId
         this.data = data.data
         this.items = data.data.items?.map((item) => new Item(item)) ?? []

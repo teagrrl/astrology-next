@@ -1,6 +1,6 @@
 import Item from "./item"
 import Player from "./player"
-import { PlayerItem, PlayerState } from "./types"
+import { ChroniclerItem, PlayerState } from "./chronicler"
 
 export const reverseAttributes = ["name", "rank", "team", "patheticism", "tragicness", "pressurization"]
 
@@ -13,9 +13,9 @@ type CategoryTuple = typeof categoryIds
 type CategoryId = CategoryTuple[number]
 
 export default class PlayerStats {
-    public readonly stats: Record<string, string | number | boolean | string[] | PlayerItem[] | PlayerState>;
+    public readonly stats: Record<string, string | number | boolean | string[] | ChroniclerItem[] | PlayerState>;
     public readonly adjustments: Record<string, number>;
-    public readonly adjusted: Record<string, string | number | boolean | string[] | PlayerItem[] | PlayerState>;
+    public readonly adjusted: Record<string, string | number | boolean | string[] | ChroniclerItem[] | PlayerState>;
 
     constructor(player: Player) {
         this.stats = {...player.data}
@@ -194,8 +194,8 @@ function getItemAdjustments(items: Item[]) {
     }, {})
 }
 
-function getAdjustedStats(stats: Record<string, string | number | boolean | string[] | PlayerItem[] | PlayerState>, adjustments: Record<string, number>) {
-    const adjusted: Record<string, string | number | boolean | string[] | PlayerItem[] | PlayerState> = {}
+function getAdjustedStats(stats: Record<string, string | number | boolean | string[] | ChroniclerItem[] | PlayerState>, adjustments: Record<string, number>) {
+    const adjusted: Record<string, string | number | boolean | string[] | ChroniclerItem[] | PlayerState> = {}
     for(const [attribute, value] of Object.entries(stats)) {
         adjusted[attribute] = value
         if(typeof value === "number") {

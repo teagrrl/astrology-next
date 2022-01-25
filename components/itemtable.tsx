@@ -141,6 +141,19 @@ export default function ItemTable({ items, armory, positions, sort, direction, t
 
 function ItemStat({ item, attribute }: ItemStatProps) {
     const adjustment = item.adjustments[attribute.id] ?? 0
+    const affixAdjustments = []
+    if(adjustment !== 0) {
+        for(const affix in item.affixes) {
+            const affixAdjustment = item.affixes[affix][attribute.id] ?? 0
+            if(affixAdjustment !== 0) {
+                affixAdjustments.push({
+                    id: affix.toLowerCase(),
+                    name: affix,
+                    adjustment: affixAdjustment,
+                })
+            }
+        }
+    }
     return (
         <td className={item.getScaleClass(attribute.id)}>
             {adjustment === 0 
@@ -155,6 +168,14 @@ function ItemStat({ item, attribute }: ItemStatProps) {
                                 <span className="font-semibold">{attribute.name}: </span>
                                 <span>{adjustment > 0 ? "+" : "-"}{Math.abs(adjustment)}</span>
                             </div>
+                            {affixAdjustments.length > 0 && <div className="flex flex-col justify-center items-center w-full mt-2 pt-2 border-t-[1px] border-white dark:border-zinc-500">
+                                {affixAdjustments.map((affix) => 
+                                    <div key={affix.id}>
+                                        <span className="font-semibold">{affix.name}: </span>
+                                        <span>{affix.adjustment > 0 ? "+" : "-"}{Math.abs(affix.adjustment)}</span>
+                                    </div>
+                                )}
+                            </div>}
                         </div>
                     }
                 >

@@ -108,7 +108,7 @@ export default function SqueezerPage({ leagueData, isItemApplied, isShowSimplifi
                                 groupId: group.id,
                             },
                         }}>
-                            <a className="px-2.5 py-1 font-semibold rounded-md bg-zinc-200 dark:bg-zinc-600 hover:bg-zinc-400 dark:hover:bg-zinc-500">{group.name}</a>
+                            <a className="px-2.5 py-1 font-semibold rounded-md bg-zinc-200 dark:bg-zinc-600 hover:bg-zinc-300 dark:hover:bg-zinc-500">{group.name}</a>
                         </Link>
                     </li>
                 )}

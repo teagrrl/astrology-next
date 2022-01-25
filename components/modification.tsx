@@ -25,6 +25,14 @@ type Modifier = {
     descriptions?: ModifierDescriptions,
 }
 
+export function getAllModifications() {
+    return Array.from(modifiers).sort((modifier1, modifier2) => {
+        if(modifier1.id > modifier2.id) return 1
+        if(modifier1.id < modifier2.id) return -1
+        return 0
+    })
+}
+
 export function getModificationTitleById(id: string) {
     return getModifierById(id).title
 }

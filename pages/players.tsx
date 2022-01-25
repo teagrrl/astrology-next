@@ -7,25 +7,21 @@ import AstrologyLoader from '../components/loader'
 import Pagination from '../components/pagination'
 import PlayerTable from '../components/playertable'
 import TeamHeader from '../components/teamheader'
-import { PlayerComparator } from '../models/player'
+import Player, { PlayerComparator } from '../models/player'
 import { reverseAttributes } from '../models/playerstats'
-import { AllPlayers } from '../models/team'
+import Team, { AllPlayers, groupTeams } from '../models/team'
 import { PageProps } from './_app'
 
 const { publicRuntimeConfig } = getConfig()
 
+type Universe = {
+    id: string,
+    name: string,
+    teams: Team[],
+}
 export default function PlayersPage({ leagueData, isShowSimplified, isItemApplied }: PageProps) {
     const router = useRouter()
-    const { page, sort, direction } = router.query
-
-    const currentPage = page ? parseInt(page.toString()) : 0
-    const currentSort = sort ? sort.toString() : undefined
-    const currentDirection = direction 
-        ? (direction.toString() as "asc" | "desc") 
-        : currentSort 
-            ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
-            : "desc"
-
+    const { page, sort, direction, universes } = router.query
             
 	if(!leagueData) {
 		return <AstrologyLoader />
@@ -33,9 +29,35 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
     if(leagueData.error) {
         return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
     }
+
+    const availableUniverses = groupTeams(leagueData.teams || []).groups
+    const currentPage = page ? parseInt(page.toString()) : 0
+    const currentSort = sort ? sort.toString() : undefined
+    const currentDirection = direction 
+        ? (direction.toString() as "asc" | "desc") 
+        : currentSort 
+            ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
+            : "desc"
+    const currentUniverseIds = (typeof universes === "string" ? universes.split(",") : universes ?? [])
+    const currentUniverses = currentUniverseIds
+        .map((id) => availableUniverses.find((group) => group.id === id))
+        .filter((universe: Universe | undefined): universe is Universe => universe !== undefined)
+    const uniqueUniversePlayers = Object.fromEntries(currentUniverses
+        .reduce((teams: Team[], universe) => teams.concat(universe.teams), [])
+        .map((team) => leagueData.rosters[team.id])
+        .reduce((players: Player[], rosters) => {
+            return players.concat(rosters.lineup, rosters.rotation, rosters.shadows)
+        }, [])
+        .map((player) => [player.id, player]))
+    const currentUniversePlayers = Object.values(uniqueUniversePlayers).sort((player1, player2) => {
+        if(player1.id > player2.id) return 1
+        if(player1.id < player2.id) return -1
+        return 0
+    })
+    
     const allPlayers = leagueData.players ?? []
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
-    const filteredPlayers = allPlayers
+    const filteredPlayers = currentUniversePlayers ?? allPlayers
     const sortedPlayers = currentSort ? Array.from(filteredPlayers).sort(PlayerComparator(leagueData.positions, currentSort, currentDirection)) : filteredPlayers
     const pagePlayers = sortedPlayers.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedPlayers.length))
     const numPages = Math.ceil(sortedPlayers.length / pageLimit)
@@ -57,21 +79,28 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         if(newDirection) {
             router.push({
                 query: {
+                    universes: currentUniverseIds,
                     sort: newSort,
                     direction: newDirection,
                 }
             }, undefined, { shallow: true })
         } else {
-            router.push({}, undefined, { shallow: true })
+            router.push({
+                query: {
+                    universes: currentUniverseIds,
+                }
+            }, undefined, { shallow: true })
         }
     }
 	
 	return (
         <section className="overflow-auto">
             <TeamHeader team={AllPlayers} />
+            {currentUniverses.length > 0 && <div className="text-lg text-center font-semibold">Currently only showing players from {currentUniverses.map((universe) => universe.name).join(" & ")}</div>}
             <Pagination href={{ 
                 pathname: "/players",
                 query: {
+                    universes: currentUniverseIds,
                     sort: currentSort,
                     direction: currentSort ? currentDirection : undefined,
                 },
@@ -88,6 +117,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
             <Pagination href={{ 
                 pathname: "/players",
                 query: {
+                    universes: currentUniverseIds,
                     sort: currentSort,
                     direction: currentSort ? currentDirection : undefined,
                 },

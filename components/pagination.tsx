@@ -6,7 +6,7 @@ const { publicRuntimeConfig } = getConfig()
 
 type LinkHrefProps = {
     pathname: string,
-    query?: Record<string, string | undefined>,
+    query?: Record<string, string | string[] | undefined>,
 }
 
 type PaginationProps = {
@@ -99,8 +99,8 @@ function PaginationLink({ children, href, title, isCurrent }: PaginationLinkProp
     )
 }
 
-function appendQueriesToHref(href: LinkHrefProps, query: Record<string, string | undefined>) {
-    const mergedQueries: Record<string, string> = {}
+function appendQueriesToHref(href: LinkHrefProps, query: Record<string, string | string[] | undefined>) {
+    const mergedQueries: Record<string, string | string[]> = {}
     for(const key in href.query) {
         let value = href.query[key]
         if(value !== undefined) {

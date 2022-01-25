@@ -16,7 +16,14 @@ const { publicRuntimeConfig } = getConfig()
 
 export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
     const router = useRouter()
-    const { page, sort, direction } = router.query
+    const { page, sort, direction, owners } = router.query
+            
+	if(!leagueData) {
+		return <AstrologyLoader />
+	}
+    if(leagueData.error) {
+        return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
+    }
 
     const currentPage = page ? parseInt(page.toString()) : 0
     const currentSort = sort ? sort.toString() : undefined
@@ -25,16 +32,18 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
         : currentSort 
             ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
             : "desc"
-            
-	if(!leagueData) {
-		return <AstrologyLoader />
-	}
-    if(leagueData.error) {
-        return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
-    }
+    const currentOwners = (typeof owners === "string" ? owners.split(",") : owners ?? [])
+        .filter((filter) => ["active", "inactive", "bargain"].includes(filter))
+
     const allItems = leagueData.items ? Object.values(leagueData.items) : []
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
-    const filteredItems = allItems
+    const filteredItems = currentOwners.length > 0 ? allItems.filter((item) => {
+        const owners = leagueData.armory[item.id] ?? []
+        const positions = owners.map((player) => leagueData.positions[player.id].position ?? "unknown")
+        return (currentOwners.includes("active") && positions.filter((position) => ["lineup", "rotation"].includes(position)).length > 0)
+            || (currentOwners.includes("inactive") && positions.filter((position) => ["shadows", "static", "unknown"].includes(position)).length > 0)
+            || (currentOwners.includes("bargain") && !owners.length)
+    }) : allItems
     const sortedItems = currentSort ? Array.from(filteredItems).sort(ItemComparator(leagueData.armory, currentSort, currentDirection)) : filteredItems
     const pageItems = sortedItems.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedItems.length))
     const numPages = Math.ceil(sortedItems.length / pageLimit)
@@ -56,12 +65,17 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
         if(newDirection) {
             router.push({
                 query: {
+                    owners: currentOwners,
                     sort: newSort,
                     direction: newDirection,
                 }
             }, undefined, { shallow: true })
         } else {
-            router.push({}, undefined, { shallow: true })
+            router.push({
+                query: {
+                    owners: currentOwners,
+                }
+            }, undefined, { shallow: true })
         }
     }
 	
@@ -71,6 +85,7 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
             <Pagination href={{
                 pathname: "/items",
                 query: {
+                    owners: currentOwners,
                     sort: currentSort,
                     direction: currentSort ? currentDirection : undefined,
                 }
@@ -89,6 +104,7 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
             <Pagination href={{
                 pathname: "/items",
                 query: {
+                    owners: currentOwners,
                     sort: currentSort,
                     direction: currentSort ? currentDirection : undefined,
                 }

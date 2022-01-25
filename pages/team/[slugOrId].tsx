@@ -34,6 +34,15 @@ export default function TeamPage({ leagueData, isItemApplied, isShowSimplified }
             ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
             : "desc"
 	const rosters = leagueData.rosters[team.id]
+    if(!rosters.lineup.length && !rosters.rotation.length && !rosters.shadows.length) {
+        return (
+            <section>
+				<TeamHeader team={team} />
+        		<h1 className="flex justify-center text-xl">Hrm, it seems that the {team.canonicalName()} roster is completely empty.</h1>
+				<p className="flex justify-center text-sm">(If you&apos;re interested, I can ask around to see if there are any openings.)</p>
+            </section>
+        )
+    }
 	const averages = leagueData.averages[team.id]
 	const comparator = currentSort ? PlayerComparator(leagueData.positions, currentSort, currentDirection) : undefined
 	const sortedRosters = [

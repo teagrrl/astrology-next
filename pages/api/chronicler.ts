@@ -3,7 +3,7 @@ import Item from '../../models/item';
 import Player, { PlayerPosition } from '../../models/player';
 import PlayerStats, { AttributeId, attributeIds, categoryIds } from '../../models/playerstats';
 import Team from '../../models/team';
-import { BlaseballPlayer, BlaseballTeam, ChroniclerEntities, ChroniclerEntity, PlayerItem } from '../../models/types';
+import { ChroniclerEntities, ChroniclerEntity, ChroniclerItem, ChroniclerPlayer, ChroniclerTeam, ChroniclerTributes } from '../../models/chronicler';
 
 type Roster = {
     lineup: Player[],
@@ -30,6 +30,12 @@ export interface HistoryData<T> {
     error?: string;
 }
 
+export interface TributeData {
+    teamIds: string[];
+    playerIds: string[];
+    error?: string;
+}
+
 export interface LeagueData {
     armory: Record<string, Player[]>;
     averages: Record<string, Averages>;
@@ -38,11 +44,6 @@ export interface LeagueData {
     positions: Record<string, PlayerPosition>;
     rosters: Record<string, Roster>;
     teams: Team[];
-    error?: string;
-}
-
-export interface VersionData {
-    players: Player[];
     error?: string;
 }
 
@@ -78,7 +79,10 @@ export const useChroniclerToFetchPlayerHistory = (id?: string): HistoryData<Play
             if(lastSnapshot.data.leagueTeamId !== player.data.leagueTeamId) {
                 snapshot.changes.push("team")
             }
-            if(lastSnapshot.modifications(true).join(",") !== player.modifications(true).join(",")) {
+            const modificationFilter = (id: string) => !["COFFEE_RALLY", "ELSEWHERE", "HEATING_UP", "INHABITING", "MAGMATIC", "ON_FIRE", "OVERPERFORMING", "UNDERPERFORMING"].includes(id) // these mods change too frequently to be worth tracking
+            const lastMods = lastSnapshot.modifications(true).filter(modificationFilter)
+            const currentMods = player.modifications(true).filter(modificationFilter)
+            if(lastMods.join(",") !== currentMods.join(",")) {
                 lastSnapshot.modifications().filter((id) => player.modifications().indexOf(id) < 0).forEach((id) => {
                     snapshot.changes.push("-" + id.replace(/\_/g, " ").toLowerCase())
                 })
@@ -101,6 +105,15 @@ export const useChroniclerToFetchPlayerHistory = (id?: string): HistoryData<Play
     
     return {
         data: snapshots,
+        error: error?.toString(),
+    }
+}
+
+export const useChroniclerToFetchTributes = (): TributeData => {
+    const { data, error } = useSWR("tributes", tributesFetcher)
+    return {
+        playerIds: data && data.length ? data[0].data.players.map((player) => player.playerId) : [],
+        teamIds: data && data.length ? data[0].data.teams.map((team) => team.teamId) : [],
         error: error?.toString(),
     }
 }
@@ -225,23 +238,27 @@ function getPlayerAverages(players: Player[]) {
     return [baseAvg, itemAvg]
 }
 
-async function playersHistoryFetcher(id?: string): Promise<ChroniclerEntity<BlaseballPlayer>[]> {
+async function playersHistoryFetcher(id?: string): Promise<ChroniclerEntity<ChroniclerPlayer>[]> {
     if(!id) {
         return []
     }
-    return await pagedFetcher<BlaseballPlayer>("versions", "player", id)
+    return await pagedFetcher<ChroniclerPlayer>("versions", "player", id)
 }
 
-async function playersFetcher(): Promise<ChroniclerEntity<BlaseballPlayer>[]> {
-    return await pagedFetcher<BlaseballPlayer>("entities", "player")
+async function playersFetcher(): Promise<ChroniclerEntity<ChroniclerPlayer>[]> {
+    return await pagedFetcher<ChroniclerPlayer>("entities", "player")
 }
 
-async function teamsFetcher(): Promise<ChroniclerEntity<BlaseballTeam>[]> {
-    return await pagedFetcher<BlaseballTeam>("entities", "team")
+async function teamsFetcher(): Promise<ChroniclerEntity<ChroniclerTeam>[]> {
+    return await pagedFetcher<ChroniclerTeam>("entities", "team")
 }
 
-async function itemsFetcher(): Promise<ChroniclerEntity<PlayerItem>[]> {
-    return await pagedFetcher<PlayerItem>("entities", "item")
+async function itemsFetcher(): Promise<ChroniclerEntity<ChroniclerItem>[]> {
+    return await pagedFetcher<ChroniclerItem>("entities", "item")
+}
+
+async function tributesFetcher(): Promise<ChroniclerEntity<ChroniclerTributes>[]> {
+    return await pagedFetcher<ChroniclerTributes>("entities", "tributes")
 }
 
 async function pagedFetcher<T>(api: "entities" | "versions", type: string, id?: string) : Promise<ChroniclerEntity<T>[]> {

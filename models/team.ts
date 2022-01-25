@@ -1,4 +1,4 @@
-import { BlaseballTeam, ChroniclerEntity } from "./types"
+import { ChroniclerTeam, ChroniclerEntity } from "./chronicler"
 
 type SpecialTeamProps = {
     emoji: string,
@@ -362,10 +362,10 @@ const groups = [
 
 export default class Team {
     public readonly id: string;
-    public readonly data: BlaseballTeam;
+    public readonly data: ChroniclerTeam;
     public readonly type: string;
 
-    constructor(data: ChroniclerEntity<BlaseballTeam>, isSpecial?: boolean) {
+    constructor(data: ChroniclerEntity<ChroniclerTeam>, isSpecial?: boolean) {
         this.id = data.entityId
         this.data = data.data
         this.type = isSpecial ? "special" : (groups.find((group) => group.teams.includes(this.id))?.id ?? "unknown")
@@ -419,7 +419,7 @@ export const groupTeams = (teams: Team[]) => {
     ungroupedTeams.sort(shorthandComparator)
 
     return {
-        special: [AllPlayers, AllTeams, TheArmory, StatSqueezer, /*TheHall,*/],
+        special: [AllPlayers, AllTeams, TheArmory, StatSqueezer, TheHall],
         groups: navGroups,
         ungrouped: ungroupedTeams,
     }
@@ -430,11 +430,11 @@ export function shorthandComparator(team1: Team, team2: Team) {
 }
 
 function getSpecialTeam(props: SpecialTeamProps) {
-    return new Team(<ChroniclerEntity<BlaseballTeam>>{
+    return new Team(<ChroniclerEntity<ChroniclerTeam>>{
         entityId: props.id,
         validFrom: "",
         validTo: null,
-        data: <BlaseballTeam>{
+        data: <ChroniclerTeam>{
             emoji: props.emoji,
             fullName: props.fullName,
             id: props.id,

@@ -1,9 +1,10 @@
 import Player from './player'
 import { reverseAttributes } from './playerstats'
-import { ItemPart, PlayerItem } from './types'
+import { ItemPart, ChroniclerItem } from './chronicler'
 
 export default class Item {
-    public readonly adjustments
+    public readonly adjustments: Record<string, number>
+    public readonly affixes: Record<string, Record<string, number>>
     public readonly durability: number
     public readonly elements: string[]
     public readonly emoji: string
@@ -14,14 +15,15 @@ export default class Item {
     public readonly type: string
     public readonly weight: number
 
-    constructor(data: PlayerItem) {
+    constructor(data: ChroniclerItem) {
         this.id = data.id
         this.name = data.name
         this.health = data.health
         this.durability = data.durability
         this.type = data.root.name
         this.emoji = emojiForRoot(this.type)
-        const { adjustments, elements, mods, weight } = getAffixProperties(data)
+        const { adjustments, affixes, elements, mods, weight } = getAffixProperties(data)
+        this.affixes = affixes
         this.adjustments = adjustments
         this.elements = elements
         this.mods = mods
@@ -91,12 +93,14 @@ export const ItemComparator = (owners: Record<string, Player[]> | undefined, col
     }
 }
 
-function getAffixProperties(data: PlayerItem) {
+function getAffixProperties(data: ChroniclerItem) {
     const adjustments: Record<string, number> = {}
+    const partAdjustments: Record<string, Record<string, number>> = {}
     const elements: string[] = []
     const mods: string[] = []
     const affixes = [data.prePrefix, data.postPrefix, data.root, data.suffix].concat(data.prefixes).filter((affix): affix is ItemPart => !!affix)
     for(const affix of affixes) {
+        partAdjustments[affix.name] = partAdjustments[affix.name] ?? {}
         if(affix.name !== data.root.name) {
             elements.push(affix.name)
         }
@@ -107,6 +111,7 @@ function getAffixProperties(data: PlayerItem) {
             if(adjustment.type === 1) {
                 let statName = adjustmentIndices[adjustment.stat]
                 adjustments[statName] = (adjustments[statName] ?? 0) + adjustment.value;
+                partAdjustments[affix.name][statName] = (partAdjustments[affix.name][statName] ?? 0) + adjustment.value;
             }
         }
     }
@@ -117,6 +122,7 @@ function getAffixProperties(data: PlayerItem) {
         }, new Map<string, number>())
     return {
         adjustments: adjustments, 
+        affixes: partAdjustments,
         elements: Array.from(elementCounts.entries()).map(([element, count]) => element + (count > 1 ? (" x" + count) : "")),
         mods: mods,
         weight: elements.length,
