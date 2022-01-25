@@ -115,7 +115,12 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
 
 ItemsPage.getLayout = function getLayout(page: ReactElement, props?: PageProps) {
 	return (
-		<Layout hasFooter={true} {...props}>
+		<Layout 
+            title="The Armory &amp; Bargain Bin - Astrology" 
+            description="Take a look at every single item in Blaseball." 
+            hasFooter={true} 
+            {...props}
+        >
 			{page}
 		</Layout>
 	)

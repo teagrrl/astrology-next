@@ -5,6 +5,7 @@ import { averageReverseAttributes } from '../../components/averagestat'
 import AstrologyError from '../../components/error'
 import Layout from '../../components/layout'
 import AstrologyLoader from '../../components/loader'
+import Metadata from '../../components/metadata'
 import SqueezerTable from '../../components/squeezertable'
 import TeamHeader from '../../components/teamheader'
 import Team, { groupTeams, StatSqueezer } from '../../models/team'
@@ -53,6 +54,7 @@ export default function SqueezerPage({ leagueData, isItemApplied, isShowSimplifi
     if(leagueData.error) {
         return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
     }
+
     const { groups } = groupTeams(leagueData.teams || [])
     const currentSort = sort ? sort.toString() : undefined
     const currentDirection = direction 
@@ -61,8 +63,13 @@ export default function SqueezerPage({ leagueData, isItemApplied, isShowSimplifi
             ? (averageReverseAttributes.includes(currentSort) ? "asc" : "desc") 
             : "desc"
     const currentGroup = groups.find((group) => groupId === group.id)
-    const filteredTeams = currentGroup?.teams.filter((team) => team.data.lineup.length + team.data.rotation.length > 0) ?? []
-    const groupRanks = getSqueezerRanks(currentGroup?.teams ?? [], leagueData.averages ?? {}, isItemApplied)
+
+    if(!currentGroup) {
+        return <AstrologyError code={404} message={`Astrology was unable to find such a universe`} />
+    }
+
+    const filteredTeams = currentGroup.teams.filter((team) => team.data.lineup.length + team.data.rotation.length > 0) ?? []
+    const groupRanks = getSqueezerRanks(currentGroup.teams ?? [], leagueData.averages ?? {}, isItemApplied)
     const sortedTeams = currentSort ? Array.from(filteredTeams).sort(AverageComparator(leagueData.averages ?? {}, groupRanks, currentSort, currentDirection, isItemApplied)) : filteredTeams
 
     const sortTeams = (newSort: string) => {
@@ -98,6 +105,10 @@ export default function SqueezerPage({ leagueData, isItemApplied, isShowSimplifi
 
 	return (
         <section className="overflow-auto">
+            <Metadata
+                title={`${currentGroup.name} - Stat Squeezer - Astrology`} 
+                description={`Freshly squeezed stats from ${currentGroup.name}.`} 
+            />
             <TeamHeader team={StatSqueezer} />
             <ul className="flex flex-row flex-wrap gap-2 justify-center px-4 pb-2">
                 {groups.map((group) => 
@@ -130,7 +141,12 @@ export default function SqueezerPage({ leagueData, isItemApplied, isShowSimplifi
 
 SqueezerPage.getLayout = function getLayout(page: ReactElement, props?: PageProps) {
 	return (
-		<Layout hasFooter={true} {...props}>
+		<Layout 
+            title={`Stat Squeezer - Astrology`} 
+            description={`Freshly squeezed stats.`} 
+            hasFooter={true} 
+            {...props}
+        >
 			{page}
 		</Layout>
 	)

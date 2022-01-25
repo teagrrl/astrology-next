@@ -8,6 +8,7 @@ import { reverseAttributes } from '../../models/playerstats'
 import { PlayerComparator } from '../../models/player'
 import AstrologyLoader from '../../components/loader'
 import AstrologyError from '../../components/error'
+import Metadata from '../../components/metadata'
 
 type TeamPageProps = PageProps & {
 	
@@ -99,6 +100,10 @@ export default function TeamPage({ leagueData, isItemApplied, isShowSimplified }
 	
 	return (
         <section className="overflow-auto">
+			<Metadata
+				title={`${team.canonicalName()} - Astrology`} 
+				description={`Check out the star charts for the ${team.canonicalName()}.`} 
+			/>
 			<TeamHeader team={team} />
 			{sortedRosters.map((roster) => 
 				<PlayerTable 

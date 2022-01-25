@@ -55,7 +55,11 @@ export default function TeamsPage({ leagueData, isDarkMode }: PageProps) {
 
 TeamsPage.getLayout = function getLayout(page: ReactElement, props?: PageProps) {
 	return (
-		<Layout {...props}>
+		<Layout 
+            title="The Teams - Astrology" 
+            description="Choose a team to begin navigating their star charts."
+            {...props}
+        >
 			{page}
 		</Layout>
 	)

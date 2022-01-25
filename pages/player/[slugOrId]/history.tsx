@@ -5,6 +5,7 @@ import Emoji from '../../../components/emoji'
 import AstrologyError from '../../../components/error'
 import Layout from '../../../components/layout'
 import AstrologyLoader from '../../../components/loader'
+import Metadata from '../../../components/metadata'
 import PlayerHistoryTable from '../../../components/playerhistorytable'
 import { useChroniclerToFetchPlayerHistory } from '../../api/chronicler'
 import { PageProps } from '../../_app'
@@ -34,6 +35,9 @@ export default function PlayerHistoryPage({ leagueData, isShowSimplified, isItem
     }
 	if(!history.data) {
 		return <AstrologyError code={404} message={`Astrology was unable to load the detailed history for ${player.canonicalName()}`} />
+	}
+	if(!history.data.length) {
+		return <AstrologyLoader message={`Loading historical data for ${player.canonicalName()}...`} />
 	}
     
     const currentSort = sort ? sort.toString() as "asc" | "desc" : "asc"
@@ -69,6 +73,10 @@ export default function PlayerHistoryPage({ leagueData, isShowSimplified, isItem
 	
 	return (
         <section className="overflow-auto">
+            <Metadata
+                title={`Historical Data for ${player.canonicalName()} - Astrology`} 
+                description={`Check out the historical star charts for ${player.canonicalName()}.`} 
+            />
             <div className="flex justify-center items-center text-center p-5">
                 <Link href={{
                     pathname: "/player/[slugOrId]",

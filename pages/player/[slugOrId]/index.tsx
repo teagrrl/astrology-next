@@ -3,6 +3,7 @@ import { ReactElement } from 'react'
 import AstrologyError from '../../../components/error'
 import Layout from '../../../components/layout'
 import AstrologyLoader from '../../../components/loader'
+import Metadata from '../../../components/metadata'
 import { PlayerCard } from '../../../components/playercard'
 import { columns } from '../../../models/columns'
 import PlayerStats from '../../../models/playerstats'
@@ -33,6 +34,10 @@ export default function PlayerPage({ leagueData }: PlayerPageProps) {
 	
 	return (
         <section className="grid grid-cols-2 overflow-hidden">
+            <Metadata
+                title={`${player.canonicalName()} - Astrology`} 
+                description={`Check out the details stats for ${player.canonicalName()}${team ? (" of the " + team.canonicalName()) : ""}.`} 
+            />
             <PlayerCard player={player} team={team} stats={stats} />
             <div className="flex flex-col grow p-2 overflow-auto">
                 {columns.categories.map((category) => 

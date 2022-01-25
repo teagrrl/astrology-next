@@ -82,7 +82,12 @@ export default function PlayerTributesPage({ leagueData, isShowSimplified, isIte
 
 PlayerTributesPage.getLayout = function getLayout(page: ReactElement, props?: PageProps) {
 	return (
-		<Layout hasFooter={true} {...props}>
+		<Layout 
+            title="The Hall of Flame - Astrology" 
+            description="Compare the star charts and hidden attributes of those who roam the Halls of Flame." 
+            hasFooter={true} 
+            {...props}
+        >
 			{page}
 		</Layout>
 	)

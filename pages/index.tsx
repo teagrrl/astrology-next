@@ -2,12 +2,17 @@ import type { ReactElement } from 'react'
 import Link from 'next/link'
 import Layout from '../components/layout'
 import { PageProps } from './_app'
+import getConfig from 'next/config'
 
 type IndexProps = PageProps & {
 
 }
 
+const { publicRuntimeConfig } = getConfig()
+
 export default function IndexPage({}: IndexProps) {
+	const twitterHandle = publicRuntimeConfig.twitterHandle ?? "yoorilikeglass"
+
 	return (
 		<section className="flex flex-col grow justify-center text-center">
 			<h1 className="text-8xl font-bold mb-4">Astrology</h1>
@@ -18,7 +23,7 @@ export default function IndexPage({}: IndexProps) {
 			<p className="flex justify-center items-center">
 				<span className="p-1.5 mx-1.5 hover:px-2">@yooori#1569</span> 
 				<span> &#x2022; </span>
-				<a className="p-1.5 mx-1.5 rounded-md transition-all hover:px-2 hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white" href="https://twitter.com/yooridotblase">twitter</a> 
+				<a className="p-1.5 mx-1.5 rounded-md transition-all hover:px-2 hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white" href={`https://twitter.com/${twitterHandle}`}>twitter</a> 
 				<span> &#x2022; </span> 
 				<a className="p-1.5 mx-1.5 rounded-md transition-all hover:px-2 hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white" href="https://www.blaseball.com/team/d2634113-b650-47b9-ad95-673f8e28e687">&#x1F52E;</a> 
 				<span> &#x2022;  </span>

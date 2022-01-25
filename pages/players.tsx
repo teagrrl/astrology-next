@@ -128,7 +128,12 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
 
 PlayersPage.getLayout = function getLayout(page: ReactElement, props?: PageProps) {
 	return (
-		<Layout hasFooter={true} {...props}>
+		<Layout 
+            title="The Players - Astrology" 
+            description="Compare the star charts and hidden attributes of every player in Blaseball." 
+            hasFooter={true} 
+            {...props}
+        >
 			{page}
 		</Layout>
 	)
