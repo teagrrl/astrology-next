@@ -24,7 +24,7 @@ export default function PlayerVibes({ stats }: PlayerVibesProps) {
 
     return (
         <div>
-            <svg viewBox={`0 0 ${stageWidth} ${stageHeight}`} width={stageWidth} height={stageHeight}>
+            <svg className="w-full h-auto" viewBox={`0 0 ${stageWidth} ${stageHeight}`} width={stageWidth} height={stageHeight}>
                 <line className="stroke-1 stroke-gray-400" x1={0} y1={centerLine} x2={stageWidth} y2={centerLine} />
                 <path className="fill-transparent stroke-2 stroke-neutral-900 dark:stroke-neutral-100" d={vibeCoords} />
                 {vibePoints.map((point, index) => 

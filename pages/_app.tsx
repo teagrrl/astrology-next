@@ -18,6 +18,7 @@ export type PageProps = {
 	isItemApplied?: boolean,
 	isShowSimplified?: boolean,
 	toggleItemAdjustments?: MouseEventHandler,
+	toggleHelp?: MouseEventHandler,
 	toggleLights?: MouseEventHandler,
 	toggleSimpleStats?: MouseEventHandler,
 }

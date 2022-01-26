@@ -58,7 +58,7 @@ export default function ItemPropertiesPage({ leagueData }: PageProps) {
                 return 0
             })
             elements.push({
-                name: name.startsWith("the ") ? name.substring(4) : name.endsWith("'s") ? name.substring(0, name.length - 2) : name,
+                name: name,
                 attributes: attributes,
             })
         }
@@ -73,7 +73,7 @@ export default function ItemPropertiesPage({ leagueData }: PageProps) {
 
     return (
         <section className="overflow-auto">
-            <h1 className="font-bold text-3xl text-center my-5">Elements</h1>
+            <h1 className="font-bold text-3xl text-center my-5">Elemental Insight</h1>
             <ul className="flex flex-row flex-wrap justify-center gap-4 mb-5">
                 {elements.map((element) =>
                     <li key={element.name} className="p-4 rounded-md bg-slate-400/20">
@@ -94,7 +94,11 @@ export default function ItemPropertiesPage({ leagueData }: PageProps) {
 
 ItemPropertiesPage.getLayout = function getLayout(page: ReactElement, props?: PageProps) {
 	return (
-		<Layout {...props}>
+		<Layout 
+            title="Elemental Insight - Astrology" 
+            description="Your guide to the elements and their presumed attribute ranges."
+            {...props}
+        >
 			{page}
 		</Layout>
 	)

@@ -2,6 +2,7 @@ import Link from "next/link"
 import { columns } from "../models/columns"
 import Item from "../models/item"
 import Player from "../models/player"
+import { reverseAttributes } from "../models/playerstats"
 import Team from "../models/team"
 import Emoji from "./emoji"
 import { getModificationTitleById } from "./modification"
@@ -100,54 +101,65 @@ export default function PlayerItem({ item, owners, showDetails, showModEmojis, s
                     </span>
                 </div>
                 {showDetails && 
-                    <div className="grid grid-cols-2 grow gap-2 ml-2.5 pl-2.5 border-l-[1px] border-white dark:border-zinc-400">
-                        <span className="font-semibold">Type</span>
-                        <span>{item.type}</span>
-                        <span className="font-semibold">Elements</span>
-                        <span>{item.elements.length > 0 ? item.elements.join(", ") : "None"}</span>
-                        <span className="font-semibold">Mods</span>
-                        <span>
-                            {item.mods.length > 0 
-                                ? showModEmojis 
-                                    ? <ModificationList type="player" item={item.mods} />
-                                    : item.mods.map((mod) => getModificationTitleById(mod)).join(", ")
-                                : "None"
-                            }
-                        </span>
-                    </div>
+                    <table className="table-auto ml-2 border-l-[1px] border-white dark:border-zinc-400">
+                        <tbody>
+                            <tr>
+                                <td className="font-semibold px-2">Type</td>
+                                <td>{item.type}</td>
+                            </tr>
+                            <tr>
+                                <td className="font-semibold px-2">Elements</td>
+                                <td>{item.elements.length > 0 ? item.elements.join(", ") : "None"}</td>
+                            </tr>
+                            <tr>
+                                <td className="font-semibold px-2">Mods</td>
+                                <td>
+                                    {item.mods.length > 0 
+                                        ? showModEmojis 
+                                            ? <ModificationList type="player" item={item.mods} />
+                                            : item.mods.map((mod) => getModificationTitleById(mod)).join(", ")
+                                        : "None"
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 }
             </div>
             {showStats && 
                 <div className="mt-4 pt-4 border-t-[1px] border-white dark:border-zinc-400">
                     {filteredColumns.map((category) => 
-                        category.id !== "misc" && <div key={category.id} className="mb-5 last:mb-0">
-                            <h2 className="text-2xl font-bold mb-2">{category.name}</h2>
-                            {category.attributes.map((attribute) => 
-                                <div 
-                                    key={attribute.id} 
-                                    className="grid grid-flow-col items-center px-4 py-2 even:bg-zinc-200 dark:even:bg-zinc-800"
-                                >
-                                    <span className="text-ellipsis font-semibold overflow-hidden">{attribute.name}</span>
-                                    <Tooltip key={attribute.id} content={
-                                        <div>
-                                            <div>
-                                                <span className="font-semibold">{attribute.name}: </span><span>{item.adjustments[attribute.id] > 0 ? "+" : "-"}{item.adjustments[attribute.id]}</span>
-                                            </div>
-                                            {item.affixes.length > 0 && <div className="flex flex-col justify-center items-center w-full mt-2 pt-2 border-t-[1px] border-white dark:border-zinc-500">
-                                                {item.affixes.map((affix, index) => 
-                                                    affix.adjustments[attribute.id] && <div key={`${affix.name}_${index}`}>
-                                                        <span className="font-semibold">{affix.name}: </span>
-                                                        <span>{affix.adjustments[attribute.id] > 0 ? "+" : "-"}{Math.abs(affix.adjustments[attribute.id])}</span>
+                        category.id !== "misc" && <table key={category.id} className="table-fixed mb-5 last:mb-0">
+                            <tbody>
+                                <tr>
+                                    <th className="pb-2 text-left text-2xl font-bold" colSpan={2}>{category.name}</th>
+                                </tr>
+                                {category.attributes.map((attribute) => 
+                                    <tr key={attribute.id} className="even:bg-zinc-200 dark:even:bg-zinc-800">
+                                        <td className="w-full px-4 py-2 font-semibold whitespace-nowrap">{attribute.name}</td>
+                                        <td className="px-4 py-2 whitespace-nowrap">
+                                            <Tooltip key={attribute.id} content={
+                                                <div>
+                                                    <div>
+                                                        <span className="font-semibold">{attribute.name}: </span><span>{item.adjustments[attribute.id] > 0 ? "+" : ""}{item.adjustments[attribute.id]}</span>
                                                     </div>
-                                                )}
-                                            </div>}
-                                        </div>
-                                    }>
-                                        <span className={`text-right ${item.adjustments[attribute.id] > 0 ? "text-sky-500" : "text-red-500"}`}>{item.adjustments[attribute.id] > 0 ? "+" : "-"}{Math.abs(Math.round(1000 * item.adjustments[attribute.id]) / 1000)}</span>
-                                    </Tooltip>
-                                </div>
-                            )}
-                        </div>
+                                                    {item.affixes.length > 0 && <div className="flex flex-col justify-center items-center w-full mt-2 pt-2 border-t-[1px] border-white dark:border-zinc-500">
+                                                        {item.affixes.map((affix, index) => 
+                                                            affix.adjustments[attribute.id] && <div key={`${affix.name}_${index}`}>
+                                                                <span className="font-semibold">{affix.name}: </span>
+                                                                <span>{affix.adjustments[attribute.id] > 0 ? "+" : ""}{affix.adjustments[attribute.id]}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>}
+                                                </div>
+                                            }>
+                                                <span className={`text-right ${(reverseAttributes.includes(attribute.id) ? item.adjustments[attribute.id] < 0 : item.adjustments[attribute.id] > 0) ? "text-sky-500" : "text-red-500"}`}>{item.adjustments[attribute.id] > 0 ? "+" : "-"}{Math.abs(Math.round(1000 * item.adjustments[attribute.id]) / 1000)}</span>
+                                            </Tooltip>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
                     )}
                 </div>
             }

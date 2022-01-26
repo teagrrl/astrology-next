@@ -8,17 +8,19 @@ import ModificationList from "./modificationlist"
 import PlayerItem from "./playeritem"
 import PlayerStars from "./playerstars"
 import PlayerVibes from "./playervibes"
+import Tooltip from "./tooltip"
 
 
 type PlayerCardProps = {
     player: Player,
     team?: Team,
     stats: PlayerStats,
+    isItemApplied?: boolean,
 }
 
-export function PlayerCard({ player, team, stats }: PlayerCardProps) {
+export function PlayerCard({ player, team, stats, isItemApplied }: PlayerCardProps) {
     return (
-        <div className="m-2 overflow-auto text-black dark:text-white border-[1px] border-black dark:border-white ">
+        <div className="m-2 text-black dark:text-white border-[1px] border-black dark:border-white md:w-1/2 md:overflow-auto">
             <div className="border-b-[1px] border-black dark:border-white p-5">
                 <div className="flex flex-row items-center text-2xl">
                     <a className="font-semibold" href={`https://blaseball.com/player/${player.id}`}>{player.canonicalName()}</a>
@@ -66,19 +68,29 @@ export function PlayerCard({ player, team, stats }: PlayerCardProps) {
             }
             <div>
                 <PlayerStatRow title="Vibes"><PlayerVibes stats={stats} /></PlayerStatRow>
-                <PlayerStatRow title="Batting"><PlayerStars baseRating={stats.battingRating(false)} adjustedRating={stats.battingRating(true)} evolution={player.data.evolution} /></PlayerStatRow>
-                <PlayerStatRow title="Pitching"><PlayerStars baseRating={stats.pitchingRating(false)} adjustedRating={stats.pitchingRating(true)} evolution={player.data.evolution} /></PlayerStatRow>
-                <PlayerStatRow title="Baserunning"><PlayerStars baseRating={stats.baserunningRating(false)} adjustedRating={stats.baserunningRating(true)} evolution={player.data.evolution} /></PlayerStatRow>
-                <PlayerStatRow title="Defense"><PlayerStars baseRating={stats.defenseRating(false)} adjustedRating={stats.defenseRating(true)} evolution={player.data.evolution} /></PlayerStatRow>
+                <PlayerStatRow title="Batting"><PlayerStars title="Batting" baseRating={stats.battingRating(false)} adjustedRating={stats.battingRating(true)} evolution={player.data.evolution} isItemApplied={isItemApplied} /></PlayerStatRow>
+                <PlayerStatRow title="Pitching"><PlayerStars title="Pitching" baseRating={stats.pitchingRating(false)} adjustedRating={stats.pitchingRating(true)} evolution={player.data.evolution} isItemApplied={isItemApplied} /></PlayerStatRow>
+                <PlayerStatRow title="Baserunning"><PlayerStars title="Baserunning" baseRating={stats.baserunningRating(false)} adjustedRating={stats.baserunningRating(true)} evolution={player.data.evolution} isItemApplied={isItemApplied} /></PlayerStatRow>
+                <PlayerStatRow title="Defense"><PlayerStars title="Defense" baseRating={stats.defenseRating(false)} adjustedRating={stats.defenseRating(true)} evolution={player.data.evolution} isItemApplied={isItemApplied} /></PlayerStatRow>
                 <PlayerStatRow title="Combined Rating">
-                    <div title={`${5 * stats.combinedRating(true)} Total Stars`}>
-                        <span className="font-semibold">{Math.round(500 * stats.combinedRating(false)) / 100}</span>
-                        {stats.hasItemAdjustment("combined") && <>
-                            <span className="mx-1">{stats.combinedRating(true) - stats.combinedRating(false) > 0 ? "+" : "-"}</span>
-                            <span className={`font-semibold ${stats.combinedRating(true) > stats.combinedRating(false) ? "text-sky-500" : "text-red-500"}`}>{Math.abs(Math.round(500 * (stats.combinedRating(true) - stats.combinedRating(false))) / 100)}</span>
-                        </>}
-                        <Emoji emoji="0x1F31F" emojiClass="inline w-4 h-4 ml-1 align-[-0.1em]" />
-                    </div>
+                    <Tooltip
+                        content={<div className="flex flex-col justify-center">
+                            <span className="text-center font-semibold">{5 * stats.combinedRating(true)} Combined Stars</span>
+                            {isItemApplied && stats.hasItemAdjustment("combined") && <div className="flex flex-col justify-center items-center w-full mt-2 pt-2 border-t-[1px] border-white dark:border-zinc-500">
+                                <div><span className="font-semibold">Base: </span><span>{5 * stats.combinedRating(false)}</span></div>
+                                <div><span className="font-semibold">Items: </span><span className={stats.combinedRating(true) > stats.combinedRating(false) ? "text-sky-500" : "text-red-500"}>{stats.combinedRating(true) > stats.combinedRating(false) ? "+" : ""}{5 * (stats.combinedRating(true) - stats.combinedRating(false))}</span></div>
+                            </div>}
+                        </div>}
+                    >
+                        <div>
+                            <span className="font-semibold">{Math.round(500 * stats.combinedRating(false)) / 100}</span>
+                            {stats.hasItemAdjustment("combined") && <>
+                                <span className="mx-1">{stats.combinedRating(true) - stats.combinedRating(false) > 0 ? "+" : "-"}</span>
+                                <span className={`font-semibold ${stats.combinedRating(true) > stats.combinedRating(false) ? "text-sky-500" : "text-red-500"}`}>{Math.abs(Math.round(500 * (stats.combinedRating(true) - stats.combinedRating(false))) / 100)}</span>
+                            </>}
+                            <Emoji emoji="0x1F31F" emojiClass="inline w-4 h-4 ml-1 align-[-0.1em]" />
+                        </div>
+                    </Tooltip>
                 </PlayerStatRow>
                 <div className="grid grid-cols-2 gap-5 px-5">
                     {Array.from(Array(4).keys()).map((index) => 

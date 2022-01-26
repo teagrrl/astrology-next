@@ -10,7 +10,7 @@ type LayoutProps = PageProps & MetadataProps & {
     hasFooter?: boolean, 
 }
 
-export default function Layout({ children, title, description, image, hasFooter, leagueData, isDarkMode, isItemApplied, isShowSimplified, toggleItemAdjustments, toggleLights, toggleSimpleStats } : LayoutProps) {
+export default function Layout({ children, title, description, image, hasFooter, leagueData, isDarkMode, isItemApplied, isShowSimplified, toggleItemAdjustments, toggleHelp, toggleLights, toggleSimpleStats } : LayoutProps) {
     return (
         <div className="flex flex-col h-screen w-screen bg-white dark:bg-zinc-900 text-black dark:text-white transition">
             <Metadata title={title} description={description} image={image} />
@@ -26,20 +26,18 @@ export default function Layout({ children, title, description, image, hasFooter,
                 <meta name="msapplication-config" content="/icons/browserconfig.xml" />
                 <meta name="theme-color" content="#2b2b2b" />
             </Head>
-            <nav className="p-1">
-                <Navigation leagueData={leagueData} isDarkMode={isDarkMode} />
-            </nav>
+            <Navigation leagueData={leagueData} isDarkMode={isDarkMode} />
             <main className="flex flex-col grow overflow-hidden">{children}</main>
-            {hasFooter && <footer className="flex flex-row flex-wrap justify-end gap-1 p-2">
-                <Footer 
-                    isDarkMode={isDarkMode}
-                    isItemApplied={isItemApplied} 
-                    isShowSimplified={isShowSimplified} 
-                    toggleItemAdjustments={toggleItemAdjustments} 
-                    toggleLights={toggleLights}
-                    toggleSimpleStats={toggleSimpleStats} 
-                />
-            </footer>}
+            <Footer 
+                isSimpleFooter={hasFooter}
+                isDarkMode={isDarkMode}
+                isItemApplied={isItemApplied} 
+                isShowSimplified={isShowSimplified} 
+                toggleItemAdjustments={toggleItemAdjustments} 
+                toggleHelp={toggleHelp}
+                toggleLights={toggleLights}
+                toggleSimpleStats={toggleSimpleStats} 
+            />
         </div>
     )
 }

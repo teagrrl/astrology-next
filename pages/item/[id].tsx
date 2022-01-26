@@ -38,12 +38,12 @@ export default function ItemPage({ leagueData }: ItemPageProps) {
     }
 
 	return (
-        <section className="flex grow justify-center items-center">
+        <section className="overflow-auto md:flex md:grow md:justify-center md:items-center">
             <Metadata
                 title={`${titleOwner ?? ""}${item.name} - Astrology`} 
                 description={`Check out ${titleOwner ?? "the"} ${item.name} on Astrology.`} 
             />
-            <div className="p-4 border-[1px] border-zinc-500 dark:border-white rounded-md overflow-auto max-h-[70vh]">
+            <div className="m-4 md:p-4 md:border-[1px] md:border-zinc-500 md:dark:border-white md:rounded-md md:overflow-auto md:max-h-[70vh]">
                 <PlayerItem item={item} owners={owners} showDetails={true} showModEmojis={true} showStats={true} />
             </div>
         </section>

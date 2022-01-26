@@ -105,8 +105,14 @@ function getAffixProperties(data: ChroniclerItem) {
     const affixes = [data.prePrefix, data.postPrefix, data.root, data.suffix].concat(data.prefixes).filter((affix): affix is ItemPart => !!affix)
     for(const affix of affixes) {
         const affixAdjustments: Record<string, number> = {}
+        // clean up the name a little bit so it looks nicer
+        const affixName = affix.name.startsWith("the ")
+            ? affix.name.substring(4) 
+            : affix.name.endsWith("'s") 
+                ? affix.name.substring(0, affix.name.length - 2) 
+                : affix.name
         if(affix.name !== data.root.name) {
-            elements.push(affix.name)
+            elements.push(affixName)
         }
         for(const adjustment of affix.adjustments) {
             if(adjustment.type === 0) {
@@ -119,7 +125,7 @@ function getAffixProperties(data: ChroniclerItem) {
             }
         }
         partAdjustments.push({
-            name: affix.name,
+            name: affixName,
             adjustments: affixAdjustments,
         })
     }

@@ -18,7 +18,7 @@ export default function Metadata({ title, description, image }: MetadataProps) {
 
     const siteName = "Astrology - A quick look at Blaseball star charts."
     const siteTitle = title ?? siteName
-    const socialDescription = description ?? "A quick look at Blaseball star charts."
+    const socialDescription = description ?? "Horoscopes for the advanced Blaseball fan. Read simple or detailed star charts for your favorite teams, players, and more!"
     const socialImage = image ?? (absoluteUrl ?? "") + "/astrology_preview.png"
     const twitterHandle = publicRuntimeConfig.twitterHandle
     
@@ -34,13 +34,11 @@ export default function Metadata({ title, description, image }: MetadataProps) {
             <meta name="twitter:description" content={socialDescription} key="twdescription" />
             <meta name="twitter:title" content={siteTitle} key="twtitle" />
             <meta name="twitter:image" content={socialImage} key="twimage" />
-            <meta name="twitter:image:alt" content={siteTitle} key="twimagealt" />
             {/* Open Graph */}
             <meta property="og:description" content={socialDescription} key="ogdescription" />
             <meta property="og:site_name" content={siteName} key="ogsitename" />
             <meta property="og:title" content={siteTitle} key="ogtitle" />
             <meta property="og:image" content={socialImage} key="ogimage" />
-            <meta property="og:image:alt" content={siteTitle} key="ogimagealt" />
             {!!absoluteUrl && <meta property="og:url" content={absoluteUrl + asPath} key="ogurl" />}
         </Head>
     )

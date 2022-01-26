@@ -30,7 +30,11 @@ export default function ModifiersPage({}: PageProps) {
 
 ModifiersPage.getLayout = function getLayout(page: ReactElement, props?: PageProps) {
 	return (
-		<Layout {...props}>
+		<Layout 
+            title="Modifications - Astrology" 
+            description="Every single modification detected by Astrology and their associated emojis."
+            {...props}
+        >
 			{page}
 		</Layout>
 	)
