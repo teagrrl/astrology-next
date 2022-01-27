@@ -172,13 +172,13 @@ function ItemStat({ item, attribute }: ItemStatProps) {
                             </div>
                             <div>
                                 <span className="font-semibold">{attribute.name}: </span>
-                                <span>{adjustment > 0 ? "+" : "-"}{Math.abs(adjustment)}</span>
+                                <span>{adjustment > 0 ? "+" : ""}{adjustment}</span>
                             </div>
                             {affixAdjustments.length > 0 && <div className="flex flex-col justify-center items-center w-full mt-2 pt-2 border-t-[1px] border-white dark:border-zinc-500">
                                 {affixAdjustments.map((affix, index) => 
                                     <div key={`${affix.id}_${index}`}>
                                         <span className="font-semibold">{affix.name}: </span>
-                                        <span>{affix.adjustment > 0 ? "+" : "-"}{Math.abs(affix.adjustment)}</span>
+                                        <span>{affix.adjustment > 0 ? "+" : ""}{affix.adjustment}</span>
                                     </div>
                                 )}
                             </div>}

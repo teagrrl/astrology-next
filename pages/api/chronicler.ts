@@ -3,7 +3,8 @@ import Item from '../../models/item';
 import Player, { PlayerPosition } from '../../models/player';
 import PlayerStats, { AttributeId, attributeIds, categoryIds } from '../../models/playerstats';
 import Team from '../../models/team';
-import { ChroniclerEntities, ChroniclerEntity, ChroniclerItem, ChroniclerPlayer, ChroniclerTeam, ChroniclerTributes } from '../../models/chronicler';
+import { ChroniclerEntities, ChroniclerEntity, ChroniclerItem, ChroniclerPlayer, ChroniclerBallpark, ChroniclerTeam, ChroniclerTributes } from '../../models/chronicler';
+import Ballpark from '../../models/ballpark';
 
 type Roster = {
     lineup: Player[],
@@ -33,6 +34,11 @@ export interface HistoryData<T> {
 export interface TributeData {
     teamIds: string[];
     playerIds: string[];
+    error?: string;
+}
+
+export interface BallparkData {
+    data: Ballpark[];
     error?: string;
 }
 
@@ -105,6 +111,14 @@ export const useChroniclerToFetchPlayerHistory = (id?: string): HistoryData<Play
     
     return {
         data: snapshots,
+        error: error?.toString(),
+    }
+}
+
+export const useChroniclerToFetchBallparks = (): BallparkData => {
+    const { data, error } = useSWR("ballparks", ballparksFetcher)
+    return {
+        data: data ? data.map((ballpark) => new Ballpark(ballpark)) : [],
         error: error?.toString(),
     }
 }
@@ -259,6 +273,10 @@ async function itemsFetcher(): Promise<ChroniclerEntity<ChroniclerItem>[]> {
 
 async function tributesFetcher(): Promise<ChroniclerEntity<ChroniclerTributes>[]> {
     return await pagedFetcher<ChroniclerTributes>("entities", "tributes")
+}
+
+async function ballparksFetcher(): Promise<ChroniclerEntity<ChroniclerBallpark>[]> {
+    return await pagedFetcher<ChroniclerBallpark>("entities", "stadium")
 }
 
 async function pagedFetcher<T>(api: "entities" | "versions", type: string, id?: string) : Promise<ChroniclerEntity<T>[]> {

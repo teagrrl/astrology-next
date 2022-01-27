@@ -10,7 +10,7 @@ type PlayerStarsProps = {
 }
 
 export default function PlayerStars({ title, baseRating, adjustedRating, evolution = 0, isItemApplied }: PlayerStarsProps) {
-    const totalStars = 5 * (adjustedRating ?? baseRating)
+    const totalStars = 5 * ((isItemApplied ? adjustedRating : undefined) ?? baseRating)
     const starDiff = adjustedRating ? adjustedRating - baseRating : 0
     return (
         <Tooltip
@@ -31,7 +31,7 @@ export default function PlayerStars({ title, baseRating, adjustedRating, evoluti
                 }
                 <span className="font-semibold ml-2 before:content-['('] after:content-[')']">
                     <span>{Math.round(500 * baseRating) / 100}</span>
-                    {starDiff !== 0 &&
+                    {isItemApplied && starDiff !== 0 &&
                         <>
                             <span className="mx-1">{starDiff > 0 ? "+" : "-"}</span>
                             <span className={starDiff > 0 ? "text-sky-500" : "text-red-500"}>{Math.abs(Math.round(500 * starDiff) / 100)}</span>

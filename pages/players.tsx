@@ -21,7 +21,7 @@ type Universe = {
 }
 export default function PlayersPage({ leagueData, isShowSimplified, isItemApplied }: PageProps) {
     const router = useRouter()
-    const { page, sort, direction, universes } = router.query
+    const { page, sort, direction, universes, collision } = router.query
             
 	if(!leagueData) {
 		return <AstrologyLoader />
@@ -54,10 +54,12 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         if(player1.id < player2.id) return -1
         return 0
     })
+    const duplicateType = collision && ["name", "slug"].includes(collision.toString()) ? collision : undefined
     
     const allPlayers = leagueData.players ?? []
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
-    const filteredPlayers = currentUniversePlayers.length > 0 ? currentUniversePlayers : allPlayers
+    const availablePlayers = currentUniversePlayers.length > 0 ? currentUniversePlayers : allPlayers
+    const filteredPlayers = duplicateType ? availablePlayers.filter((player1) => availablePlayers.some((player2) => player1.id !== player2.id && ((duplicateType === "name" && player1.canonicalName() === player2.canonicalName()) || (duplicateType === "slug" && player1.slug() === player2.slug())))) : availablePlayers
     const sortedPlayers = currentSort ? Array.from(filteredPlayers).sort(PlayerComparator(leagueData.positions, currentSort, currentDirection)) : filteredPlayers
     const pagePlayers = sortedPlayers.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedPlayers.length))
     const numPages = Math.ceil(sortedPlayers.length / pageLimit)
@@ -82,12 +84,14 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
                     universes: currentUniverseIds,
                     sort: newSort,
                     direction: newDirection,
+                    collision: duplicateType,
                 }
             }, undefined, { shallow: true })
         } else {
             router.push({
                 query: {
                     universes: currentUniverseIds,
+                    collision: duplicateType,
                 }
             }, undefined, { shallow: true })
         }
@@ -97,31 +101,36 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         <section className="overflow-auto">
             <TeamHeader team={AllPlayers} />
             {currentUniverses.length > 0 && <div className="text-lg text-center font-semibold">Currently only showing players from {currentUniverses.map((universe) => universe.name).join(" & ")}</div>}
-            <Pagination href={{ 
+            {numPages > 1 && <Pagination href={{ 
                 pathname: "/players",
                 query: {
                     universes: currentUniverseIds,
                     sort: currentSort,
                     direction: currentSort ? currentDirection : undefined,
+                    collision: duplicateType,
                 },
-            }} currentPage={currentPage} numPages={numPages} />
-            <PlayerTable 
-                players={pagePlayers} 
-                positions={leagueData.positions} 
-                sort={currentSort} 
-                direction={currentDirection} 
-                triggerSort={sortPlayers}
-                isShowSimplified={isShowSimplified} 
-                isItemApplied={isItemApplied} 
-            />
-            <Pagination href={{ 
+            }} currentPage={currentPage} numPages={numPages} />}
+            {allPlayers.length > 0 && pagePlayers.length > 0 
+                ? <PlayerTable 
+                    players={pagePlayers} 
+                    positions={leagueData.positions} 
+                    sort={currentSort} 
+                    direction={currentDirection} 
+                    triggerSort={sortPlayers}
+                    isShowSimplified={isShowSimplified} 
+                    isItemApplied={isItemApplied} 
+                /> 
+                : <h1 className="text-3xl text-center font-bold p-5">Huh, it looks like not enough players with that criteria exist.</h1>
+            }
+            {numPages > 1 && <Pagination href={{ 
                 pathname: "/players",
                 query: {
                     universes: currentUniverseIds,
                     sort: currentSort,
                     direction: currentSort ? currentDirection : undefined,
+                    collision: duplicateType,
                 },
-            }} currentPage={currentPage} numPages={numPages} />
+            }} currentPage={currentPage} numPages={numPages} />}
         </section>
 	)
 }

@@ -76,7 +76,7 @@ export default function AverageStat({ header, averages, stat, id, hasColorScale,
                                     </div>
                                     <div>
                                         <span className="font-semibold">Items: </span>
-                                        <span className={statDifference > 0 ? "text-sky-300 dark:text-sky-500" : "text-red-400 dark:text-red-600"}>{statDifference > 0 ? "+" : "-"}{Math.abs(statDifference)}</span>
+                                        <span className={(averageReverseAttributes.includes(statId) ? statDifference < 0 : statDifference > 0) ? "text-sky-300 dark:text-sky-500" : "text-red-400 dark:text-red-600"}>{statDifference > 0 ? "+" : ""}{statDifference}</span>
                                     </div>
                                 </div>
                             }

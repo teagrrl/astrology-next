@@ -7,7 +7,7 @@ import Metadata from '../../../components/metadata'
 import { PlayerCard } from '../../../components/playercard'
 import Tooltip from '../../../components/tooltip'
 import { columns } from '../../../models/columns'
-import PlayerStats from '../../../models/playerstats'
+import PlayerStats, { reverseAttributes } from '../../../models/playerstats'
 import { PageProps } from '../../_app'
 
 type PlayerPageProps = PageProps & {
@@ -61,7 +61,7 @@ export default function PlayerPage({ leagueData, isItemApplied }: PlayerPageProp
                                                         </div>
                                                         {player.items.map((item) => 
                                                             item.adjustments[attribute.id] && item.adjustments[attribute.id] !== 0 && <div key={`${attribute.id}_${item.id}`}>
-                                                                <span className="font-semibold">{item.name}: </span><span className={item.adjustments[attribute.id] > 0 ? "text-sky-500" : "text-red-500"}>{item.adjustments[attribute.id] > 0 ? "+" : ""}{item.adjustments[attribute.id]}</span>
+                                                                <span className="font-semibold">{item.name}: </span><span className={(reverseAttributes.includes(attribute.id) ? item.adjustments[attribute.id] < 0 : item.adjustments[attribute.id] > 0) ? "text-sky-500" : "text-red-500"}>{item.adjustments[attribute.id] > 0 ? "+" : ""}{item.adjustments[attribute.id]}</span>
                                                             </div>
                                                         )}
                                                     </div>}
@@ -69,7 +69,7 @@ export default function PlayerPage({ leagueData, isItemApplied }: PlayerPageProp
                                             </div>}
                                         >
                                             <div className="h-4 rounded-full overflow-hidden bg-zinc-400 dark:bg-zinc-700">
-                                                <div className={`h-4 rounded-full ${stats.getScaleClass(attribute.id)}`} style={{ width: `${(stats.get(attribute.id, true) as number) * 100}%` }}></div>
+                                                <div className={`h-4 rounded-full ${stats.getScaleClass(attribute.id, isItemApplied)}`} style={{ width: `${(stats.get(attribute.id, isItemApplied) as number) * 100}%` }}></div>
                                             </div>
                                         </Tooltip>
                                     </td>
@@ -77,7 +77,7 @@ export default function PlayerPage({ leagueData, isItemApplied }: PlayerPageProp
                                         <span>{Math.round(1000 * (stats.get(attribute.id, false) as number)) / 1000}</span>
                                         {isItemApplied && stats.hasItemAdjustment(attribute.id) && <>
                                             <span className="mx-1">{stats.adjustments[attribute.id] > 0 ? "+" : "-"}</span>
-                                            <span className={stats.adjustments[attribute.id] > 0 ? "text-sky-500" : "text-red-500"}>
+                                            <span className={(reverseAttributes.includes(attribute.id) ? stats.adjustments[attribute.id] < 0 : stats.adjustments[attribute.id] > 0) ? "text-sky-500" : "text-red-500"}>
                                                 {Math.round(1000 * Math.abs(stats.adjustments[attribute.id])) / 1000}
                                             </span>
                                         </>}

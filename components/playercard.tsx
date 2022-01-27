@@ -10,12 +10,16 @@ import PlayerStars from "./playerstars"
 import PlayerVibes from "./playervibes"
 import Tooltip from "./tooltip"
 
-
 type PlayerCardProps = {
     player: Player,
     team?: Team,
     stats: PlayerStats,
     isItemApplied?: boolean,
+}
+
+type PlayerCardStatRowProps = {
+    children: ReactNode,
+    title: string,
 }
 
 export function PlayerCard({ player, team, stats, isItemApplied }: PlayerCardProps) {
@@ -84,7 +88,7 @@ export function PlayerCard({ player, team, stats, isItemApplied }: PlayerCardPro
                     >
                         <div>
                             <span className="font-semibold">{Math.round(500 * stats.combinedRating(false)) / 100}</span>
-                            {stats.hasItemAdjustment("combined") && <>
+                            {isItemApplied && stats.hasItemAdjustment("combined") && <>
                                 <span className="mx-1">{stats.combinedRating(true) - stats.combinedRating(false) > 0 ? "+" : "-"}</span>
                                 <span className={`font-semibold ${stats.combinedRating(true) > stats.combinedRating(false) ? "text-sky-500" : "text-red-500"}`}>{Math.abs(Math.round(500 * (stats.combinedRating(true) - stats.combinedRating(false))) / 100)}</span>
                             </>}
@@ -118,11 +122,6 @@ export function PlayerCard({ player, team, stats, isItemApplied }: PlayerCardPro
             </div>
         </div>
     )
-}
-
-type PlayerCardStatRowProps = {
-    children: ReactNode,
-    title: string,
 }
 
 function PlayerStatRow({ children, title }: PlayerCardStatRowProps) {

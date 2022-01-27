@@ -98,7 +98,7 @@ export default function PlayerStat({ player, stat, id, hasColorScale, isStarRati
                                                     </div>
                                                     <div>
                                                         <span className="font-semibold">Items: </span>
-                                                        <span className={starDifference > 0 ? "text-sky-300 dark:text-sky-500" : "text-red-400 dark:text-red-600"}>{starDifference > 0 ? "+" : "-"}{Math.abs(starDifference)}</span>
+                                                        <span className={starDifference > 0 ? "text-sky-300 dark:text-sky-500" : "text-red-400 dark:text-red-600"}>{starDifference > 0 ? "+" : ""}{starDifference}</span>
                                                     </div>
                                                 </>
                                                 : <>
@@ -106,7 +106,7 @@ export default function PlayerStat({ player, stat, id, hasColorScale, isStarRati
                                                         <span className="font-semibold">Base: </span><span>{baseStat}</span>
                                                     </div>
                                                     {itemAdjustments.map((item) => 
-                                                        <div key={item.id}><span className="font-semibold">{item.name}: </span><span className={(statId && reverseAttributes.includes(statId) ? item.adjustment < 0 : item.adjustment > 0) ? "text-sky-300 dark:text-sky-500" : "text-red-400 dark:text-red-600"}>{item.adjustment > 0 ? "+" : "-"}{Math.abs(Math.round(1000 * item.adjustment) / 1000)}</span></div>
+                                                        <div key={item.id}><span className="font-semibold">{item.name}: </span><span className={(statId && reverseAttributes.includes(statId) ? item.adjustment < 0 : item.adjustment > 0) ? "text-sky-300 dark:text-sky-500" : "text-red-400 dark:text-red-600"}>{item.adjustment > 0 ? "+" : ""}{Math.round(1000 * item.adjustment) / 1000}</span></div>
                                                     )}
                                                 </> 
                                             }

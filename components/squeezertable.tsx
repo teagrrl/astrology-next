@@ -77,7 +77,7 @@ export default function SqueezerTable({teams, averages, ranks, sort, direction, 
                                     </Link>
                                 </td>
                                 <td className="px-1.5 py-1">
-                                    <a href={`https://blaseball.com/player/${team.id}`} title={`Go to official team page for the ${team.canonicalName()}`}>
+                                    <a href={`https://blaseball.com/team/${team.id}`} title={`Go to official team page for the ${team.canonicalName()}`}>
                                         <Emoji emoji="0x1F517" emojiClass="min-w-[1em] h-4" />
                                     </a>
                                 </td>

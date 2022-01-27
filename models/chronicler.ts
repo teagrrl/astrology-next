@@ -164,3 +164,41 @@ export interface PlayerTribute {
     peanuts: number;
     playerId: string;
 }
+
+export interface ChroniclerBallpark {
+    id: string;
+    teamId: string;
+    name: string;
+    nickname: string;
+    model: number | null;
+
+    mainColor: string;
+    secondaryColor: string;
+    tertiaryColor: string;
+
+    elongation: number;
+    fortification: number;
+    forwardness: number;
+    grandiosity: number;
+    inconvenience: number;
+    mysticism: number;
+    obtuseness: number;
+    ominousness: number;
+    viscosity: number;
+
+    mods: string[];
+    weather: Record<string, number>;
+    renoLog: Record<string, boolean>;
+
+    hype: number;
+    filthiness: number;
+    luxuriousness: number;
+
+    birds: number;
+    state: BallparkState;
+}
+
+export interface BallparkState {
+    air_balloons?: number;
+    flood_balloons?: number;
+}

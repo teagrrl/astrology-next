@@ -419,7 +419,7 @@ export const groupTeams = (teams: Team[]) => {
     ungroupedTeams.sort(shorthandComparator)
 
     return {
-        special: [AllPlayers, AllTeams, TheArmory, StatSqueezer, TheHall],
+        special: [AllPlayers, AllTeams, AllBallparks, TheArmory, StatSqueezer, TheHall],
         groups: navGroups,
         ungrouped: ungroupedTeams,
     }
@@ -470,6 +470,16 @@ export const AllTeams = getSpecialTeam({
     secondaryColor: "#c58585",
     shorthand: "All Teams",
     slogan: "Pick your favorite.",
+})
+
+export const AllBallparks = getSpecialTeam({
+    emoji: "0x1F3DF",
+    fullName: "The Ballparks",
+    id: "ballparks",
+    mainColor: "#9cd965",
+    secondaryColor: "#a3e36a",
+    shorthand: "All Ballparks",
+    slogan: "Located somewhere on the Immaterial Plane.",
 })
 
 export const TheArmory = getSpecialTeam({

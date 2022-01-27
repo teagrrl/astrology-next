@@ -28,6 +28,11 @@ module.exports = {
 				destination: '/squeezer/beta',
 				permanent: true,
 			},
+			{
+				source: '/ballpark',
+				destination: '/ballparks',
+				permanent: true,
+			},
 		]
 	},
 }

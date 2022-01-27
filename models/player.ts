@@ -42,13 +42,28 @@ export default class Player {
     }
 
     slug() : string {
+        if(this.canonicalName().startsWith("Clone")) { // screw these guys lmao
+            return this.id
+        }
         switch(this.id) { // this sucks but i don't wanna do a "good" solution
+            case "1f747294-df75-42e2-ba7f-aa0dfcca2beb":
+                return "mild-sancho-thrower"
+            case "44adbb77-feab-4392-906a-bf04ef3aa8aa":
+                return "also-layla-pork"
+            case "47d646fe-a45c-47b4-bd07-38110ec00bbe":
+                return "levar-shoethiefmaker"
+            case "48c44e04-dd37-4cf8-8b0a-e228ce0401cd":
+                return "stale-copernicus-biscuits"
             case "5d063a91-31b3-4688-97a7-e34a7181da30":
-                return "baby-pitching-machine"
+                return "lil-pitchy"
             case "82067351-3038-4001-bfac-9ecdae67d504":
                 return "bees-manhattan-of-hades"
             case "a8399207-a19c-449e-a3bf-4311fbea8ebd":
                 return "taller-everts"
+            case "bc4187fa-459a-4c06-bbf2-4e0e013d27ce":
+                return "original-sixpack-dogwalker"
+            case "fc94eb21-e4bb-4ad2-adfb-69543a774996":
+                return "slightly-burned-worf-hatchler"
         }
         return this.canonicalName().toLowerCase().replace(/,/g, "-comma-").replace(/[.']+/g, "").replace(/[-\s]+/g, "-");
     }

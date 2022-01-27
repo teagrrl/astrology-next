@@ -153,7 +153,7 @@ export default function PlayerItem({ item, owners, showDetails, showModEmojis, s
                                                     </div>}
                                                 </div>
                                             }>
-                                                <span className={`text-right ${(reverseAttributes.includes(attribute.id) ? item.adjustments[attribute.id] < 0 : item.adjustments[attribute.id] > 0) ? "text-sky-500" : "text-red-500"}`}>{item.adjustments[attribute.id] > 0 ? "+" : "-"}{Math.abs(Math.round(1000 * item.adjustments[attribute.id]) / 1000)}</span>
+                                                <span className={`text-right ${(reverseAttributes.includes(attribute.id) ? item.adjustments[attribute.id] < 0 : item.adjustments[attribute.id] > 0) ? "text-sky-500" : "text-red-500"}`}>{item.adjustments[attribute.id] > 0 ? "+" : ""}{Math.round(1000 * item.adjustments[attribute.id]) / 1000}</span>
                                             </Tooltip>
                                         </td>
                                     </tr>
