@@ -2,10 +2,14 @@ import Player from './player'
 import { reverseAttributes } from './playerstats'
 import { ItemPart, ChroniclerItem } from './chronicler'
 
+export const adjustmentIndices = ["tragicness", "buoyancy", "thwackability", "moxie", "divinity", "musclitude", "patheticism", "martyrdom", "cinnamon", "baseThirst", "laserlikeness", "continuation", "indulgence", "groundFriction", "shakespearianism", "suppression", "unthwackability", "coldness", "overpowerment", "ruthlessness", "pressurization", "omniscience", "tenaciousness", "watchfulness", "anticapitalism", "chasiness"]
+
 type Affix = {
     name: string,
     adjustments: Record<string, number>,
+    position?: "prefix" | "root" | "suffix",
 }
+
 export default class Item {
     public readonly adjustments: Record<string, number>
     public readonly affixes: Affix[]
@@ -102,7 +106,9 @@ function getAffixProperties(data: ChroniclerItem) {
     const partAdjustments: Affix[] = []
     const elements: string[] = []
     const mods: string[] = []
-    const affixes = [data.prePrefix, data.postPrefix, data.root, data.suffix].concat(data.prefixes).filter((affix): affix is ItemPart => !!affix)
+    const itemPartFilter = (affix: ItemPart | null): affix is ItemPart => !!affix
+    const prefixNames = [data.prePrefix, data.postPrefix].concat(data.prefixes).filter(itemPartFilter).map((affix) => affix.name)
+    const affixes = [data.prePrefix, data.postPrefix, data.root, data.suffix].concat(data.prefixes).filter(itemPartFilter)
     for(const affix of affixes) {
         const affixAdjustments: Record<string, number> = {}
         // clean up the name a little bit so it looks nicer
@@ -111,6 +117,11 @@ function getAffixProperties(data: ChroniclerItem) {
             : affix.name.endsWith("'s") 
                 ? affix.name.substring(0, affix.name.length - 2) 
                 : affix.name
+        const affixPosition = affix.name === data.root.name 
+            ? "root" 
+            : affix.name === data.suffix?.name 
+                ? "suffix"
+                : prefixNames.includes(affix.name) ? "prefix" : undefined
         if(affix.name !== data.root.name) {
             elements.push(affixName)
         }
@@ -127,6 +138,7 @@ function getAffixProperties(data: ChroniclerItem) {
         partAdjustments.push({
             name: affixName,
             adjustments: affixAdjustments,
+            position: affixPosition,
         })
     }
     const elementCounts = elements
@@ -219,5 +231,3 @@ function getColorClassForValue(value: number) {
         return "";
     };
 }
-
-const adjustmentIndices = ["tragicness", "buoyancy", "thwackability", "moxie", "divinity", "musclitude", "patheticism", "martyrdom", "cinnamon", "baseThirst", "laserlikeness", "continuation", "indulgence", "groundFriction", "shakespearianism", "suppression", "unthwackability", "coldness", "overpowerment", "ruthlessness", "pressurization", "omniscience", "tenaciousness", "watchfulness", "anticapitalism", "chasiness"]

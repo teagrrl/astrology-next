@@ -478,7 +478,7 @@ export const AllBallparks = getSpecialTeam({
     id: "ballparks",
     mainColor: "#9cd965",
     secondaryColor: "#a3e36a",
-    shorthand: "All Ballparks",
+    shorthand: "Ballparks",
     slogan: "Located somewhere on the Immaterial Plane.",
 })
 

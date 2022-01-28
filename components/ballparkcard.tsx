@@ -125,12 +125,22 @@ export function BallparkCard({ ballpark, team }: BallparkCardProps) {
                                 <tr key={stat.id} className="odd:bg-zinc-200 dark:odd:bg-zinc-800">
                                     <td className="pl-4 py-2 font-semibold whitespace-nowrap">{stat.name}</td>
                                     <td className="px-4 py-2 w-full">
-                                        <div className="relative h-5 rounded-full overflow-hidden bg-zinc-400 dark:bg-zinc-700">
-                                            <div className={`h-5 ${stat.value >= 0.49 ? "rounded-r-full" : ""} ${stat.value <= 0.51 ? "rounded-l-full" : ""}`} style={stat.style}></div>
-                                            {stat.label && <div className="absolute top-0 left-0 w-full h-full flex justify-center align-center">
-                                                <span className="px-4 text-sm uppercase font-bold overflow-hidden text-ellipsis whitespace-nowrap" style={{ color: ballpark.data.secondaryColor }}>{stat.label}</span>
-                                            </div>}
-                                        </div>
+                                        <Tooltip content={
+                                            <div className="flex flex-col justify-center items-center">
+                                                <div className="font-bold">{ballpark.data.nickname}</div>
+                                                <div>
+                                                    <span className="font-semibold">{stat.name}: </span>
+                                                    <span>{stat.value}</span>
+                                                </div>
+                                            </div>
+                                        }>
+                                            <div className="relative h-5 rounded-full overflow-hidden bg-zinc-400 dark:bg-zinc-700">
+                                                <div className={`h-5 ${stat.value >= 0.49 ? "rounded-r-full" : ""} ${stat.value <= 0.51 ? "rounded-l-full" : ""}`} style={stat.style}></div>
+                                                {stat.label && <div className="absolute top-0 left-0 w-full h-full flex justify-center align-center">
+                                                    <span className="px-4 text-sm uppercase font-bold overflow-hidden text-ellipsis whitespace-nowrap" style={{ color: ballpark.data.secondaryColor }}>{stat.label}</span>
+                                                </div>}
+                                            </div>
+                                        </Tooltip>
                                     </td>
                                     <td className="pr-4 py-2 text-right">{Math.round(1000 * stat.value) / 1000}</td>
                                 </tr>
