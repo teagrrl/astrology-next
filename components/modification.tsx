@@ -38,13 +38,15 @@ export function getModificationTitleById(id: string) {
 }
 
 export default function Modification({ id, duration, type }: ModificationProps) {
-    const modifier = getModifierById(id);
+    const modifier = getModifierById(id)
     if(modifier.emoji) {
-        let description: string | undefined = modifier.title;
+        let description;
         if(type && modifier.descriptions && modifier.descriptions[type]) {
-            description = modifier.descriptions[type];
+            description = modifier.descriptions[type] ?? modifier.title
         } else if(modifier.description) {
-            description = modifier.description;
+            description = modifier.description
+        } else {
+            description = modifier.title
         }
         return (
             <Tooltip 

@@ -7,7 +7,24 @@ export const adjustmentIndices = ["tragicness", "buoyancy", "thwackability", "mo
 type Affix = {
     name: string,
     adjustments: Record<string, number>,
-    position?: "prefix" | "root" | "suffix",
+    position?: AffixPosition,
+}
+
+type AffixPosition = "prePrefix" | "prefix" | "postPrefix" | "root" | "suffix"
+
+type Element = {
+    name: string,
+    attributes: ElementAttribute[],
+    position: AffixPosition,
+}
+
+type ElementAttribute = {
+    id: string,
+    average: number,
+    variance: number,
+    min: number,
+    max: number,
+    values: number[],
 }
 
 export default class Item {
@@ -105,27 +122,108 @@ export const ItemComparator = (owners: Record<string, Player[]> | undefined, col
     }
 }
 
+export function getAffixDurability(affix: string) {
+    switch(affix) {
+        case "Paper":
+            return -3
+        case "Glass":
+            return -2
+        case "Plastic":
+            return -1
+        case "Rock":
+            return 1
+        case "Concrete":
+            return 2
+        case "Steel":
+            return 2
+        default:
+            return 0
+    }
+}
+
+export function getDetailedAffixData(items: Item[]) {
+    const affixes: Record<string, Record<string, number[]>> = {}
+    const positions = {
+        prePrefix: new Set<string>(),
+        prefix: new Set<string>(),
+        postPrefix: new Set<string>(),
+        root: new Set<string>(),
+        suffix: new Set<string>(),
+    }
+    const mods: Record<string, string> = {}
+    items.map((item) => {
+        item.affixes.map((affix) => {
+            if(affix.position) {
+                positions[affix.position].add(affix.name)
+            }
+            affixes[affix.name] = affixes[affix.name] ?? []
+            for(const attribute in affix.adjustments) {
+                affixes[affix.name][attribute] = affixes[affix.name][attribute] ?? []
+                affixes[affix.name][attribute].push(affix.adjustments[attribute])
+            }
+        })
+        for(const name in item.mods) {
+            if(!mods[name]) {
+                mods[name] = item.mods[name]
+            }
+        }
+    })
+    const elements: Element[] = []
+    for(const name in affixes) {
+        const attributes = []
+        for(const attribute in affixes[name]) {
+            const values = affixes[name][attribute]
+            const average = values.reduce((v1, v2) => v1 + v2) / values.length
+            attributes.push({
+                id: attribute, 
+                average: average,
+                variance: Math.sqrt(values.reduce((stdev, value) => stdev + Math.pow(value - average, 2), 0) / values.length),
+                min: Math.min(...values),
+                max: Math.max(...values),
+                values: values,
+            })
+        }
+        attributes.sort((a1, a2) => {
+            if(a1.average < a2.average) return 1
+            if(a1.average > a2.average) return -1
+            if(a1.id > a2.id) return 1
+            if(a1.id < a2.id) return -1
+            return 0
+        })
+        elements.push({
+            name: name,
+            attributes: attributes,
+            position: "prefix",
+        })
+    }
+    return {
+        elements: elements.sort((element1, element2) => {
+            if(element1.name > element2.name) return 1
+            if(element2.name > element1.name) return -1
+            return 0     
+        }),
+        positions: {
+            prePrefix: Array.from(positions.prePrefix.values()).sort(),
+            prefix: Array.from(positions.prefix.values()).sort(),
+            postPrefix: Array.from(positions.postPrefix.values()).sort(),
+            root: Array.from(positions.root.values()).sort(),
+            suffix: Array.from(positions.suffix.values()).sort(),
+        },
+        mods: mods,
+    }
+}
+
 function getAffixProperties(data: ChroniclerItem) {
     const adjustments: Record<string, number> = {}
     const partAdjustments: Affix[] = []
     const elements: string[] = []
     const mods: Record<string, string> = {}
     const itemPartFilter = (affix: ItemPart | null): affix is ItemPart => !!affix
-    const prefixNames = [data.prePrefix, data.postPrefix].concat(data.prefixes).filter(itemPartFilter).map((affix) => affix.name)
     const affixes = [data.prePrefix, data.postPrefix, data.root, data.suffix].concat(data.prefixes).filter(itemPartFilter)
     for(const affix of affixes) {
         const affixAdjustments: Record<string, number> = {}
         // clean up the name a little bit so it looks nicer
-        const affixName = affix.name.startsWith("the ")
-            ? affix.name.substring(4) 
-            : affix.name.endsWith("'s") 
-                ? affix.name.substring(0, affix.name.length - 2) 
-                : affix.name
-        const affixPosition = affix.name === data.root.name 
-            ? "root" 
-            : affix.name === data.suffix?.name 
-                ? "suffix"
-                : prefixNames.includes(affix.name) ? "prefix" : undefined
+        const affixName = affix.name.startsWith("the ") ? affix.name.substring(4) : affix.name
         if(affix.name !== data.root.name) {
             elements.push(affixName)
         }
@@ -142,7 +240,7 @@ function getAffixProperties(data: ChroniclerItem) {
         partAdjustments.push({
             name: affixName,
             adjustments: affixAdjustments,
-            position: affixPosition,
+            position: getAffixPosition(data, affix.name),
         })
     }
     const elementCounts = elements
@@ -234,4 +332,23 @@ function getColorClassForValue(value: number) {
     } else {
         return "";
     };
+}
+
+function getAffixPosition(data: ChroniclerItem, affix: string) {
+    if(data.root.name === affix) {
+        return "root"
+    }
+    if(data.prePrefix?.name === affix) {
+        return "prePrefix"
+    }
+    if(data.postPrefix?.name === affix) {
+        return "postPrefix"
+    }
+    if(data.suffix?.name === affix) {
+        return "suffix"
+    }
+    if(data.prefixes.map((part) => part.name === affix)) {
+        return "prefix"
+    }
+    return undefined
 }

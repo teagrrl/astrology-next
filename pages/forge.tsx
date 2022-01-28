@@ -3,20 +3,24 @@ import AstrologyError from "../components/error";
 import Layout from "../components/layout";
 import AstrologyLoader from "../components/loader";
 import PlayerItem from "../components/playeritem";
-import Item, { adjustmentIndices } from "../models/item";
+import { ItemAdjustment } from "../models/chronicler";
+import Item, { adjustmentIndices, getAffixDurability, getDetailedAffixData } from "../models/item";
 import { PageProps } from "./_app";
 
-type Affix = {
-    name: string,
-    attributes: AffixAttribute[],
-    position: AffixPosition,
+enum AffixSelectorLimit {
+    ExactlyOne,
+    UpToOne, 
+    AnyNumber,
 }
 
-type AffixPosition = "prefix" | "root" | "suffix"
-
-type AffixAttribute = {
-    id: string,
-    value: number,
+type AffixSelectorProps = {
+    name: string,
+    affixes: string[],
+    activeAffix?: string | null,
+    selectAffix: Function,
+    resetActive?: boolean,
+    resetAffixes?: Function,
+    limit: AffixSelectorLimit,
 }
 
 type ItemAffix = {
@@ -24,21 +28,10 @@ type ItemAffix = {
     adjustments: ItemAdjustment[],
 }
 
-type ItemAdjustment = ItemMod | ItemStat
-
-type ItemMod = {
-    type: 0,
-    mod: string,
-}
-
-type ItemStat = {
-    type: 1,
-    stat: number,
-    value: number,
-}
-
 export default function ItemForgePage({ leagueData }: PageProps) {
+    const [forgePrePrefix, setForgePrePrefix] = useState<string | null>(null)
     const [forgePrefixes, setForgePrefixes] = useState<string[] | null>(null)
+    const [forgePostPrefix, setForgePostPrefix] = useState<string | null>(null)
     const [forgeRoot, setForgeRoot] = useState<string | null>(null)
     const [forgeSuffix, setForgeSuffix] = useState<string | null>(null)
 
@@ -49,7 +42,7 @@ export default function ItemForgePage({ leagueData }: PageProps) {
         return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
     }
 
-    const { elements, positions, mods } = getForgeData(leagueData.items ? Object.values(leagueData.items) : [])
+    const { elements, positions, mods } = getDetailedAffixData(leagueData.items ? Object.values(leagueData.items) : [])
 
     const getItemAffix = (name: string): ItemAffix => {
         const affix = elements.find((element) => element.name.toLowerCase() === name.toLowerCase())
@@ -58,7 +51,7 @@ export default function ItemForgePage({ leagueData }: PageProps) {
                 return {
                     type: 1,
                     stat: adjustmentIndices.indexOf(attribute.id),
-                    value: attribute.value,
+                    value: attribute.average,
                 }
             })
             if(Object.keys(mods).includes(affix.name)) {
@@ -79,44 +72,31 @@ export default function ItemForgePage({ leagueData }: PageProps) {
         }
     }
 
-    const forgeItem = (root: string, prefixes: string[], suffix?: string): Item => {
+    const forgeItem = (root: string, prefixes: string[], prePrefix?: string, postPrefix?: string, suffix?: string): Item => {
         const itemRoot = getItemAffix(root)
-        const itemSuffix = suffix ? getItemAffix(suffix) : null
+        const itemPrePrefix = prePrefix ? getItemAffix(prePrefix) : null
         const itemPrefixes = prefixes.map((prefix) => getItemAffix(prefix))
+        const itemPostPrefix = postPrefix ? getItemAffix(postPrefix) : null
+        const itemSuffix = suffix ? getItemAffix(suffix) : null
         const prefixNames = itemPrefixes.map((prefix) => prefix.name)
-        const prefixDurability = prefixNames.reduce((durability, name) => {
-            switch(name) {
-                case "Paper":
-                    return durability - 2
-                case "Glass":
-                    return durability - 1
-                case "Plastic":
-                    return durability
-                case "Rock":
-                    return durability + 2
-                case "Concrete":
-                    return durability + 3
-                case "Steel":
-                    return durability + 3
-                default:
-                    return durability + 1
-            }
-        }, 0)
         const filteredPrefixNames = prefixNames.filter((name) => !["aDense", "eDense"].includes(name))
         const density = prefixNames.length - filteredPrefixNames.length
+
         const itemName = Array.from(new Set(filteredPrefixNames).values()).join(" ")
             + " " + itemRoot.name + (itemSuffix ? (" of " + itemSuffix.name) : "") + (density > 0 ? ("+" + density) : "")
-        const durability = 1 + prefixDurability + (suffix ? 1 : 0)
+            const itemDurability = Math.max([itemRoot, itemPrePrefix, ...itemPrefixes, itemPostPrefix, itemSuffix]
+                .filter((affix): affix is ItemAffix => affix !== null)
+                .reduce((durability, affix) => durability + getAffixDurability(affix.name) + 1, 0), 1)
         return new Item({
             id: itemName,
             name: itemName,
-            prePrefix: null,
+            prePrefix: itemPrePrefix,
             prefixes: itemPrefixes,
-            postPrefix: null,
+            postPrefix: itemPostPrefix,
             root: itemRoot,
             suffix: itemSuffix,
-            health: durability,
-            durability: durability,
+            health: itemDurability,
+            durability: itemDurability,
             // we don't care about these
             hittingRating: 0,
             pitchingRating: 0,
@@ -137,6 +117,14 @@ export default function ItemForgePage({ leagueData }: PageProps) {
         setForgePrefixes([])
     }
 
+    const selectPrePrefix = (prefix: string) => {
+        setForgePrePrefix(forgePrePrefix === prefix ? null : prefix)
+    }
+
+    const selectPostPrefix = (prefix: string) => {
+        setForgePostPrefix(forgePostPrefix === prefix ? null : prefix)
+    }
+
     const selectSuffix = (suffix: string) => {
         setForgeSuffix(forgeSuffix === suffix ? null : suffix)
     }
@@ -144,62 +132,19 @@ export default function ItemForgePage({ leagueData }: PageProps) {
     return (
         <section className="overflow-auto md:flex md:flex-wrap md:grow md:justify-center md:items-center">
             <h1 className="w-full font-bold text-3xl text-center my-5">The Astrological Forge</h1>
-            <div className="m-4 md:p-4 md:border-[1px] md:border-zinc-500 md:dark:border-white md:rounded-md md:overflow-auto md:max-h-[70vh] md:max-w-[40vw]">
+            <div className="m-4 p-4 border-[1px] border-zinc-500 dark:border-white md:rounded-md md:overflow-auto md:max-h-[70vh] md:max-w-[40vw]">
                 {forgeRoot 
-                    ? <PlayerItem item={forgeItem(forgeRoot, forgePrefixes ?? [], forgeSuffix ?? undefined)} showDetails={true} showModEmojis={true} showStats={true} />
+                    ? <PlayerItem item={forgeItem(forgeRoot, forgePrefixes ?? [], forgePrePrefix ?? undefined, forgePostPrefix ?? undefined, forgeSuffix ?? undefined)} showDetails={true} showModEmojis={true} showStats={true} />
                     : <h1 className="text-2xl font-bold">Select an item base to begin forging.</h1>
                 }
             </div>
-            <div className="m-4 md:p-4 md:border-[1px] md:border-zinc-500 md:dark:border-white md:rounded-md md:overflow-auto md:max-h-[70vh] md:max-w-[40vw]">
+            <div className="md:py-2 md:border-[1px] md:border-zinc-500 md:dark:border-white md:rounded-md md:overflow-auto md:max-h-[70vh] md:max-w-[40vw]">
                 <div className="flex flex-col grow overflow-auto">
-                    <div>
-                        <div className="text-lg font-bold">Choose a base: </div>
-                        <ul className="flex flex-row flex-wrap p-2">
-                            {Array.from(positions.root).map((root) => 
-                                <li key={root} className="m-1">
-                                    <button 
-                                        className={`px-3 py-1 rounded-md ${forgeRoot === root ? "font-bold bg-zinc-300 dark:bg-zinc-400 cursor-not-allowed" : "font-semibold bg-zinc-200 dark:bg-zinc-600 hover:bg-zinc-400 dark:hover:bg-zinc-500"}`}
-                                        onClick={() => {selectRoot(root)}}
-                                    >
-                                        {root}
-                                    </button>
-                                </li>
-                            )}
-                        </ul>
-                    </div>
-                    <div>
-                        <div className="text-lg font-bold">Choose any number of prefixes: </div>
-                        <ul className="flex flex-row flex-wrap p-2">
-                            {forgePrefixes && forgePrefixes.length > 0 && <li className="m-1">
-                                <button className={`px-3 py-1 rounded-md font-semibold whitespace-nowrap bg-rose-600/70 dark:bg-rose-600/50 hover:bg-rose-600 dark:hover:bg-rose-600/70`} onClick={() => {removeAllPrefixes()}} >Reset</button>
-                            </li>}
-                            {Array.from(positions.prefix).map((prefix) => 
-                                <li key={prefix} className="m-1">
-                                    <button 
-                                        className={`px-3 py-1 rounded-md font-semibold bg-zinc-200 dark:bg-zinc-600 hover:bg-zinc-400 dark:hover:bg-zinc-500`}
-                                        onClick={() => {appendPrefix(prefix)}}
-                                    >
-                                        {prefix}
-                                    </button>
-                                </li>
-                            )}
-                        </ul>
-                    </div>
-                    <div>
-                        <div className="text-lg font-bold">Choose up to one suffix: </div>
-                        <ul className="flex flex-row flex-wrap p-2">
-                            {Array.from(positions.suffix).map((suffix) => 
-                                <li key={suffix} className="m-1">
-                                    <button 
-                                        className={`px-3 py-1 rounded-md ${forgeSuffix === suffix ? "font-bold bg-zinc-300 dark:bg-zinc-400" : "font-semibold bg-zinc-200 dark:bg-zinc-600 hover:bg-zinc-400 dark:hover:bg-zinc-500"}`}
-                                        onClick={() => {selectSuffix(suffix)}}
-                                    >
-                                        {suffix}
-                                    </button>
-                                </li>
-                            )}
-                        </ul>
-                    </div>
+                    <AffixSelector name="base" limit={AffixSelectorLimit.ExactlyOne} affixes={positions.root} activeAffix={forgeRoot} selectAffix={selectRoot} />
+                    <AffixSelector name="prefix" limit={AffixSelectorLimit.AnyNumber} affixes={positions.prefix} selectAffix={appendPrefix} resetActive={(forgePrefixes ?? []).length > 0} resetAffixes={removeAllPrefixes} />
+                    <AffixSelector name="pre-prefix" limit={AffixSelectorLimit.UpToOne} affixes={positions.prePrefix} activeAffix={forgePrePrefix} selectAffix={selectPrePrefix} />
+                    <AffixSelector name="post-prefix" limit={AffixSelectorLimit.UpToOne} affixes={positions.postPrefix} activeAffix={forgePostPrefix} selectAffix={selectPostPrefix} />
+                    <AffixSelector name="suffix" limit={AffixSelectorLimit.UpToOne} affixes={positions.suffix} activeAffix={forgeSuffix} selectAffix={selectSuffix} />
                 </div>
             </div>
         </section>
@@ -217,66 +162,41 @@ ItemForgePage.getLayout = function getLayout(page: ReactElement, props?: PagePro
 		</Layout>
 	)
 }
-
-function getForgeData(items: Item[]) {
-    const affixes: Record<string, Record<string, number[]>> = {}
-    const positions = {
-        prefix: new Set<string>(),
-        root: new Set<string>(),
-        suffix: new Set<string>(),
+function AffixSelector({ name, limit, affixes, activeAffix, selectAffix, resetActive, resetAffixes }: AffixSelectorProps) {
+    let header;
+    let activeClass = "";
+    switch(limit) {
+        case AffixSelectorLimit.ExactlyOne:
+            header = `Choose exactly one ${name}`
+            activeClass = "bg-zinc-400 cursor-not-allowed"
+            break;
+        case AffixSelectorLimit.UpToOne:
+            header = `Choose up to one ${name}`
+            activeClass = "bg-zinc-400"
+            break;
+        case AffixSelectorLimit.AnyNumber:
+            header = `Choose any number of ${name}`
+            activeClass = "bg-zinc-400"
+            break;
     }
-    const mods: Record<string, string> = {}
-    items.map((item) => {
-        item.affixes.map((affix) => {
-            if(affix.position) {
-                positions[affix.position].add(affix.name)
-            }
-            affixes[affix.name] = affixes[affix.name] ?? []
-            for(const attribute in affix.adjustments) {
-                affixes[affix.name][attribute] = affixes[affix.name][attribute] ?? []
-                affixes[affix.name][attribute].push(affix.adjustments[attribute])
-            }
-        })
-        for(const name in item.mods) {
-            if(!mods[name]) {
-                mods[name] = item.mods[name]
-            }
-        }
-    })
-    const elements: Affix[] = []
-    for(const name in affixes) {
-        const attributes = []
-        for(const attribute in affixes[name]) {
-            const values = affixes[name][attribute]
-            attributes.push({
-                id: attribute, 
-                value: values.reduce((v1, v2) => v1 + v2) / values.length,
-            })
-        }
-        attributes.sort((a1, a2) => {
-            if(a1.value < a2.value) return 1
-            if(a1.value > a2.value) return -1
-            if(a1.id > a2.id) return 1
-            if(a1.id < a2.id) return -1
-            return 0
-        })
-        elements.push({
-            name: name,
-            attributes: attributes,
-            position: "prefix",
-        })
-    }
-    return {
-        elements: elements.sort((element1, element2) => {
-            if(element1.name > element2.name) return 1
-            if(element2.name > element1.name) return -1
-            return 0     
-        }),
-        positions: {
-            prefix: Array.from(positions.prefix.values()).sort(),
-            root: Array.from(positions.root.values()).sort(),
-            suffix: Array.from(positions.suffix.values()).sort(),
-        },
-        mods: mods,
-    }
+    return (
+        <div className="px-4 py-2 even:bg-zinc-100 even:dark:bg-zinc-800">
+            <div className="text-lg font-bold">{header}:</div>
+            <ul className="flex flex-row flex-wrap p-2">
+                {resetAffixes && resetActive && <li className="m-1">
+                    <button className={`px-3 py-1 rounded-md font-semibold whitespace-nowrap bg-rose-600/70 dark:bg-rose-600/50 hover:bg-rose-600 dark:hover:bg-rose-600/70`} onClick={() => {resetAffixes()}} >Reset</button>
+                </li>}
+                {affixes.map((affix) => 
+                    <li key={affix} className="m-1">
+                        <button 
+                            className={`px-3 py-1 rounded-md ${activeAffix === affix ? `font-bold ${activeClass}` : "font-semibold bg-zinc-300 dark:bg-zinc-600 hover:bg-zinc-400 dark:hover:bg-zinc-500"}`}
+                            onClick={() => {selectAffix(affix)}}
+                        >
+                            {affix}
+                        </button>
+                    </li>
+                )}
+            </ul>
+        </div>
+    )
 }
