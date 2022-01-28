@@ -49,20 +49,27 @@ export default function ItemForgePage({ leagueData }: PageProps) {
         return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
     }
 
-    const { elements, positions, } = getForgeData(leagueData.items ? Object.values(leagueData.items) : [])
+    const { elements, positions, mods } = getForgeData(leagueData.items ? Object.values(leagueData.items) : [])
 
     const getItemAffix = (name: string): ItemAffix => {
         const affix = elements.find((element) => element.name.toLowerCase() === name.toLowerCase())
         if(affix) {
+            const adjustments: ItemAdjustment[] = affix.attributes.map((attribute) => {
+                return {
+                    type: 1,
+                    stat: adjustmentIndices.indexOf(attribute.id),
+                    value: attribute.value,
+                }
+            })
+            if(Object.keys(mods).includes(affix.name)) {
+                adjustments.push({
+                    type: 0,
+                    mod: mods[affix.name],
+                })
+            }
             return {
                 name: affix.name,
-                adjustments: affix.attributes.map((attribute) => {
-                    return {
-                        type: 1,
-                        stat: adjustmentIndices.indexOf(attribute.id),
-                        value: attribute.value,
-                    }
-                })
+                adjustments: adjustments
             }
         } else {
             return {
@@ -108,16 +115,6 @@ export default function ItemForgePage({ leagueData }: PageProps) {
         setForgePrefixes((prefixes) => prefixes ? prefixes.concat(prefix) : [prefix])
     }
 
-    const removePrefix = (prefix: string) => {
-        if(forgePrefixes) {
-            const prefixIndex = prefix.indexOf(prefix)
-            if(prefixIndex > -1) {
-                forgePrefixes.splice(prefixIndex, 1)
-                setForgePrefixes(forgePrefixes)
-            }
-        }
-    }
-
     const removeAllPrefixes = () => {
         setForgePrefixes([])
     }
@@ -154,22 +151,10 @@ export default function ItemForgePage({ leagueData }: PageProps) {
                     </div>
                     <div>
                         <div className="text-lg font-bold">Choose any number of prefixes: </div>
-                        {forgePrefixes && forgePrefixes.length > 0 && <ul className="flex flex-row p-2 items-center overflow-auto">
-                            <li className="px-3 py-1 font-bold whitespace-nowrap">Selected Prefixes:</li>
-                            {forgePrefixes && forgePrefixes.length > 1 && <li><button className={`px-3 py-1 rounded-md font-semibold whitespace-nowrap bg-rose-600/70 dark:bg-rose-600/50 hover:bg-rose-600 dark:hover:bg-rose-600/70`} onClick={() => {removeAllPrefixes()}}
-                                    >Remove All</button></li>}
-                            {Array.from(forgePrefixes ?? []).sort().map((prefix, index) => 
-                                <li key={`selected_${prefix}_${index}`} className="m-1">
-                                    <button 
-                                        className={`px-3 py-1 rounded-md font-semibold bg-rose-600/70 dark:bg-rose-600/50 hover:bg-rose-600 dark:hover:bg-rose-600/70`}
-                                        onClick={() => {removePrefix(prefix)}}
-                                    >
-                                        {prefix}
-                                    </button>
-                                </li>
-                            )}
-                        </ul>}
                         <ul className="flex flex-row flex-wrap p-2">
+                            {forgePrefixes && forgePrefixes.length > 0 && <li className="m-1">
+                                <button className={`px-3 py-1 rounded-md font-semibold whitespace-nowrap bg-rose-600/70 dark:bg-rose-600/50 hover:bg-rose-600 dark:hover:bg-rose-600/70`} onClick={() => {removeAllPrefixes()}} >Reset</button>
+                            </li>}
                             {Array.from(positions.prefix).map((prefix) => 
                                 <li key={prefix} className="m-1">
                                     <button 
@@ -222,6 +207,7 @@ function getForgeData(items: Item[]) {
         root: new Set<string>(),
         suffix: new Set<string>(),
     }
+    const mods: Record<string, string> = {}
     items.map((item) => {
         item.affixes.map((affix) => {
             if(affix.position) {
@@ -233,6 +219,11 @@ function getForgeData(items: Item[]) {
                 affixes[affix.name][attribute].push(affix.adjustments[attribute])
             }
         })
+        for(const name in item.mods) {
+            if(!mods[name]) {
+                mods[name] = item.mods[name]
+            }
+        }
     })
     const elements: Affix[] = []
     for(const name in affixes) {
@@ -244,20 +235,18 @@ function getForgeData(items: Item[]) {
                 value: values.reduce((v1, v2) => v1 + v2) / values.length,
             })
         }
-        if(attributes.length > 0) {
-            attributes.sort((a1, a2) => {
-                if(a1.value < a2.value) return 1
-                if(a1.value > a2.value) return -1
-                if(a1.id > a2.id) return 1
-                if(a1.id < a2.id) return -1
-                return 0
-            })
-            elements.push({
-                name: name,
-                attributes: attributes,
-                position: "prefix",
-            })
-        }
+        attributes.sort((a1, a2) => {
+            if(a1.value < a2.value) return 1
+            if(a1.value > a2.value) return -1
+            if(a1.id > a2.id) return 1
+            if(a1.id < a2.id) return -1
+            return 0
+        })
+        elements.push({
+            name: name,
+            attributes: attributes,
+            position: "prefix",
+        })
     }
     return {
         elements: elements.sort((element1, element2) => {
@@ -270,5 +259,6 @@ function getForgeData(items: Item[]) {
             root: Array.from(positions.root.values()).sort(),
             suffix: Array.from(positions.suffix.values()).sort(),
         },
+        mods: mods,
     }
 }

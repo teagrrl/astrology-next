@@ -120,10 +120,10 @@ export default function ItemTable({ items, armory, positions, sort, direction, t
                             }
                         </td>
                         <td className="px-1.5 py-1 text-center">
-                            {item.mods.length > 0 
+                            {item.modifications().length > 0 
                                 ? <ModificationList 
                                     type="player" 
-                                    item={item.mods} 
+                                    item={item.modifications()} 
                                 />
                                 : <>-</>
                             }

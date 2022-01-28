@@ -18,7 +18,7 @@ export default class Item {
     public readonly emoji: string
     public readonly health: number
     public readonly id: string
-    public readonly mods: string[]
+    public readonly mods: Record<string, string>
     public readonly name: string
     public readonly type: string
     public readonly weight: number
@@ -41,6 +41,10 @@ export default class Item {
     getScaleClass(key: string) {
         let value = this.adjustments[key]
         return getColorClassForValue(reverseAttributes.includes(key) ? -1 * value : value)
+    }
+
+    modifications() {
+        return Object.values(this.mods)
     }
 
     healthRating(): number {
@@ -72,7 +76,7 @@ function getComparatorValue(item: Item, owners: number, attribute: string) {
         case "elements":
             return item.weight
         case "modifications":
-            return item.mods.length
+            return item.modifications().length
         case "name":
             return item.name
         case "owners":
@@ -105,7 +109,7 @@ function getAffixProperties(data: ChroniclerItem) {
     const adjustments: Record<string, number> = {}
     const partAdjustments: Affix[] = []
     const elements: string[] = []
-    const mods: string[] = []
+    const mods: Record<string, string> = {}
     const itemPartFilter = (affix: ItemPart | null): affix is ItemPart => !!affix
     const prefixNames = [data.prePrefix, data.postPrefix].concat(data.prefixes).filter(itemPartFilter).map((affix) => affix.name)
     const affixes = [data.prePrefix, data.postPrefix, data.root, data.suffix].concat(data.prefixes).filter(itemPartFilter)
@@ -127,7 +131,7 @@ function getAffixProperties(data: ChroniclerItem) {
         }
         for(const adjustment of affix.adjustments) {
             if(adjustment.type === 0) {
-                mods.push(adjustment.mod)
+                mods[affix.name] = adjustment.mod
             }
             if(adjustment.type === 1) {
                 let statName = adjustmentIndices[adjustment.stat]

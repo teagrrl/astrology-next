@@ -114,10 +114,10 @@ export default function PlayerItem({ item, owners, showDetails, showModEmojis, s
                             <tr>
                                 <td className="font-semibold px-2">Mods</td>
                                 <td>
-                                    {item.mods.length > 0 
+                                    {item.modifications().length > 0 
                                         ? showModEmojis 
-                                            ? <ModificationList type="player" item={item.mods} />
-                                            : item.mods.map((mod) => getModificationTitleById(mod)).join(", ")
+                                            ? <ModificationList type="player" item={item.modifications()} />
+                                            : item.modifications().map((mod) => getModificationTitleById(mod)).join(", ")
                                         : "None"
                                     }
                                 </td>
