@@ -36,7 +36,7 @@ export default function PlayerTributesPage({ leagueData, isShowSimplified, isIte
     const players = tributes.playerIds
         .map(((id) => leagueData.players.find((player) => player.id === id)))
         .filter((player): player is Player => player !== undefined)
-	const sortedPlayers = currentSort ? Array.from(players).sort(PlayerComparator(leagueData.positions, currentSort, currentDirection)) : players
+	const sortedPlayers = currentSort ? Array.from(players).sort(PlayerComparator(leagueData.positions, currentSort, currentDirection, isItemApplied)) : players
     
     const sortPlayers = (newSort: string) => {
         let newDirection: "asc" | "desc" | null = null;

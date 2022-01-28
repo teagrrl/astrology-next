@@ -45,7 +45,7 @@ export default function TeamPage({ leagueData, isItemApplied, isShowSimplified }
         )
     }
 	const averages = leagueData.averages[team.id]
-	const comparator = currentSort ? PlayerComparator(leagueData.positions, currentSort, currentDirection) : undefined
+	const comparator = currentSort ? PlayerComparator(leagueData.positions, currentSort, currentDirection, isItemApplied) : undefined
 	const sortedRosters = [
 		{
 			id: "lineup",

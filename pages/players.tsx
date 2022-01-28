@@ -60,7 +60,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
     const availablePlayers = currentUniversePlayers.length > 0 ? currentUniversePlayers : allPlayers
     const filteredPlayers = duplicateType ? availablePlayers.filter((player1) => availablePlayers.some((player2) => player1.id !== player2.id && ((duplicateType === "name" && player1.canonicalName() === player2.canonicalName()) || (duplicateType === "slug" && player1.slug() === player2.slug())))) : availablePlayers
-    const sortedPlayers = currentSort ? Array.from(filteredPlayers).sort(PlayerComparator(leagueData.positions, currentSort, currentDirection)) : filteredPlayers
+    const sortedPlayers = currentSort ? Array.from(filteredPlayers).sort(PlayerComparator(leagueData.positions, currentSort, currentDirection, isItemApplied)) : filteredPlayers
     const pagePlayers = sortedPlayers.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedPlayers.length))
     const numPages = Math.ceil(sortedPlayers.length / pageLimit)
 
