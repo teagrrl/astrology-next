@@ -84,11 +84,29 @@ export default function ItemForgePage({ leagueData }: PageProps) {
         const itemSuffix = suffix ? getItemAffix(suffix) : null
         const itemPrefixes = prefixes.map((prefix) => getItemAffix(prefix))
         const prefixNames = itemPrefixes.map((prefix) => prefix.name)
+        const prefixDurability = prefixNames.reduce((durability, name) => {
+            switch(name) {
+                case "Paper":
+                    return durability - 2
+                case "Glass":
+                    return durability - 1
+                case "Plastic":
+                    return durability
+                case "Rock":
+                    return durability + 2
+                case "Concrete":
+                    return durability + 3
+                case "Steel":
+                    return durability + 3
+                default:
+                    return durability + 1
+            }
+        }, 0)
         const filteredPrefixNames = prefixNames.filter((name) => !["aDense", "eDense"].includes(name))
         const density = prefixNames.length - filteredPrefixNames.length
         const itemName = Array.from(new Set(filteredPrefixNames).values()).join(" ")
             + " " + itemRoot.name + (itemSuffix ? (" of " + itemSuffix.name) : "") + (density > 0 ? ("+" + density) : "")
-        const durability = 1 + prefixes.length + (suffix ? 1 : 0)
+        const durability = 1 + prefixDurability + (suffix ? 1 : 0)
         return new Item({
             id: itemName,
             name: itemName,
