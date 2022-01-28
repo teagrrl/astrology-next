@@ -82,11 +82,16 @@ export default function ItemForgePage({ leagueData }: PageProps) {
         const filteredPrefixNames = prefixNames.filter((name) => !["aDense", "eDense"].includes(name))
         const density = prefixNames.length - filteredPrefixNames.length
 
-        const itemName = Array.from(new Set(filteredPrefixNames).values()).join(" ")
-            + " " + itemRoot.name + (itemSuffix ? (" of " + itemSuffix.name) : "") + (density > 0 ? ("+" + density) : "")
-            const itemDurability = Math.max([itemRoot, itemPrePrefix, ...itemPrefixes, itemPostPrefix, itemSuffix]
-                .filter((affix): affix is ItemAffix => affix !== null)
-                .reduce((durability, affix) => durability + getAffixDurability(affix.name) + 1, 0), 1)
+        const itemName = (itemPrePrefix ? (itemPrePrefix.name + " ") : "")
+            + Array.from(new Set(filteredPrefixNames).values()).join(" ") + " "
+            + (itemPostPrefix ? (itemPostPrefix.name + " ") : "")
+            + itemRoot.name 
+            + (itemSuffix ? (" of " + itemSuffix.name) : "") + (density > 0 ? ("+" + density) : "")
+
+        const itemDurability = Math.max([itemRoot, itemPrePrefix, ...itemPrefixes, itemPostPrefix, itemSuffix]
+            .filter((affix): affix is ItemAffix => affix !== null)
+            .reduce((durability, affix) => durability + getAffixDurability(affix.name) + 1, 0), 1)
+
         return new Item({
             id: itemName,
             name: itemName,
@@ -184,7 +189,7 @@ function AffixSelector({ name, limit, affixes, activeAffix, selectAffix, resetAc
             <div className="text-lg font-bold">{header}:</div>
             <ul className="flex flex-row flex-wrap p-2">
                 {resetAffixes && resetActive && <li className="m-1">
-                    <button className={`px-3 py-1 rounded-md font-semibold whitespace-nowrap bg-rose-600/70 dark:bg-rose-600/50 hover:bg-rose-600 dark:hover:bg-rose-600/70`} onClick={() => {resetAffixes()}} >Reset</button>
+                    <button className={`px-3 py-1 rounded-md font-semibold whitespace-nowrap bg-rose-600/70 dark:bg-rose-600/50 hover:bg-rose-600 dark:hover:bg-rose-600/70`} onClick={() => {resetAffixes()}}>Reset</button>
                 </li>}
                 {affixes.map((affix) => 
                     <li key={affix} className="m-1">
