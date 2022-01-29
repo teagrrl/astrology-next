@@ -244,7 +244,7 @@ const timeline = [
         end: "August 1, 2021",
     },
     {
-        name: "Grandito Siesta",
+        name: "Venti Siesta",
         start: "August 1, 2021",
         end: "October 27, 2021",
     },
@@ -264,7 +264,7 @@ const timeline = [
         end: "November 15, 2021",
     },
     {
-        name: "Grandito Siesta",
+        name: "Venti Siesta",
         start: "November 15, 2021",
         end: "December 6, 2021",
     },
@@ -274,7 +274,7 @@ const timeline = [
         end: "December 20, 2021",
     },
     {
-        name: "Grandito Siesta",
+        name: "Venti Siesta",
         start: "December 20, 2021",
         end: "January 24, 2022",
     },
@@ -282,5 +282,10 @@ const timeline = [
         name: "Gamma 10",
         start: "January 24, 2022",
         end: "February 7, 2022",
+    },
+    {
+        name: "Venti Siesta",
+        start: "February 7, 2022",
+        end: "",
     },
 ]
