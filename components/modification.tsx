@@ -1941,5 +1941,11 @@ const modifiers = [
       emoji: "0x1F427",
       title: "Unfreezable",
       description: "This Player cannot be Frozen."
-    }
+    },
+    {
+      id: "TITLE_BELT",
+      emoji: "0x1F3C6",
+      title: "The Title Belt",
+      description: "The Title Belt guarantees a spot in the Postseason. Stolen if this Team is defeated in a Title Match."
+    },
 ]

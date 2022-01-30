@@ -54,7 +54,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         if(player1.id < player2.id) return -1
         return 0
     })
-    const duplicateType = collision && ["name", "slug"].includes(collision.toString()) ? collision : undefined
+    const duplicateType = collision && collision.length > 0 && ["name", "slug"].includes(collision.toString()) ? collision : undefined
     
     const allPlayers = leagueData.players ?? []
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50

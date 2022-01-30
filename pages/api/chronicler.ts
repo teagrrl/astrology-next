@@ -203,12 +203,12 @@ export async function leagueFetcher(): Promise<LeagueData> {
             averages[id].roster[1][attribute] = averages[id].lineup[1][attribute]
         }
         for(const attribute of ["erpr", "pitching", "coldness", "overpowerment", "ruthlessness", 
-                "shakespearianism", "suppression", "unthwackability", "musclitude"]) {
+                "shakespearianism", "suppression", "unthwackability"]) {
             averages[id].roster[0][attribute] = averages[id].rotation[0][attribute]
             averages[id].roster[1][attribute] = averages[id].rotation[1][attribute]
         }
-        for(const attribute of ["combined", "defense", "anticapitalism", "chasiness", "omniscience", "tenaciousness", 
-                "watchfulness", "suppression", "pressurization", "cinnamon", "soul", "fate", "totalFingers", "peanutAllergy"]) {
+        for(const attribute of ["dripdr", "combined", "defense", "anticapitalism", "chasiness", "omniscience", "tenaciousness", 
+                "watchfulness", "pressurization", "cinnamon", "soul", "fate", "totalFingers", "peanutAllergy"]) {
             /*averages[id].roster[0][attribute] = (averages[id].lineup[0][attribute] + averages[id].rotation[0][attribute]) / 2
             averages[id].roster[1][attribute] = (averages[id].lineup[1][attribute] + averages[id].rotation[1][attribute]) / 2*/
 			let lineupSize = rosters[id].lineup.length

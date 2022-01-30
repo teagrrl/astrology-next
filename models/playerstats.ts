@@ -8,7 +8,7 @@ export const attributeIds = ["buoyancy", "divinity", "martyrdom", "moxie", "musc
 type AttributeTuple = typeof attributeIds
 export type AttributeId = AttributeTuple[number]
 
-export const categoryIds = ["combined", "baserunning", "batting", "defense", "pitching", "bsrr", "erpr", "slgbr", "wobabr"] as const
+export const categoryIds = ["combined", "baserunning", "batting", "defense", "pitching", "bsrr", "dripdr", "erpr", "slgbr", "wobabr"] as const
 type CategoryTuple = typeof categoryIds
 type CategoryId = CategoryTuple[number]
 
@@ -42,6 +42,8 @@ export default class PlayerStats {
                     return attributesHasAdjustments(["shakespearianism", "unthwackability", "coldness", "overpowerment", "ruthlessness"])
                 case "bsrr":
                     return attributesHasAdjustments(["baseThirst", "continuation", "laserlikeness", "indulgence"])
+                case "dripdr":
+                    return attributesHasAdjustments(["anticapitalism", "omniscience", "tenaciousness"])
                 case "erpr":
                     return attributesHasAdjustments(["unthwackability", "overpowerment", "ruthlessness"])
                 case "slgbr":
@@ -85,6 +87,8 @@ export default class PlayerStats {
                 return this.pitchingRating(isItemApplied)
             case "bsrr":
                 return this.BsRR(isItemApplied)
+            case "dripdr":
+                return this.DRiPDR(isItemApplied)
             case "erpr":
                 return this.ERPR(isItemApplied)
             case "slgbr":
@@ -144,6 +148,12 @@ export default class PlayerStats {
             + (this.get("laserlikeness", isItemApplied) as number) * 0.58;
     }
 
+    DRiPDR(isItemApplied?: boolean): number {
+        return (this.get("anticapitalism", isItemApplied) as number) * 0.25
+            + (this.get("omniscience", isItemApplied) as number) * 0.4
+            + (this.get("tenaciousness", isItemApplied) as number) * 0.35;
+    }
+
     ERPR(isItemApplied?: boolean): number {
         return (this.get("overpowerment", isItemApplied) as number) * 0.1
             + (this.get("ruthlessness", isItemApplied) as number) * 0.74
@@ -155,7 +165,7 @@ export default class PlayerStats {
             + (this.get("musclitude", isItemApplied) as number) * 0.13
             + (1 - (this.get("patheticism", isItemApplied) as number)) * 0.11
             + (this.get("thwackability", isItemApplied) as number) * 0.37
-            + (this.get("groundFriction", isItemApplied) as number) * 0.15;
+            + (this.get("groundFriction", isItemApplied) as number) * 0.14;
     }
 
     wOBABR(isItemApplied?: boolean): number {
