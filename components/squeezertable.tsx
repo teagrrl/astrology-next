@@ -1,22 +1,31 @@
 import Link from "next/link";
 import { Fragment } from "react";
-import { columns } from "../models/columns";
+import { CategoryAttributes, ColumnAttributes, squeezerColumns } from "../models/columns";
 import Team from "../models/team";
 import { Averages } from "../pages/api/chronicler";
 import AverageStat from "./averagestat";
 import Emoji from "./emoji";
 import ModificationList from "./modificationlist";
-import TableHeader from "./tableheader";
+import StatTableHeader, { StatTableHeaderProps } from "./stattableheader";
 
-type SqueezerTableProps = {
-    teams?: Team[],
-    averages?: Record<string, Averages>,
-    ranks?: Record<string, number>,
-    sort?: string,
-    direction?: "asc" | "desc",
-    triggerSort?: Function,
+type SqueezerTableProps = SqueezerTableBodyProps & StatTableHeaderProps
+
+type SqueezerTableBodyProps = {
+    teams: Team[],
+    averages: Record<string, Averages>,
+    ranks: Record<string, number>,
     isItemApplied?: boolean,
     isShowSimplified?: boolean,
+}
+
+type SqueezerTableCellProps = {
+    team: Team,
+    averages: Record<string, Averages>,
+    ranks: Record<string, number>,
+    category: CategoryAttributes,
+    column?: ColumnAttributes,
+    isShowSimplified?: boolean,
+    isItemApplied?: boolean,
 }
 
 export default function SqueezerTable({teams, averages, ranks, sort, direction, triggerSort, isItemApplied, isShowSimplified}: SqueezerTableProps) {
@@ -29,89 +38,90 @@ export default function SqueezerTable({teams, averages, ranks, sort, direction, 
     return (
         <div className="overflow-auto">
             <table className="table-auto">
-            <colgroup span={(isShowSimplified ? 0 : columns.sibrmetrics.length) + 5} className="border-r-2 border-black dark:border-white"></colgroup>
-                    {columns.categories.map((category) => 
-                        isShowSimplified 
-                            ? category.hasRating && <colgroup key={`colgroup_${category.id}`}></colgroup>
-                            : <colgroup key={`colgroup_${category.id}`} span={category.attributes.length + (category.hasRating ? 1 : 0)} className="border-r-2 border-black dark:border-white last-of-type:border-0"></colgroup>
-                    )}
-                    <thead>
-                        <tr className="border-b-[1px] border-black dark:border-zinc-500">
-                            <TableHeader colSpan={(isShowSimplified ? 0 : columns.sibrmetrics.length) + 5}>General</TableHeader>
-                            {columns.categories.map((category) =>
-                                isShowSimplified 
-                                    ? category.hasRating && <TableHeader key={`header_${category.id}`}>{category.name}</TableHeader>
-                                    : <TableHeader key={`header_${category.id}`} colSpan={category.attributes.length + (category.hasRating ? 1 : 0)}>{category.name}</TableHeader>
-                            )}
-                        </tr>
-                        <tr className="border-b-[1px] border-black dark:border-zinc-500">
-                            <TableHeader colSpan={2} sortId="name" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title="Team Name">Name</TableHeader>
-                            <TableHeader sortId="rank" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title="Team Rank">Rank</TableHeader>
-                            <TableHeader sortId="modifications" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title="Player Modifications">Modifications</TableHeader>
-                            {!isShowSimplified && columns.sibrmetrics.map((sibrmetric) => 
-                                <TableHeader key={sibrmetric.id} sortId={sibrmetric.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title={sibrmetric.name}>{sibrmetric.shorthand}</TableHeader>
-                            )}
-                            <TableHeader sortId="combined" sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title="Combined Stars"><Emoji emoji="0x1F31F" emojiClass="inline w-4 h-4" /></TableHeader>
-                            {columns.categories.map((category) =>
-                                <Fragment key={`subheader_${category.id}`}>
-                                    {category.hasRating && <TableHeader sortId={category.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title={`${category.name} Stars`}><Emoji emoji="0x2B50" emojiClass="inline w-4 h-4" /></TableHeader>}
-                                    {!isShowSimplified && category.attributes.map((attribute) =>
-                                        <TableHeader key={`subheader_${attribute.id}`} sortId={attribute.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort} title={attribute.name}>{attribute.shorthand}</TableHeader>
-                                    )}
-                                </Fragment>
-                            )}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {teams.map((team) =>
-                            <tr key={team.id} className="duration-300 hover:bg-zinc-400/20">
-                                <td className="px-1.5 py-1 whitespace-nowrap">
-                                    {false && <Emoji emoji="0x1F480" emojiClass="inline min-w-[1em] h-4 mr-1" />}
-                                    <Link href={{
-                                        pathname: "/team/[slugOrId]",
-                                        query: {
-                                            slugOrId: team.slug()
-                                        }
-                                    }}>
-                                        <a className="font-bold">{team.canonicalName()}</a>
-                                    </Link>
-                                </td>
-                                <td className="px-1.5 py-1">
-                                    <a href={`https://blaseball.com/team/${team.id}`} title={`Go to official team page for the ${team.canonicalName()}`}>
-                                        <Emoji emoji="0x1F517" emojiClass="min-w-[1em] h-4" />
-                                    </a>
-                                </td>
-                                <td className="px-1.5 py-1 text-center">
-                                    {ranks ? ranks[team.id] + 1 : "N/A"}
-                                </td>
-                                <td className="px-1.5 py-1 text-center">
-                                    {team.modifications().length > 0 
-                                        ? <ModificationList 
-                                            type="team" 
-                                            permanent={team.data.permAttr} 
-                                            season={team.data.seasAttr} 
-                                            week={team.data.weekAttr} 
-                                            game={team.data.gameAttr} 
-                                        />
-                                        : <>-</>
-                                    }
-                                </td>
-                                {!isShowSimplified && columns.sibrmetrics.map((sibrmetric) =>
-                                     <AverageStat key={`${team.id}_${sibrmetric.id}`} header={team.canonicalName()} averages={averages[team.id].roster} stat={sibrmetric} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
-                                )}
-                                <AverageStat header={team.canonicalName()} averages={averages[team.id].roster} id="combined" hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
-                                {columns.categories.map((category) =>
-                                    <Fragment key={`${team.id}_${category.id}`}>
-                                        {category.hasRating && <AverageStat key={`${team.id}_${category.id}`} header={team.canonicalName()} averages={averages[team.id].roster} stat={category} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />}
-                                        {!isShowSimplified && category.attributes.map((attribute) => 
-                                            <AverageStat key={`${team.id}_${attribute.id}`} header={team.canonicalName()} averages={averages[team.id].roster} stat={attribute} hasColorScale={attribute.id === "peanutAllergy" || category.id !== "misc"} isItemApplied={isItemApplied} />
-                                        )}
-                                    </Fragment>
-                                )}
-                            </tr>
-                        )}
-                    </tbody>
+                <StatTableHeader columns={squeezerColumns} sort={sort} direction={direction} triggerSort={triggerSort} isShowSimplified={isShowSimplified} />
+                <SqueezerTableBody teams={teams} averages={averages} ranks={ranks} isShowSimplified={isShowSimplified} isItemApplied={isItemApplied} />
             </table>
         </div>
     )
+}
+
+
+function SqueezerTableBody({ teams, averages, ranks, isShowSimplified, isItemApplied }: SqueezerTableBodyProps) {
+    return (
+        <tbody>
+            {teams.map((team) => 
+                <tr key={team.id} className="duration-300 hover:bg-zinc-400/20 dark:hover:bg-zinc-400/20">
+                    {squeezerColumns.map((category) => 
+                        <Fragment key={`${team.id}_${category.id}`}>
+                            {category.hasRating && <SqueezerTableCell team={team} averages={averages} ranks={ranks} category={category} isItemApplied={isItemApplied} />}
+                            {(category.id === "general" || !isShowSimplified) && category.columns.map((column) => 
+                                <SqueezerTableCell key={`${team.id}_${column.id}`} team={team} averages={averages} ranks={ranks} category={category} column={column} isItemApplied={isItemApplied} />
+                            )}
+                        </Fragment>
+                    )}
+                </tr>
+            )}
+        </tbody>
+    )
+}
+
+function SqueezerTableCell({ team, averages, ranks, category, column, isItemApplied }: SqueezerTableCellProps) {
+    if(column) {
+        switch(column.id) {
+            case "name":
+                return (
+                    <>
+                        <td className="px-1.5 py-1 whitespace-nowrap">
+                            {false && <Emoji emoji="0x1F480" emojiClass="inline min-w-[1em] h-4 mr-1" />}
+                            <Link href={{
+                                pathname: "/team/[slugOrId]",
+                                query: {
+                                    slugOrId: team.slug()
+                                }
+                            }}>
+                                <a className="font-bold">{team.canonicalName()}</a>
+                            </Link>
+                        </td>
+                        <td className="px-1.5 py-1">
+                            <a href={`https://blaseball.com/team/${team.id}`} title={`Go to official team page for the ${team.canonicalName()}`}>
+                                <Emoji emoji="0x1F517" emojiClass="min-w-[1em] h-4" />
+                            </a>
+                        </td>
+                    </>
+                )
+            case "rank":
+                return (
+				    <td className="px-1.5 py-1 text-center">
+                        {ranks ? ranks[team.id] + 1 : "N/A"}
+                    </td>
+                )
+            case "modifications":
+                return (
+                    <td className="px-1.5 py-1 text-center">
+                        {team.modifications().length > 0 
+                            ? <ModificationList 
+                                type="team" 
+                                permanent={team.data.permAttr} 
+                                season={team.data.seasAttr} 
+                                week={team.data.weekAttr} 
+                                game={team.data.gameAttr} 
+                            />
+                            : <>-</>
+                        }
+                    </td>
+                )
+            case "combined":
+                return (
+                    <AverageStat header={team.canonicalName()} averages={averages[team.id].roster} id="combined" hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
+                )
+            default:
+                return (
+                    <AverageStat header={team.canonicalName()} averages={averages[team.id].roster} stat={column} hasColorScale={column.id === "peanutAllergy" || category.id !== "misc"} isStarRating={category.id === "sibrmetrics"} isItemApplied={isItemApplied} />
+                )
+        }
+    } else {
+        return (
+            <AverageStat header={team.canonicalName()} averages={averages[team.id].roster} stat={category} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
+        )
+    }
 }

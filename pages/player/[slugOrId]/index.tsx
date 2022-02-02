@@ -6,7 +6,7 @@ import AstrologyLoader from '../../../components/loader'
 import Metadata from '../../../components/metadata'
 import { PlayerCard } from '../../../components/playercard'
 import Tooltip from '../../../components/tooltip'
-import { columns } from '../../../models/columns'
+import { playerStatColumns } from '../../../models/columns'
 import PlayerStats, { reverseAttributes } from '../../../models/playerstats'
 import { PageProps } from '../../_app'
 
@@ -41,13 +41,13 @@ export default function PlayerPage({ leagueData, isItemApplied }: PlayerPageProp
             />
             <PlayerCard player={player} team={team} stats={stats} isItemApplied={isItemApplied} />
             <div className="p-2 md:w-1/2 md:overflow-auto">
-                {columns.categories.map((category) => 
+                {playerStatColumns.map((category) => 
                     category.id !== "misc" && <table key={category.id} className="table-fixed mb-5">
                         <tbody>
                             <tr>
                                 <th className="text-left text-2xl font-bold" colSpan={3}>{category.name}</th>
                             </tr>
-                            {category.attributes.map((attribute) => 
+                            {category.columns.map((attribute) => 
                                 <tr key={attribute.id} className="odd:bg-zinc-200 dark:odd:bg-zinc-800">
                                     <td className="pl-4 py-2 font-semibold whitespace-nowrap">{attribute.name}</td>
                                     <td className="px-4 py-2 w-full">

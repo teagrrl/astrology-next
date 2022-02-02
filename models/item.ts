@@ -1,6 +1,9 @@
 import Player from './player'
 import { reverseAttributes } from './playerstats'
 import { ItemPart, ChroniclerItem } from './chronicler'
+import { getReverseAttributes, itemColumns } from './columns'
+
+export const reverseItemAttributes = getReverseAttributes(itemColumns)
 
 export const adjustmentIndices = ["tragicness", "buoyancy", "thwackability", "moxie", "divinity", "musclitude", "patheticism", "martyrdom", "cinnamon", "baseThirst", "laserlikeness", "continuation", "indulgence", "groundFriction", "shakespearianism", "suppression", "unthwackability", "coldness", "overpowerment", "ruthlessness", "pressurization", "omniscience", "tenaciousness", "watchfulness", "anticapitalism", "chasiness"]
 
@@ -219,7 +222,7 @@ function getAffixProperties(data: ChroniclerItem) {
     const elements: string[] = []
     const mods: Record<string, string> = {}
     const itemPartFilter = (affix: ItemPart | null): affix is ItemPart => !!affix
-    const affixes = [data.prePrefix, data.postPrefix, data.root, data.suffix].concat(data.prefixes).filter(itemPartFilter)
+    const affixes = [data.prePrefix, ...(data.prefixes ?? []), data.postPrefix, data.root, data.suffix].filter(itemPartFilter)
     for(const affix of affixes) {
         const affixAdjustments: Record<string, number> = {}
         // clean up the name a little bit so it looks nicer
@@ -244,7 +247,7 @@ function getAffixProperties(data: ChroniclerItem) {
         })
     }
     const elementCounts = elements
-        .reduceRight((count, element: string) => {
+        .reduce((count, element: string) => {
                 count.set(element, (count.get(element) ?? 0) + 1)
                 return count
         }, new Map<string, number>())

@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { ReactElement } from "react";
 import BallparkTable from "../components/ballparktable";
 import AstrologyError from "../components/error";
+import { exportBallparkData } from "../components/exportcsv";
 import Layout from "../components/layout";
 import AstrologyLoader from "../components/loader";
 import Pagination from "../components/pagination";
@@ -43,7 +44,7 @@ export default function BallparksPage({ leagueData }: PageProps) {
     const allBallparks = ballparks.data
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
     const filteredBallparks = allBallparks.filter((ballpark) => ballpark.data.model !== null)
-    const sortedBallparks = currentSort ? Array.from(filteredBallparks).sort(BallparkComparator(currentSort, currentDirection)) : filteredBallparks
+    const sortedBallparks = currentSort ? Array.from(filteredBallparks).sort(BallparkComparator(leagueData.teams, currentSort, currentDirection)) : filteredBallparks
     const pageBallparks = sortedBallparks.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedBallparks.length))
     const numPages = Math.ceil(sortedBallparks.length / pageLimit)
 
@@ -76,13 +77,22 @@ export default function BallparksPage({ leagueData }: PageProps) {
     return (
         <section className="overflow-auto">
             <TeamHeader team={AllBallparks} />
-            {numPages > 1 && <Pagination href={{
-                pathname: "/ballparks",
-                query: {
-                    sort: currentSort,
-                    direction: currentSort ? currentDirection : undefined,
-                }
-            }} currentPage={currentPage} numPages={numPages} />}
+            <Pagination 
+                href={{
+                    pathname: "/ballparks",
+                    query: {
+                        sort: currentSort,
+                        direction: currentSort ? currentDirection : undefined,
+                    }
+                    
+                }}
+                exportData={{
+                    data: exportBallparkData(allBallparks), 
+                    filename: "ballparks",
+                }}
+                currentPage={currentPage} 
+                numPages={numPages} 
+            />
             {allBallparks.length > 0 && pageBallparks.length > 0 
                 ? <div className="overflow-auto">
                     <BallparkTable 
@@ -95,13 +105,22 @@ export default function BallparksPage({ leagueData }: PageProps) {
                 </div>
                 : <h1 className="text-3xl text-center font-bold p-5">Huh, it looks like not enough ballparks with that criteria exist.</h1>
             }
-            {numPages > 1 && <Pagination href={{
-                pathname: "/ballparks",
-                query: {
-                    sort: currentSort,
-                    direction: currentSort ? currentDirection : undefined,
-                }
-            }} currentPage={currentPage} numPages={numPages} />}
+            <Pagination 
+                href={{
+                    pathname: "/ballparks",
+                    query: {
+                        sort: currentSort,
+                        direction: currentSort ? currentDirection : undefined,
+                    }
+                    
+                }}
+                exportData={{
+                    data: exportBallparkData(sortedBallparks), 
+                    filename: "ballparks",
+                }}
+                currentPage={currentPage} 
+                numPages={numPages} 
+            />
         </section>
     )
 }

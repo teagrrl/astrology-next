@@ -1946,6 +1946,6 @@ const modifiers = [
       id: "TITLE_BELT",
       emoji: "0x1F3C6",
       title: "The Title Belt",
-      description: "The Title Belt guarantees a spot in the Postseason. Stolen if this Team is defeated in a Title Match."
+      description: "The Title Belt guarantees a spot in the Postseason. A Challenger may claim the Belt by defeating the current Wielder in a Title Match."
     },
 ]

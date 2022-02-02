@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import { averageReverseAttributes } from '../../components/averagestat'
 import AstrologyError from '../../components/error'
+import ExportCSV, { exportSqueezerData } from '../../components/exportcsv'
 import Layout from '../../components/layout'
 import AstrologyLoader from '../../components/loader'
 import Metadata from '../../components/metadata'
@@ -124,7 +125,10 @@ export default function SqueezerPage({ leagueData, isItemApplied, isShowSimplifi
                     </li>
                 )}
             </ul>
-            {currentGroup && <h1 className="my-2 text-center text-2xl font-bold">{currentGroup.name}</h1>}
+            <div className="flex flex-row justify-end p-2">
+                {currentGroup && <h1 className="flex grow justify-center text-2xl font-bold">{currentGroup.name}</h1>}
+                <ExportCSV data={exportSqueezerData(sortedTeams, leagueData.averages, groupRanks, isShowSimplified, isItemApplied)} filename={`squeezer_${currentGroup.name.toLowerCase()}`} />
+            </div>
             <SqueezerTable 
                 teams={sortedTeams}
                 averages={leagueData.averages}
@@ -157,6 +161,7 @@ function getSqueezerRanks(teams: Team[], averages: Record<string, Averages>, isI
         return {
             id: team.id,
             value: (averages[team.id].roster[isItemApplied ? 1 : 0]["wobabr"] + averages[team.id].roster[isItemApplied ? 1 : 0]["erpr"]) / 2,
+            //value: averages[team.id].roster[isItemApplied ? 1 : 0]["wobabr"] + averages[team.id].roster[isItemApplied ? 1 : 0]["erpr"] / 1.4 + averages[team.id].roster[isItemApplied ? 1 : 0]["dripdr"] / 2.1 + averages[team.id].roster[isItemApplied ? 1 : 0]["bsrr"] / 5.7,
         }
     })
     rankings.sort((rank1, rank2) => rank2.value - rank1.value)

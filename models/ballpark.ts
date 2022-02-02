@@ -1,8 +1,9 @@
 import { ChroniclerEntity, ChroniclerBallpark } from "./chronicler"
+import { ballparkColumns, getReverseAttributes } from "./columns"
+import Team from "./team"
 
-export const ballparkAttributeIds = ["grandiosity", "fortification", "obtuseness", "ominousness", "inconvenience", "viscosity", "forwardness", "mysticism", "elongation"]
-
-export const reverseBallparkAttributes = ["name", "prefab"]
+export const ballparkAttributeIds = ballparkColumns.find((category) => category.id === "stats")?.columns.map((column) => column.id) ?? []
+export const reverseBallparkAttributes = getReverseAttributes(ballparkColumns)
 
 const weathers = [
 	{ 
@@ -268,28 +269,55 @@ export default class Ballpark {
         }
     }
 
-    prefab(): string {
+    prefab() {
         switch(this.data.model) {
             case 0:
-                return "Palermo";
+                return {
+					name: "Palermo",
+					description: "Settle in. Why go anywhere when you could stay home?",
+				}
             case 1:
-                return "Silverada";
+                return {
+					name: "Silverada",
+					description: "The sleek lines and open space scream speed.",
+				}
             case 2:
-                return "Douglas";
+                return {
+					name: "Douglas",
+					description: "Keep your loved ones safe with the leader in home field security.",
+				}
             case 3:
-                return "Hillcrest";
+                return {
+					name: "Hillcrest",
+					description: "A high-energy space you'll want to sink into.",
+				}
             case 4:
-                return "Twede";
+                return {
+					name: "Twede",
+					description: "Keep things in front of you in this minimalist dream.",
+				}
             case 5:
-                return "Rodeo";
+                return {
+					name: "Rodeo",
+					description: "Everything's a long ball in this cozy space-saver.",
+				}
             case 6:
-                return "Loge";
+                return {
+					name: "Loge",
+					description: "Open air and easy access make this the perfect event space.",
+				}
             case 7:
-                return "Pine";
+                return {
+					name: "Pine",
+					description: "Pitchers will go absolutely wild over the view.",
+				}
             case 8:
-                return "Boreal";
+                return {
+					name: "Boreal",
+					description: "High ceilings, tons of natural light. You could get lost in your own home.",
+				}
             default:
-                return "None";
+                return null
         }
     }
 
@@ -312,7 +340,7 @@ export default class Ballpark {
     }
 }
 
-function getComparatorValue(ballpark: Ballpark, attribute: string) {
+function getComparatorValue(teams: Team[], ballpark: Ballpark, attribute: string) {
     switch(attribute) {
 		case "airBalloons":
 			return ballpark.data.state?.air_balloons ?? 0
@@ -330,8 +358,11 @@ function getComparatorValue(ballpark: Ballpark, attribute: string) {
             return ballpark.data.mods.length
 		case "name":
 			return ballpark.data.nickname.startsWith("The ") ? ballpark.data.nickname.substring(4) : ballpark.data.nickname
-		case "prefab":
-			return ballpark.prefab()
+		case "type":
+			return ballpark.prefab()?.name ?? ""
+		case "team":
+			const team = teams.find((team) => team.id === ballpark.data.teamId)
+			return team ? team.canonicalNickname() : ""
         case "weather":
             return ballpark.weather().reduce((sum, weather) => sum + weather.frequency, 0)
         default:
@@ -339,11 +370,11 @@ function getComparatorValue(ballpark: Ballpark, attribute: string) {
     }
 }
 
-export const BallparkComparator = (column: string, direction?: "asc" | "desc") => {
+export const BallparkComparator = (teams: Team[], column: string, direction?: "asc" | "desc") => {
 	return (ballpark1: Ballpark, ballpark2: Ballpark) => {
         let comparison = 0;
-		let attribute1 = getComparatorValue(ballpark1, column)
-		let attribute2 = getComparatorValue(ballpark2, column)
+		let attribute1 = getComparatorValue(teams, ballpark1, column)
+		let attribute2 = getComparatorValue(teams, ballpark2, column)
         if(attribute1 !== attribute2) {
             if (attribute1 > attribute2 || attribute1 === void 0) comparison = 1;
             if (attribute1 < attribute2 || attribute2 === void 0) comparison = -1;

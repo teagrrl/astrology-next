@@ -9,6 +9,7 @@ import { PlayerComparator } from '../../models/player'
 import AstrologyLoader from '../../components/loader'
 import AstrologyError from '../../components/error'
 import Metadata from '../../components/metadata'
+import { exportPlayerData } from '../../components/exportcsv'
 
 type TeamPageProps = PageProps & {
 	
@@ -117,6 +118,10 @@ export default function TeamPage({ leagueData, isItemApplied, isShowSimplified }
 					triggerSort={sortPlayers}
 					isShowSimplified={isShowSimplified} 
 					isItemApplied={isItemApplied} 
+					exportData={{
+						data: exportPlayerData(roster.players, leagueData.positions, isShowSimplified, isItemApplied),
+						filename: `${roster.header}_${roster.id}`,
+					}}
 				/>
 			)}
 		</section>

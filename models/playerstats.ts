@@ -142,22 +142,22 @@ export default class PlayerStats {
     }
 
     BsRR(isItemApplied?: boolean): number {
-        return (this.get("baseThirst", isItemApplied) as number) * 0.16
-            + (this.get("continuation", isItemApplied) as number) * 0.21
-            + (this.get("indulgence", isItemApplied) as number) * 0.06
-            + (this.get("laserlikeness", isItemApplied) as number) * 0.58;
+        return (this.get("baseThirst", isItemApplied) as number) * 0.05
+            + (this.get("continuation", isItemApplied) as number) * 0.2
+            + (this.get("indulgence", isItemApplied) as number) * 0.2
+            + (this.get("laserlikeness", isItemApplied) as number) * 0.55
     }
 
     DRiPDR(isItemApplied?: boolean): number {
         return (this.get("anticapitalism", isItemApplied) as number) * 0.25
             + (this.get("omniscience", isItemApplied) as number) * 0.4
-            + (this.get("tenaciousness", isItemApplied) as number) * 0.35;
+            + (this.get("tenaciousness", isItemApplied) as number) * 0.35
     }
 
     ERPR(isItemApplied?: boolean): number {
         return (this.get("overpowerment", isItemApplied) as number) * 0.1
-            + (this.get("ruthlessness", isItemApplied) as number) * 0.74
-            + (this.get("unthwackability", isItemApplied) as number) * 0.16;
+            + (this.get("ruthlessness", isItemApplied) as number) * 0.6
+            + (this.get("unthwackability", isItemApplied) as number) * 0.3
     }
 
     SLGBR(isItemApplied?: boolean): number {
@@ -165,17 +165,17 @@ export default class PlayerStats {
             + (this.get("musclitude", isItemApplied) as number) * 0.13
             + (1 - (this.get("patheticism", isItemApplied) as number)) * 0.11
             + (this.get("thwackability", isItemApplied) as number) * 0.37
-            + (this.get("groundFriction", isItemApplied) as number) * 0.14;
+            + (this.get("groundFriction", isItemApplied) as number) * 0.14
     }
 
     wOBABR(isItemApplied?: boolean): number {
-        return (this.get("divinity", isItemApplied) as number) * 0.21 
-            + (this.get("martyrdom", isItemApplied) as number) * 0.07
-            + (this.get("moxie", isItemApplied) as number) * 0.09
-            + (this.get("musclitude", isItemApplied) as number) * 0.04
-            + (1 - (this.get("patheticism", isItemApplied) as number)) * 0.17
-            + (this.get("thwackability", isItemApplied) as number) * 0.35
-            + (this.get("groundFriction", isItemApplied) as number) * 0.06;
+        return (this.get("divinity", isItemApplied) as number) * 0.16 
+            + (this.get("martyrdom", isItemApplied) as number) * 0.04
+            + (this.get("moxie", isItemApplied) as number) * 0.13
+            + (this.get("musclitude", isItemApplied) as number) * 0.03
+            + (1 - (this.get("patheticism", isItemApplied) as number)) * 0.15
+            + (this.get("thwackability", isItemApplied) as number) * 0.38
+            + (this.get("groundFriction", isItemApplied) as number) * 0.12
     }
 
     vibes(isItemApplied?: boolean) {

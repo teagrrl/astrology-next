@@ -9,8 +9,9 @@
 	},
 	"dependencies": {
 		"@tippyjs/react": "^4.2.6",
-		"next": "12.0.7",
+		"next": "^12.0.9",
 		"react": "17.0.2",
+		"react-csv": "^2.2.2",
 		"react-dom": "17.0.2",
 		"swr": "^1.1.2",
 		"twemoji": "^13.1.0"
@@ -18,6 +19,7 @@
 	"devDependencies": {
 		"@types/node": "17.0.8",
 		"@types/react": "17.0.38",
+		"@types/react-csv": "^1.1.2",
 		"@types/twemoji": "^12.1.2",
 		"autoprefixer": "^10.4.2",
 		"eslint": "8.6.0",

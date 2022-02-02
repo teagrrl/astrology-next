@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { columns } from "../models/columns"
+import { playerStatColumns } from "../models/columns"
 import Item from "../models/item"
 import Player from "../models/player"
 import { reverseAttributes } from "../models/playerstats"
@@ -24,8 +24,8 @@ type PlayerItemProps = {
 }
 
 export default function PlayerItem({ item, owners, showDetails, showModEmojis, showStats, hasLink }: PlayerItemProps) {
-    const filteredColumns = columns.categories.map((category) => {
-        const attributes = category.attributes.filter((attribute) => Object.keys(item.adjustments).includes(attribute.id))
+    const filteredColumns = playerStatColumns.map((category) => {
+        const attributes = category.columns.filter((column) => Object.keys(item.adjustments).includes(column.id))
         return {
             attributes: attributes,
             id: category.id,

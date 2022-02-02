@@ -2,6 +2,7 @@ import getConfig from 'next/config'
 import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import AstrologyError from '../components/error'
+import { exportItemData } from '../components/exportcsv'
 import ItemTable from '../components/itemtable'
 import Layout from '../components/layout'
 import AstrologyLoader from '../components/loader'
@@ -82,14 +83,22 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
 	return (
         <section className="overflow-auto">
             <TeamHeader team={TheArmory} />
-            {numPages > 1 && <Pagination href={{
-                pathname: "/items",
-                query: {
-                    owners: currentOwners,
-                    sort: currentSort,
-                    direction: currentSort ? currentDirection : undefined,
-                }
-            }} currentPage={currentPage} numPages={numPages} />}
+            <Pagination 
+                href={{
+                    pathname: "/items",
+                    query: {
+                        owners: currentOwners,
+                        sort: currentSort,
+                        direction: currentSort ? currentDirection : undefined,
+                    }
+                }}
+                exportData={{
+                    data: exportItemData(sortedItems, leagueData.armory), 
+                    filename: "items",
+                }}
+                currentPage={currentPage} 
+                numPages={numPages} 
+            />
             {allItems.length > 0 && pageItems.length > 0 
                 ? <div className="overflow-auto">
                     <ItemTable 
@@ -104,14 +113,22 @@ export default function ItemsPage({ leagueData, isShowSimplified }: PageProps) {
                 </div>
                 : <h1 className="text-3xl text-center font-bold p-5">Huh, it looks like not enough items with that criteria exist.</h1>
             }
-            {numPages > 1 && <Pagination href={{
-                pathname: "/items",
-                query: {
-                    owners: currentOwners,
-                    sort: currentSort,
-                    direction: currentSort ? currentDirection : undefined,
-                }
-            }} currentPage={currentPage} numPages={numPages} />}
+            <Pagination 
+                href={{
+                    pathname: "/items",
+                    query: {
+                        owners: currentOwners,
+                        sort: currentSort,
+                        direction: currentSort ? currentDirection : undefined,
+                    }
+                }} 
+                exportData={{
+                    data: exportItemData(sortedItems, leagueData.armory), 
+                    filename: "items",
+                }}
+                currentPage={currentPage} 
+                numPages={numPages} 
+            />
         </section>
 	)
 }

@@ -2,12 +2,13 @@ import getConfig from 'next/config'
 import { useRouter } from 'next/router'
 import type { ReactElement } from 'react'
 import AstrologyError from '../components/error'
+import { exportPlayerData } from '../components/exportcsv'
 import Layout from '../components/layout'
 import AstrologyLoader from '../components/loader'
 import Pagination from '../components/pagination'
 import PlayerTable from '../components/playertable'
 import TeamHeader from '../components/teamheader'
-import Player, { PlayerComparator } from '../models/player'
+import Player, { PlayerComparator, PlayerPosition } from '../models/player'
 import { reverseAttributes } from '../models/playerstats'
 import Team, { AllPlayers, groupTeams } from '../models/team'
 import { PageProps } from './_app'
@@ -84,14 +85,12 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
                     universes: currentUniverseIds,
                     sort: newSort,
                     direction: newDirection,
-                    collision: duplicateType,
                 }
             }, undefined, { shallow: true })
         } else {
             router.push({
                 query: {
                     universes: currentUniverseIds,
-                    collision: duplicateType,
                 }
             }, undefined, { shallow: true })
         }
@@ -101,15 +100,23 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         <section className="overflow-auto">
             <TeamHeader team={AllPlayers} />
             {currentUniverses.length > 0 && <div className="text-lg text-center font-semibold">Currently only showing players from {currentUniverses.map((universe) => universe.name).join(" & ")}</div>}
-            {numPages > 1 && <Pagination href={{ 
-                pathname: "/players",
-                query: {
-                    universes: currentUniverseIds,
-                    sort: currentSort,
-                    direction: currentSort ? currentDirection : undefined,
-                    collision: duplicateType,
-                },
-            }} currentPage={currentPage} numPages={numPages} />}
+            <Pagination 
+                href={{ 
+                    pathname: "/players",
+                    query: {
+                        universes: currentUniverseIds,
+                        sort: currentSort,
+                        direction: currentSort ? currentDirection : undefined,
+                        collision: duplicateType,
+                    },
+                }} 
+                exportData={{
+                    data: exportPlayerData(sortedPlayers, leagueData.positions, isShowSimplified, isItemApplied), 
+                    filename: "players",
+                }}
+                currentPage={currentPage}
+                numPages={numPages} 
+            />
             {allPlayers.length > 0 && pagePlayers.length > 0 
                 ? <PlayerTable 
                     players={pagePlayers} 
@@ -122,15 +129,23 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
                 /> 
                 : <h1 className="text-3xl text-center font-bold p-5">Huh, it looks like not enough players with that criteria exist.</h1>
             }
-            {numPages > 1 && <Pagination href={{ 
-                pathname: "/players",
-                query: {
-                    universes: currentUniverseIds,
-                    sort: currentSort,
-                    direction: currentSort ? currentDirection : undefined,
-                    collision: duplicateType,
-                },
-            }} currentPage={currentPage} numPages={numPages} />}
+            <Pagination 
+                href={{ 
+                    pathname: "/players",
+                    query: {
+                        universes: currentUniverseIds,
+                        sort: currentSort,
+                        direction: currentSort ? currentDirection : undefined,
+                        collision: duplicateType,
+                    },
+                }} 
+                exportData={{
+                    data: exportPlayerData(sortedPlayers, leagueData.positions, isShowSimplified, isItemApplied), 
+                    filename: "players",
+                }}
+                currentPage={currentPage}
+                numPages={numPages} 
+            />
         </section>
 	)
 }
