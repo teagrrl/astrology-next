@@ -27,15 +27,18 @@ export function PlayerCard({ player, team, stats, isItemApplied }: PlayerCardPro
         <div className="m-2 text-black dark:text-white border-[1px] border-black dark:border-white md:w-1/2 md:overflow-auto">
             <div className="border-b-[1px] border-black dark:border-white p-5">
                 <div className="flex flex-row items-center text-2xl">
-                    <a className="font-semibold" href={`https://blaseball.com/player/${player.id}`}>{player.canonicalName()}</a>
+                    <span className="font-semibold">{player.canonicalName()}</span>
                     <Link href={{
                         pathname: "[slugOrId]/history",
                         query: {
                             slugOrId: player.slug()
                         }
                     }}>
-                        <a title={`See the history of changes for ${player.canonicalName()}`}><Emoji emoji="0x1F4CA" emojiClass="h-6 h-6 ml-2" /></a>
+                        <a className="ml-1" title={`See the history of changes for ${player.canonicalName()}`}><Emoji emoji="0x1F4CA" emojiClass="w-6 h-6" /></a>
                     </Link>
+                    <a className="ml-1" href={`https://blaseball.com/player/${player.id}`} title={`Go to official player page for ${player.canonicalName()}`}>
+                        <Emoji emoji="0x1F517" emojiClass="w-6 h-6" />
+                    </a>
                 </div>
                 <div className="flex flex-row flex-wrap items-center mt-1">
                     <Emoji emoji={team?.data.emoji ?? "0x2753"} className="h-7 w-7 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: team?.data.mainColor ?? "#aaaaaa" }} emojiClass="w-4 h-4" />

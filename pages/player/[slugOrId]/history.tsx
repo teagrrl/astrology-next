@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import Emoji from '../../../components/emoji'
 import AstrologyError from '../../../components/error'
+import ExportCSV, { exportPlayerHistoryData } from '../../../components/exportcsv'
 import Layout from '../../../components/layout'
 import AstrologyLoader from '../../../components/loader'
 import Metadata from '../../../components/metadata'
@@ -77,18 +78,21 @@ export default function PlayerHistoryPage({ leagueData, isShowSimplified, isItem
                 title={`Historical Data for ${player.canonicalName()} - Astrology`} 
                 description={`Check out the historical star charts for ${player.canonicalName()}.`} 
             />
-            <div className="flex justify-center items-center text-center p-5">
-                <Link href={{
-                    pathname: "/player/[slugOrId]",
-                    query: {
-                        slugOrId: slugOrId
-                    }
-                }}>
-                    <a className="text-3xl font-bold mr-2" title="Back to player page">&laquo; {player.canonicalName()}</a>
-                </Link>
-                <a href={`https://blaseball.com/player/${player.id}`} title={`Go to official player page for ${player.canonicalName()}`}>
-                    <Emoji emoji="0x1F517" emojiClass="w-7 h-7 " />
-                </a>
+            <div className="flex flex-row px-2 py-5">    
+                <div className="flex grow justify-center items-center">
+                    <Link href={{
+                        pathname: "/player/[slugOrId]",
+                        query: {
+                            slugOrId: slugOrId
+                        }
+                    }}>
+                        <a className="text-3xl font-bold mr-2" title="Back to player page">&laquo; {player.canonicalName()}</a>
+                    </Link>
+                    <a href={`https://blaseball.com/player/${player.id}`} title={`Go to official player page for ${player.canonicalName()}`}>
+                        <Emoji emoji="0x1F517" emojiClass="w-7 h-7 " />
+                    </a>
+                </div>
+                <ExportCSV data={exportPlayerHistoryData(sortedHistory, isShowSimplified, isItemApplied)} filename={`history_${player.id}`} />
             </div>
             <PlayerHistoryTable 
                 history={sortedHistory} 

@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import AstrologyError from '../components/error'
+import { exportPlayerData } from '../components/exportcsv'
 import Layout from '../components/layout'
 import AstrologyLoader from '../components/loader'
 import PlayerTable from '../components/playertable'
@@ -68,13 +69,18 @@ export default function PlayerTributesPage({ leagueData, isShowSimplified, isIte
         <section className="overflow-auto">
             <TeamHeader team={TheHall} />
             <PlayerTable 
+                header="Tributes"
                 players={sortedPlayers} 
                 positions={leagueData.positions} 
                 sort={currentSort} 
                 direction={currentDirection} 
                 triggerSort={sortPlayers}
                 isShowSimplified={isShowSimplified} 
-                isItemApplied={isItemApplied} 
+                isItemApplied={isItemApplied}
+                exportData={{
+                    data: exportPlayerData(sortedPlayers, leagueData.positions, isShowSimplified, isItemApplied), 
+                    filename: "tributes",
+                }}
             />
         </section>
 	)

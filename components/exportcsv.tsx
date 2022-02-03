@@ -1,11 +1,11 @@
 import { CSVLink } from "react-csv"
 import Ballpark from "../models/ballpark"
-import { ballparkColumns, itemColumns, playerColumns, squeezerColumns } from "../models/columns"
+import { ballparkColumns, itemColumns, playerColumns, playerHistoryColumns, squeezerColumns } from "../models/columns"
 import Item from "../models/item"
 import Player, { PlayerPosition } from "../models/player"
 import PlayerStats from "../models/playerstats"
 import Team from "../models/team"
-import { Averages } from "../pages/api/chronicler"
+import { Averages, EntityHistory } from "../pages/api/chronicler"
 import Emoji from "./emoji"
 
 export type ExportCSVProps = {
@@ -63,6 +63,50 @@ export function exportPlayerData(players: Player[], positions: Record<string, Pl
                             break
                         case "items":
                             csvRow.push(player.items.map((item) => item.name).join(","))
+                            break
+                        default:
+                            const statValue = stats.get(column.id, isItemApplied)
+                            if(typeof statValue === "string" || typeof statValue === "number" || typeof statValue === "boolean") {
+                                csvRow.push(statValue.toString())
+                            } else {
+                                csvRow.push("")
+                            }
+                    }
+                })
+            }
+        })
+        csvMatrix.push(csvRow)
+    })
+    return csvMatrix
+}
+
+export function exportPlayerHistoryData(history: EntityHistory<Player>[], isShowSimplified?: boolean, isItemApplied?: boolean) {
+    const csvMatrix = [playerHistoryColumns.map((category) => category.columns.map((column) => column.name)).flat()]
+    history.forEach((snapshot) => {
+        const stats = new PlayerStats(snapshot.data)
+        const csvRow: string[] = []
+        playerHistoryColumns.forEach((category) => {
+            const ratingValue = stats.get(category.id, isItemApplied) as number
+            if(category.hasRating) {
+                csvRow.push(ratingValue.toString())
+            }
+            if(!isShowSimplified) {
+                category.columns.forEach((column) => {
+                    switch(column.id) {
+                        case "date":
+                            csvRow.push(snapshot.date.toDateString() + " " + snapshot.date.toTimeString())
+                            break
+                        case "name":
+                            csvRow.push(snapshot.data.data.name)
+                            break
+                        case "team":
+                            csvRow.push(snapshot.data.data.leagueTeamId ?? "")
+                            break
+                        case "modifications":
+                            csvRow.push(snapshot.data.modifications().join(","))
+                            break
+                        case "items":
+                            csvRow.push(snapshot.data.items.map((item) => item.name).join(","))
                             break
                         default:
                             const statValue = stats.get(column.id, isItemApplied)

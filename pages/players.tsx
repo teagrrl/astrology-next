@@ -1,3 +1,4 @@
+import fuzzysort from 'fuzzysort'
 import getConfig from 'next/config'
 import { useRouter } from 'next/router'
 import type { ReactElement } from 'react'
@@ -22,7 +23,7 @@ type Universe = {
 }
 export default function PlayersPage({ leagueData, isShowSimplified, isItemApplied }: PageProps) {
     const router = useRouter()
-    const { page, sort, direction, universes, collision } = router.query
+    const { page, sort, direction, universes, name, collision } = router.query
             
 	if(!leagueData) {
 		return <AstrologyLoader />
@@ -55,13 +56,32 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         if(player1.id < player2.id) return -1
         return 0
     })
+    const currentName = name ? name.toString() : undefined
     const duplicateType = collision && collision.length > 0 && ["name", "slug"].includes(collision.toString()) ? collision : undefined
     
     const allPlayers = leagueData.players ?? []
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
     const availablePlayers = currentUniversePlayers.length > 0 ? currentUniversePlayers : allPlayers
-    const filteredPlayers = duplicateType ? availablePlayers.filter((player1) => availablePlayers.some((player2) => player1.id !== player2.id && ((duplicateType === "name" && player1.canonicalName() === player2.canonicalName()) || (duplicateType === "slug" && player1.slug() === player2.slug())))) : availablePlayers
-    const sortedPlayers = currentSort ? Array.from(filteredPlayers).sort(PlayerComparator(leagueData.positions, currentSort, currentDirection, isItemApplied)) : filteredPlayers
+    const filteredPlayers = duplicateType 
+        ? availablePlayers.filter((player1) => 
+            availablePlayers.some((player2) => 
+                player1.id !== player2.id 
+                && ((duplicateType === "name" && player1.canonicalName() === player2.canonicalName()) 
+                    || (duplicateType === "slug" && player1.slug() === player2.slug())
+                )
+            )
+        ) 
+        : availablePlayers
+    const searchablePlayers = filteredPlayers.map((player) => {
+        return {
+            name: player.canonicalName(),
+            modifications: player.modifications().join(","),
+            player: player,
+        }
+    })
+    const searchedNames = currentName ? fuzzysort.go(currentName, searchablePlayers, { threshold: -25, key: "name" }) : undefined
+    const searchPlayers = searchedNames?.map((result) => result.obj.player) ?? filteredPlayers
+    const sortedPlayers = currentSort ? Array.from(searchPlayers).sort(PlayerComparator(leagueData.positions, currentSort, currentDirection, isItemApplied)) : searchPlayers
     const pagePlayers = sortedPlayers.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedPlayers.length))
     const numPages = Math.ceil(sortedPlayers.length / pageLimit)
 
@@ -82,6 +102,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         if(newDirection) {
             router.push({
                 query: {
+                    name: currentName,
                     universes: currentUniverseIds,
                     sort: newSort,
                     direction: newDirection,
@@ -90,6 +111,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         } else {
             router.push({
                 query: {
+                    name: currentName,
                     universes: currentUniverseIds,
                 }
             }, undefined, { shallow: true })
@@ -104,6 +126,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
                 href={{ 
                     pathname: "/players",
                     query: {
+                        name: currentName,
                         universes: currentUniverseIds,
                         sort: currentSort,
                         direction: currentSort ? currentDirection : undefined,
@@ -133,6 +156,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
                 href={{ 
                     pathname: "/players",
                     query: {
+                        name: currentName,
                         universes: currentUniverseIds,
                         sort: currentSort,
                         direction: currentSort ? currentDirection : undefined,

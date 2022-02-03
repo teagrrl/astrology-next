@@ -56,8 +56,8 @@ export default function PlayerTable({ header, players, positions, averages, sort
     }
     return (
         <>
-            {!!header && <div className="flex flex-row justify-end p-2">
-                <h1 className="flex grow justify-center text-2xl font-bold">{header}</h1>
+            {(header || exportData) && <div className="flex flex-row justify-end p-2">
+                {!!header && <h1 className="flex grow justify-center text-2xl font-bold">{header}</h1>}
                 {exportData && <ExportCSV {...exportData} />}
             </div>}
             <div className="overflow-auto">
