@@ -1,6 +1,6 @@
 import Player from './player'
 import { reverseAttributes } from './playerstats'
-import { ItemPart, ChroniclerItem } from './chronicler'
+import { ItemPart, ChroniclerItem, ItemAdjustment } from './chronicler'
 import { getReverseAttributes, itemColumns } from './columns'
 
 export const reverseItemAttributes = getReverseAttributes(itemColumns)
@@ -76,7 +76,9 @@ export default class Item {
     }
 
     status(): string {
-        if(this.durability < 1) {
+        if(this.durability < -1) {
+            return "Legendary"
+        } else if(this.durability < 1) {
             return "Unbreakable"
         } else if(this.health < 1) {
             return "Broken"
@@ -262,54 +264,66 @@ function getAffixProperties(data: ChroniclerItem) {
     
 function emojiForRoot(root: string) {
     switch(root) {
+        case "Armor":
+            return "0x1F9BE"
+        case "Blagonball":
+            return "0x1F7E0"
+        case "Goggles":
+            return "0x1F97D"
+        case "Hook":
+            return "0x1FA9D"
+        case "Mushroom":
+            return "0x1F344"
+        case "Plane":
+            return "0x2708"
         case "Base":
-            return "0x1F539";
+            return "0x1F539"
         case "Bat":
-            return "0x1F3CF";
+            return "0x1F3CF"
         case "Board":
-            return "0x1F6F9";
+            return "0x1F6F9"
         case "Broom":
-            return "0x1F9F9";
+            return "0x1F9F9"
         case "Cannon":
-            return "0x1F52B";
+            return "0x1F52B"
         case "Cap":
-            return "0x1F9E2";
+            return "0x1F9E2"
         case "Cape":
-            return "0x1F9E3";
+            return "0x1F9E3"
         case "Chair":
-            return "0x1FA91";
+            return "0x1FA91"
         case "Egg":
-            return "0x1F95A";
+            return "0x1F95A"
         case "Field":
-            return "0x1F535";
+            return "0x1F535"
         case "Glove":
-            return "0x1F9E4";
+            return "0x1F9E4"
         case "Helmet":
-            return "0x1FA96";
+            return "0x1FA96"
         case "Jacket":
-            return "0x1F9E5";
+            return "0x1F9E5"
         case "Jersey":
-            return "0x1F455";
+            return "0x1F455"
         case "Necklace":
-            return "0x1F4FF";
+            return "0x1F4FF"
         case "Phone":
-            return "0x260E";
+            return "0x260E"
         case "Pillow":
-            return "0x1F411";
+            return "0x1F411"
         case "Potion":
-            return "0x2697";
+            return "0x2697"
         case "Quill":
-            return "0x1FAB6";
+            return "0x1FAB6"
         case "Ring":
-            return "0x1F48D";
+            return "0x1F48D"
         case "Socks":
-            return "0x1F9E6";
+            return "0x1F9E6"
         case "Shoes":
-            return "0x1F45F";
+            return "0x1F45F"
         case "Sunglasses":
-            return "0x1F576";
+            return "0x1F576"
         default:
-            return "0x2753";
+            return "0x2753"
     }
 }
 
@@ -355,3 +369,160 @@ function getAffixPosition(data: ChroniclerItem, affix: string) {
     }
     return undefined
 }
+
+export function getItemFromArmorOrBat(id: string, type: "Armor" | "Bat"): ChroniclerItem {
+    const attributes = oldItems.find((items) => items.id === id)
+    const entity = {
+        id: id.replaceAll("_", "-").toLowerCase(),
+        name: id,
+        prePrefix: null,
+        prefixes: new Array<ItemPart>(),
+        postPrefix: null,
+        root: {
+            name: "",
+            adjustments: new Array<ItemAdjustment>(),
+        },
+        suffix: null,
+        hittingRating: 0,
+        pitchingRating: 0,
+        baserunningRating: 0,
+        defenseRating: 0,
+        health: 0,
+        durability: -2,
+    }
+    if(attributes) {
+        entity.name = attributes.name
+        entity.root.name = attributes.root
+        if(attributes.mod) {
+            entity.root.adjustments.push({
+                type: 0,
+                mod: attributes.mod,
+            })
+        }
+        attributes.elements?.forEach((element) => {
+            entity.prefixes.push({
+                name: element,
+                adjustments: []
+            })
+        })
+    } else {
+        entity.root.name = type
+    }
+    return entity
+}
+
+const oldItems = [
+    {
+    	id: "the Dial Tone",
+    	name: "The Dial Tone",
+        elements: ["Batter"],
+        root: "Phone",
+    },
+    {
+    	id: "Gunblade Bat",
+    	name: "Vibe Check",
+        elements: ["Gunblade"],
+        root: "Bat",
+    },
+    {
+    	id: "Vibe Check",
+    	name: "Vibe Check",
+        elements: ["Gunblade"],
+        root: "Bat",
+    },
+    {
+    	id: "FIREPROOF",
+    	name: "Fireproof Jacket",
+    	mod: "FIREPROOF",
+        elements: ["Fireproof"],
+        root: "Jacket",
+    },
+    {
+    	id: "GUNBLADE_A",
+    	name: "The Dial Tone",
+        elements: ["Batter"],
+        root: "Phone",
+    },
+    {
+    	id: "GUNBLADE_B",
+    	name: "Vibe Check",
+        elements: ["Gunblade"],
+        root: "Bat",
+    },
+    {
+    	id: "MUSHROOM",
+    	name: "Mushroom",
+        root: "Mushroom",
+    },
+    {
+    	id: "GRAPPLING_HOOK",
+    	name: "Grappling Hook",
+        elements: ["Grappling"],
+        root: "Hook",
+    },
+    {
+    	id: "HEADPHONES",
+    	name: "Noise-Cancelling Headphones",
+    	mod: "SOUNDPROOF",
+        elements: ["Noise-Cancelling", "Head"],
+        root: "Phone",
+    },
+    {
+    	id: "ENGLAND_MEMORABILIA",
+    	name: "Bangers & Smash",
+        root: "Bat",
+    },
+    {
+    	id: "ARM_CANNON",
+    	name: "Literal Arm Cannon",
+        elements: ["Literal", "Arm"],
+        root: "Cannon",
+    },
+    {
+    	id: "SHRINK_RAY",
+    	name: "Shrink Ray",
+        elements: ["Shrinking"],
+        root: "Cannon",
+    },
+    {
+    	id: "GRAVITY_BOOTS",
+    	name: "Gravity Boots",
+    	mod: "GRAVITY",
+        elements: ["Gravity"],
+        root: "Shoes",
+    },
+    {
+    	id: "NIGHT_VISION_GOGGLES",
+    	name: "Night Vision Goggles",
+        mod: "NIGHT_VISION",
+        elements: ["Night Vision"],
+        root: "Goggles",
+    },
+    {
+    	id: "SAWED_OFF_BAT",
+    	name: "The Iffey Jr.",
+    	mod: "FIRE_PROTECTOR",
+        elements: ["Protector"],
+        root: "Bat",
+    },
+    {
+    	id: "SCORPLERS_JACKET",
+    	name: "Scorpler's Jacket",
+    	mod: "FIREPROOF",
+        elements: ["Fireproof"],
+        root: "Jacket",
+    },
+    {
+    	id: "INKY_BLAGONBALL",
+    	name: "The 2-Blood Blagonball",
+        elements: ["Blood", "Blood"],
+        root: "Blagonball",
+    },
+    {
+    	id: "AN_ACTUAL_AIRPLANE",
+    	name: "An Actual Airplane",
+    	mod: "BLASERUNNING",
+        elements: ["Actual", "Air", "Blaserunning"],
+        root: "Plane",
+    }
+]

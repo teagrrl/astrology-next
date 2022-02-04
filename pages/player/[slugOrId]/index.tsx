@@ -8,7 +8,7 @@ import { PlayerCard } from '../../../components/playercard'
 import Tooltip from '../../../components/tooltip'
 import { playerStatColumns } from '../../../models/columns'
 import PlayerStats, { reverseAttributes } from '../../../models/playerstats'
-import { PageProps } from '../../_app'
+import { PageProps, removeDiacritics } from '../../_app'
 
 type PlayerPageProps = PageProps & {
 	
@@ -24,7 +24,9 @@ export default function PlayerPage({ leagueData, isItemApplied }: PlayerPageProp
     if(leagueData.error) {
         return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
     }
-	const player = leagueData.players.find((player) => player.id === slugOrId || player.slug() === (slugOrId as string).toLowerCase())
+    
+    const searchableSlug = removeDiacritics(slugOrId?.toString().toLowerCase() ?? "")
+	const player = leagueData.players.find((player) => player.id === slugOrId || removeDiacritics(player.slug()) === searchableSlug)
 	if(!player) {
 		return (
 			<AstrologyError code={404} message="Astrology was unable to find data about any such player" />

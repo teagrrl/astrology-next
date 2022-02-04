@@ -9,7 +9,7 @@ import AstrologyLoader from '../../../components/loader'
 import Metadata from '../../../components/metadata'
 import PlayerHistoryTable from '../../../components/playerhistorytable'
 import { useChroniclerToFetchPlayerHistory } from '../../api/chronicler'
-import { PageProps } from '../../_app'
+import { PageProps, removeDiacritics } from '../../_app'
 
 type PlayerHistoryPageProps = PageProps & {
 	
@@ -19,7 +19,8 @@ export default function PlayerHistoryPage({ leagueData, isShowSimplified, isItem
     const router = useRouter()
     const { slugOrId, sort } = router.query
 
-	const player = leagueData?.players.find((player) => player.id === slugOrId || player.slug() === (slugOrId as string).toLowerCase())
+    const searchableSlug = removeDiacritics(slugOrId?.toString().toLowerCase() ?? "")
+	const player = leagueData?.players.find((player) => player.id === slugOrId || removeDiacritics(player.slug()) === searchableSlug)
     const history = useChroniclerToFetchPlayerHistory(player?.id)
 
 	if(!leagueData) {

@@ -68,7 +68,7 @@ export default function PlayerHistoryTable({ history, teams, sort, triggerSort, 
                                 {category.hasRating && <TableHeader title={`${category.name} Stars`} sortId={category.id} ><Emoji emoji="0x2B50" emojiClass="inline w-4 h-4" /></TableHeader>}
                                 {(category.isSimple || !isShowSimplified) && category.columns.map((column) => 
                                     column.id === "date"
-                                        ? <TableHeader sortId="date" sortBy={{ id: "date", direction: sort }} triggerSort={triggerSort} title={sort === "asc" ? "Oldest First" : "Newest First"}>Date</TableHeader>
+                                        ? <TableHeader key="header_date" sortId="date" sortBy={{ id: "date", direction: sort }} triggerSort={triggerSort} title={sort === "asc" ? "Oldest First" : "Newest First"}>Date</TableHeader>
                                         : <TableHeader key={`header_${column.id}`} title={column.name}>{column.id === "combined" ? <Emoji emoji="0x1F31F" emojiClass="inline w-4 h-4" /> : column.shorthand}</TableHeader>
                                 )}
                             </Fragment>
@@ -139,7 +139,7 @@ function PlayerHistoryTableCell({ snapshot, teams, category, column, isItemAppli
                                 season={snapshot.data.data.seasAttr} 
                                 week={snapshot.data.data.weekAttr} 
                                 game={snapshot.data.data.gameAttr} 
-                                item={snapshot.data.data.itemAttr} 
+                                item={(snapshot.data.data.itemAttr ?? []).concat(snapshot.data.oldMods)} 
                             />
                             : <>-</>
                         }

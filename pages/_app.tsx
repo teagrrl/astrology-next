@@ -80,4 +80,8 @@ function checkLocalStorage(key: string, defaultValue: any) {
 	return defaultValue;
 }
 
+export function removeDiacritics(slug: string) {
+	return slug.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 export default Astrology

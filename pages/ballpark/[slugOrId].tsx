@@ -6,7 +6,7 @@ import AstrologyLoader from '../../components/loader'
 import Metadata from '../../components/metadata'
 import { BallparkCard } from '../../components/ballparkcard'
 import { useChroniclerToFetchBallparks } from '../api/chronicler'
-import { PageProps } from '../_app'
+import { PageProps, removeDiacritics } from '../_app'
 
 type BallparkPageProps = PageProps & {
 	
@@ -27,7 +27,8 @@ export default function BallparkPage({ leagueData }: BallparkPageProps) {
         return <AstrologyError code={400} message={`Astrology encountered an error: ${ballparks.error}`} />
     }
 
-    const ballpark = ballparks.data.find((ballpark) => ballpark.id === slugOrId || ballpark.slug() === (slugOrId as string).toLowerCase())
+    const searchableSlug = removeDiacritics(slugOrId?.toString().toLowerCase() ?? "")
+    const ballpark = ballparks.data.find((ballpark) => ballpark.id === slugOrId || removeDiacritics(ballpark.slug()) === searchableSlug)
 	if(!ballpark) {
 		return (
 			<AstrologyError code={404} message="Astrology was unable to find any such ballparks" />

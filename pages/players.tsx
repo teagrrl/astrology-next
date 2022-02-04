@@ -9,10 +9,10 @@ import AstrologyLoader from '../components/loader'
 import Pagination from '../components/pagination'
 import PlayerTable from '../components/playertable'
 import TeamHeader from '../components/teamheader'
-import Player, { PlayerComparator, PlayerPosition } from '../models/player'
+import Player, { PlayerComparator } from '../models/player'
 import { reverseAttributes } from '../models/playerstats'
 import Team, { AllPlayers, groupTeams } from '../models/team'
-import { PageProps } from './_app'
+import { PageProps, removeDiacritics } from './_app'
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -56,7 +56,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         if(player1.id < player2.id) return -1
         return 0
     })
-    const currentName = name ? name.toString() : undefined
+    const currentName = name ? removeDiacritics(name.toString()) : undefined
     const duplicateType = collision && collision.length > 0 && ["name", "slug"].includes(collision.toString()) ? collision : undefined
     
     const allPlayers = leagueData.players ?? []
@@ -74,7 +74,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         : availablePlayers
     const searchablePlayers = filteredPlayers.map((player) => {
         return {
-            name: player.canonicalName(),
+            name: removeDiacritics(player.canonicalName()),
             modifications: player.modifications().join(","),
             player: player,
         }

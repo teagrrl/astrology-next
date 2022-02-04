@@ -1,7 +1,7 @@
-import Item from "./item";
+import Item, { getItemFromArmorOrBat } from "./item";
 import PlayerStats, { reverseAttributes } from "./playerstats";
 import Team from "./team";
-import { ChroniclerPlayer, ChroniclerEntity } from "./chronicler";
+import { ChroniclerPlayer, ChroniclerEntity, ChroniclerItem } from "./chronicler";
 
 export type PlayerPosition = {
     position?: "lineup" | "rotation" | "shadows" | "static" | undefined,
@@ -12,11 +12,14 @@ export default class Player {
     public readonly id: string
     public readonly data: ChroniclerPlayer
     public readonly items: Item[]
+    public readonly oldMods: string[]
 
     constructor(data: ChroniclerEntity<ChroniclerPlayer>) {
         this.id = data.entityId
         this.data = data.data
-        this.items = data.data.items?.map((item) => new Item(item)) ?? []
+        const { items, mods } = getItemsAndOldMods(data.data.items ?? [], data.data.bat, data.data.armor)
+        this.items = items
+        this.oldMods = mods
     }
 
     blood() {
@@ -37,7 +40,7 @@ export default class Player {
             ...(this.data.weekAttr ?? []),
             ...(this.data.seasAttr ?? []),
             ...(this.data.permAttr ?? []),
-            ...(this.data.itemAttr ?? []),
+            ...((this.data.itemAttr ?? []).concat(this.oldMods)),
         ]
     }
 
@@ -85,6 +88,29 @@ export default class Player {
         }
 
         return soulscream;
+    }
+}
+
+function getItemsAndOldMods(entities: ChroniclerItem[], bat?: string, armor?: string) {
+    const items = entities.map((entity) => new Item(entity))
+    const mods = []
+    if(bat) {
+        const batItem = new Item(getItemFromArmorOrBat(bat, "Bat"))
+        items.push(batItem)
+        for(const id in batItem.mods) {
+            mods.push(batItem.mods[id])
+        }
+    }
+    if(armor) {
+        const armorItem = new Item(getItemFromArmorOrBat(armor, "Armor"))
+        items.push(armorItem)
+        for(const id in armorItem.mods) {
+            mods.push(armorItem.mods[id])
+        }
+    }
+    return {
+        items: items,
+        mods: mods,
     }
 }
 

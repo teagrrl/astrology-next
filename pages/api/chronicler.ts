@@ -87,7 +87,7 @@ export const useChroniclerToFetchPlayerHistory = (id?: string): HistoryData<Play
             }
             const modificationFilter = (id: string) => !["COFFEE_RALLY", "ELSEWHERE", "HEATING_UP", "INHABITING", "MAGMATIC", "ON_FIRE", "OVERPERFORMING", "UNDERPERFORMING"].includes(id) // these mods change too frequently to be worth tracking
             const lastMods = lastSnapshot.modifications(true).filter(modificationFilter)
-            const currentMods = player.modifications(true).filter(modificationFilter)
+            const currentMods = player.modifications(!snapshot.data.data.deceased).filter(modificationFilter) // dead players keep game mods forever
             if(lastMods.join(",") !== currentMods.join(",")) {
                 lastSnapshot.modifications().filter((id) => player.modifications().indexOf(id) < 0).forEach((id) => {
                     snapshot.changes.push("-" + id.replace(/\_/g, " ").toLowerCase())

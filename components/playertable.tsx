@@ -151,7 +151,7 @@ function PlayerTableCell({ player, positions, category, column, isItemApplied }:
                                 season={player.data.seasAttr} 
                                 week={player.data.weekAttr} 
                                 game={player.data.gameAttr} 
-                                item={player.data.itemAttr} 
+                                item={(player.data.itemAttr ?? []).concat(player.oldMods)} 
                             />
                             : <>-</>
                         }

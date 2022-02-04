@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import Layout from '../../components/layout'
 import PlayerTable from '../../components/playertable'
-import { PageProps } from '../_app'
+import { PageProps, removeDiacritics } from '../_app'
 import TeamHeader from '../../components/teamheader'
 import { reverseAttributes } from '../../models/playerstats'
 import { PlayerComparator } from '../../models/player'
@@ -25,7 +25,9 @@ export default function TeamPage({ leagueData, isItemApplied, isShowSimplified }
     if(leagueData.error) {
         return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
     }
-	const team = leagueData.teams.find((team) => team.id === slugOrId || team.slug() === (slugOrId as string).toLowerCase())
+	
+    const searchableSlug = removeDiacritics(slugOrId?.toString().toLowerCase() ?? "")
+	const team = leagueData.teams.find((team) => team.id === slugOrId || removeDiacritics(team.slug()) === searchableSlug)
 	if(!team) {
 		return <AstrologyError code={404} message="Astrology was unable to find data about any such team" />
 	}

@@ -19,14 +19,17 @@ export default function PlayerTableItems({ items }: PlayerTableItemsProps) {
                             content={<PlayerItem item={item} showDetails={true} />}
                         >
                             <span>
-                                <Link href={{
-                                    pathname: "/item/[id]",
-                                    query: {
-                                        id: item.id
-                                    }
-                                }}>
-                                    <a><Emoji emoji={item.isBroken() ? "0x274C" : item.emoji} emojiClass="inline min-w-[1em] h-4 m-0.5" /></a>
-                                </Link>
+                                {item.durability < -1
+                                    ? <Emoji emoji={item.emoji} emojiClass="inline min-w-[1em] h-4 m-0.5" />
+                                    : <Link href={{
+                                        pathname: "/item/[id]",
+                                        query: {
+                                            id: item.id
+                                        }
+                                    }}>
+                                        <a><Emoji emoji={item.isBroken() ? "0x274C" : item.emoji} emojiClass="inline min-w-[1em] h-4 m-0.5" /></a>
+                                    </Link>
+                                }
                             </span>
                         </Tooltip>
                     )}

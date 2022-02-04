@@ -63,7 +63,7 @@ export function PlayerCard({ player, team, stats, isItemApplied }: PlayerCardPro
                         season={player.data.seasAttr} 
                         week={player.data.weekAttr} 
                         game={player.data.gameAttr} 
-                        item={player.data.itemAttr} 
+                        item={(player.data.itemAttr ?? []).concat(player.oldMods)} 
                     />
                 </div>
             }

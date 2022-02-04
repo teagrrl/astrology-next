@@ -56,6 +56,8 @@ export interface ChroniclerPlayer {
     evolution: number;
     leagueTeamId?: string;
     tournamentTeamId?: string;
+    bat?: string,
+    armor?: string,
     items?: ChroniclerItem[];
     state?: PlayerState;
 }
