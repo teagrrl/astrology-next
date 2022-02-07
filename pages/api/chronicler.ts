@@ -142,7 +142,7 @@ export async function leagueFetcher(): Promise<LeagueData> {
     const teams = fetchedTeams.map((team) => new Team(team))
     const players = fetchedPlayers.map((player) => new Player(player))
     const items = Object.fromEntries(fetchedItems.map((item) => [item.entityId, new Item(item.data)]))
-
+    
     const rosters = Object.fromEntries(teams.map((team) => {
         let idToPlayerMapper = (id: string) => players.find((player) => player.id === id);
         let undefinedPlayerFilter = (player : Player | undefined): player is Player => player !== undefined;
@@ -196,6 +196,8 @@ export async function leagueFetcher(): Promise<LeagueData> {
     }
     
     for(const id in averages) {
+        let lineupSize = rosters[id].lineup.length
+        let rotationSize = rosters[id].rotation.length
         for(const attribute of ["wobabr", "slgbr", "bsrr", "batting", "buoyancy", "divinity", "martyrdom", 
                 "moxie", "musclitude", "patheticism", "thwackability", "tragicness", "baserunning", 
                 "baseThirst", "continuation", "groundFriction", "indulgence", "laserlikeness"]) {
@@ -211,8 +213,6 @@ export async function leagueFetcher(): Promise<LeagueData> {
                 "watchfulness", "pressurization", "cinnamon", "soul", "fate", "totalFingers", "peanutAllergy"]) {
             /*averages[id].roster[0][attribute] = (averages[id].lineup[0][attribute] + averages[id].rotation[0][attribute]) / 2
             averages[id].roster[1][attribute] = (averages[id].lineup[1][attribute] + averages[id].rotation[1][attribute]) / 2*/
-			let lineupSize = rosters[id].lineup.length
-			let rotationSize = rosters[id].rotation.length
 			averages[id].roster[0][attribute] = ((averages[id].lineup[0][attribute] * lineupSize) + (averages[id].rotation[0][attribute] * rotationSize)) / (lineupSize + rotationSize)
             averages[id].roster[1][attribute] = ((averages[id].lineup[1][attribute] * lineupSize) + (averages[id].rotation[1][attribute] * rotationSize)) / (lineupSize + rotationSize)
         }

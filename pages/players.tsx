@@ -23,7 +23,7 @@ type Universe = {
 }
 export default function PlayersPage({ leagueData, isShowSimplified, isItemApplied }: PageProps) {
     const router = useRouter()
-    const { page, sort, direction, universes, name, collision } = router.query
+    const { page, sort, direction, universes, name, deceased, positions, modifications, collision } = router.query
             
 	if(!leagueData) {
 		return <AstrologyLoader />
@@ -40,6 +40,7 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         : currentSort 
             ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
             : "desc"
+            
     const currentUniverseIds = (typeof universes === "string" ? universes.split(",") : universes ?? [])
     const currentUniverses = currentUniverseIds
         .map((id) => availableUniverses.find((group) => group.id === id))
@@ -57,21 +58,43 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         return 0
     })
     const currentName = name ? removeDiacritics(name.toString()) : undefined
+    const isDeceased = deceased && ["true", "false"].includes(deceased.toString()) ? deceased : undefined
+    const currentPositions = (typeof positions === "string" ? positions.split(",") : positions ?? [])
+    const currentModifications = (typeof modifications === "string" ? modifications.split(",") : modifications ?? [])
     const duplicateType = collision && collision.length > 0 && ["name", "slug"].includes(collision.toString()) ? collision : undefined
     
     const allPlayers = leagueData.players ?? []
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
-    const availablePlayers = currentUniversePlayers.length > 0 ? currentUniversePlayers : allPlayers
-    const filteredPlayers = duplicateType 
-        ? availablePlayers.filter((player1) => 
-            availablePlayers.some((player2) => 
+    let filteredPlayers = currentUniversePlayers.length > 0 ? currentUniversePlayers : allPlayers
+    if(isDeceased) {
+        filteredPlayers = filteredPlayers.filter((player) => 
+            (player.data.deceased && isDeceased === "true") || (!player.data.deceased && isDeceased === "false")
+        )
+    }
+    if(currentPositions.length > 0) {
+        filteredPlayers = filteredPlayers.filter((player) => 
+            currentPositions.filter((position) => 
+                leagueData.positions[player.id].position === position
+            ).length > 0
+        )
+    }
+    if(currentModifications.length > 0) {
+        filteredPlayers = filteredPlayers.filter((player) => 
+            currentModifications.filter((id) => 
+                player.modifications().map((mod) => mod.toLowerCase()).includes(id.toLowerCase())
+            ).length > 0
+        ) 
+    }
+    if(duplicateType) {
+        filteredPlayers = filteredPlayers.filter((player1) => 
+            filteredPlayers.some((player2) => 
                 player1.id !== player2.id 
                 && ((duplicateType === "name" && player1.canonicalName() === player2.canonicalName()) 
                     || (duplicateType === "slug" && player1.slug() === player2.slug())
                 )
             )
         ) 
-        : availablePlayers
+    }
     const searchablePlayers = filteredPlayers.map((player) => {
         return {
             name: removeDiacritics(player.canonicalName()),
@@ -99,23 +122,32 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
         } else {
             newDirection = reverseAttributes.includes(newSort) ? "asc" : "desc"
         }
-        if(newDirection) {
-            router.push({
-                query: {
-                    name: currentName,
-                    universes: currentUniverseIds,
-                    sort: newSort,
-                    direction: newDirection,
-                }
-            }, undefined, { shallow: true })
-        } else {
-            router.push({
-                query: {
-                    name: currentName,
-                    universes: currentUniverseIds,
-                }
-            }, undefined, { shallow: true })
+        const routerQuery: Record<string, string | string[]> = {}
+        if(currentName) {
+            routerQuery["name"] = currentName
         }
+        if(currentUniverseIds) {
+            routerQuery["universes"] = currentUniverseIds
+        }
+        if(currentPositions) {
+            routerQuery["positions"] = currentPositions
+        }
+        if(currentModifications) {
+            routerQuery["modifications"] = currentModifications
+        }
+        if(isDeceased) {
+            routerQuery["deceased"] = isDeceased
+        }
+        if(duplicateType) {
+            routerQuery["collision"] = duplicateType
+        }
+        if(newDirection) {
+            routerQuery["sort"] = newSort
+            routerQuery["direction"] = newDirection
+        } 
+        router.push({
+            query: routerQuery
+        }, undefined, { shallow: true })
     }
 	
 	return (
@@ -128,8 +160,11 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
                     query: {
                         name: currentName,
                         universes: currentUniverseIds,
+                        positions: currentPositions,
+                        modifications: currentModifications,
                         sort: currentSort,
                         direction: currentSort ? currentDirection : undefined,
+                        deceased: isDeceased,
                         collision: duplicateType,
                     },
                 }} 
@@ -158,8 +193,11 @@ export default function PlayersPage({ leagueData, isShowSimplified, isItemApplie
                     query: {
                         name: currentName,
                         universes: currentUniverseIds,
+                        positions: currentPositions,
+                        modifications: currentModifications,
                         sort: currentSort,
                         direction: currentSort ? currentDirection : undefined,
+                        deceased: isDeceased,
                         collision: duplicateType,
                     },
                 }} 

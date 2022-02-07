@@ -12,20 +12,20 @@ type ModificationListProps = {
 export default function ModificationList({ type, permanent, season, week, item, game }: ModificationListProps) {
     return (
         <>
-            {permanent?.map((id) => 
-                <Modification key={`permanent_${id}`} id={id} duration="permanent" type={type} />
+            {permanent?.map((id, index) => 
+                <Modification key={`permanent_${id}_${index}`} id={id} duration="permanent" type={type} />
             )}
-            {season?.map((id) => 
-                <Modification key={`season_${id}`} id={id} duration="season" type={type} />
+            {season?.map((id, index) => 
+                <Modification key={`season_${id}_${index}`} id={id} duration="season" type={type} />
             )}
-            {week?.map((id) => 
-                <Modification key={`week_${id}`} id={id} duration="week" type={type} />
+            {week?.map((id, index) => 
+                <Modification key={`week_${id}_${index}`} id={id} duration="week" type={type} />
             )}
-            {game?.map((id) => 
-                <Modification key={`game_${id}`} id={id} duration="game" type={type} />
+            {game?.map((id, index) => 
+                <Modification key={`game_${id}_${index}`} id={id} duration="game" type={type} />
             )}
-            {item?.map((id) => 
-                <Modification key={`item_${id}`} id={id} duration="item" type={type} />
+            {item?.map((id, index) => 
+                <Modification key={`item_${id}_${index}`} id={id} duration="item" type={type} />
             )}
         </>
     )
