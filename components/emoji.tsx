@@ -1,5 +1,5 @@
 import { CSSProperties } from "react"
-import twemoji from "twemoji"
+import twemoji from "@twemoji/api"
 
 type EmojiProps = { 
     className?: string,
