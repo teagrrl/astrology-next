@@ -2,7 +2,11 @@ import { MouseEventHandler, ReactElement, ReactNode, useEffect, useState } from 
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import '../styles/globals.css'
-import { LeagueData, useChroniclerToFetchLeagueData } from './api/chronicler'
+import useSWR from 'swr'
+import { leagueFetcher } from '@models/api2'
+import Player from '@models/player2'
+import { LeagueData, useChroniclerToFetchLeagueData } from '@legacyapi/chronicler'
+import Team from '@models/team2'
 
 type NextPageWithLayout = NextPage & {
 	getLayout?: (page: ReactElement, props?: PageProps) => ReactNode
@@ -13,7 +17,9 @@ type AppPropsWithLayout = AppProps & {
 }
 
 export type PageProps = {
-	leagueData?: LeagueData,
+    leagueData?: LeagueData,
+	teams?: Team[],
+    players?: Player[],
 	isDarkMode?: boolean,
 	isItemApplied?: boolean,
 	isShowSimplified?: boolean,
@@ -27,6 +33,8 @@ function Astrology({ Component, pageProps }: AppPropsWithLayout) {
 	// Use the layout defined at the page level, if available
 	const getLayout = Component.getLayout ?? ((page) => page)
     const leagueData = useChroniclerToFetchLeagueData()
+    
+    const { data, error } = useSWR("leaguedata2", leagueFetcher)
 
 	const [isShowSimplified, setIsShowSimplified] = useState<boolean>(checkLocalStorage("isShowSimplified", true));
 	//const [canSeeRealStars, setCanSeeRealStars] = useState<boolean>(checkLocalStorage("canSeeRealStars", false));
@@ -61,7 +69,9 @@ function Astrology({ Component, pageProps }: AppPropsWithLayout) {
 		setInLocalStorage("isDarkMode", !isDarkMode)
 		setIsDarkMode(!isDarkMode)
 	}
-	pageProps.leagueData = leagueData
+    pageProps.leagueData = leagueData
+    pageProps.players = data?.players
+	pageProps.teams = data?.teams
 
 	return getLayout(<Component {...pageProps} />, pageProps)
 }

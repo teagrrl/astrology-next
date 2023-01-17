@@ -1,7 +1,7 @@
-import Item, { getItemFromArmorOrBat } from "./item";
-import PlayerStats, { reverseAttributes } from "./playerstats";
-import Team from "./team";
-import { ChroniclerPlayer, ChroniclerEntity, ChroniclerItem } from "./chronicler";
+import Item, { getItemFromArmorOrBat } from "@models/item";
+import PlayerStats, { reverseAttributes } from "@models/playerstats";
+import Team from "@models/team";
+import { ChroniclerPlayer, ChroniclerEntity, ChroniclerItem } from "@models/chronicler";
 
 export type PlayerPosition = {
     position?: "lineup" | "rotation" | "shadows" | "static" | undefined,

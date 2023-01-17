@@ -14,23 +14,28 @@ module.exports = {
 				permanent: true,
 			},
 			{
-				source: '/player',
-				destination: '/players',
+				source: '/legacy/team',
+				destination: '/legacy/teams',
 				permanent: true,
 			},
 			{
-				source: '/item',
-				destination: '/items',
+				source: '/legacy/player',
+				destination: '/legacy/players',
 				permanent: true,
 			},
 			{
-				source: '/squeezer',
-				destination: '/squeezer/beta',
+				source: '/legacy/item',
+				destination: '/legacy/items',
 				permanent: true,
 			},
 			{
-				source: '/ballpark',
-				destination: '/ballparks',
+				source: '/legacy/squeezer',
+				destination: '/legacy/squeezer/beta',
+				permanent: true,
+			},
+			{
+				source: '/legacy/ballpark',
+				destination: '/legacy/ballparks',
 				permanent: true,
 			},
 		]

@@ -1,65 +1,56 @@
-import Link from 'next/link'
-import type { ReactElement } from 'react'
-import Emoji from '../components/emoji'
-import AstrologyError from '../components/error'
-import Layout from '../components/layout'
-import AstrologyLoader from '../components/loader'
-import TeamHeader from '../components/teamheader'
-import TeamLink from '../components/teamlink'
-import { AllTeams, groupTeams } from '../models/team'
-import { PageProps } from './_app'
+import { ReactElement } from "react"
+import { PageProps } from "@pages/_app"
+import Layout from "@components/layout"
+import Emoji from "@components/emoji"
+import Link from "next/link"
 
-export default function TeamsPage({ leagueData, isDarkMode }: PageProps) {
-	if(!leagueData) {
-		return <AstrologyLoader />
-	}
-    if(leagueData.error) {
-        return <AstrologyError code={400} message={`Astrology encountered an error: ${leagueData.error}`} />
-    }
-    const { groups, ungrouped } = groupTeams(leagueData.teams || [])
-	
-	return (
-        <section className="overflow-auto">
-            <TeamHeader team={AllTeams} />
-            {groups?.map((group) => 
-                <div key={group.id} className="p-5 odd:bg-zinc-100 dark:odd:bg-zinc-800">
-                    <h2 className="flex justify-center items-center mb-5 text-3xl text-center font-bold">
-                        <span>{group.name}</span>
-                        <Link href={{
-                            pathname: "/squeezer/[groupId]",
-                            query: {
-                                groupId: group.id,
-                            },
-                        }}>
-                            <a className="ml-2" title={`${group.name} Stat Squeezer`}><Emoji emoji="0x1F9EE" emojiClass="w-6 h-6 " /></a>
-                        </Link>
-                    </h2>
-                    <ul className="flex flex-row flex-wrap justify-center items-center gap-1">
-                        {group.teams?.map((team) =>  
-                            <TeamLink key={team.id} team={team} useFullName={true} isDarkMode={isDarkMode} />
-                        )}
-                    </ul>
-                </div>
-            )}
-            <div className="p-5 odd:bg-zinc-100 dark:odd:bg-zinc-800">
-                <h2 className="flex justify-center items-center mb-5 text-3xl text-center font-bold">Others</h2>
-                <ul className="flex flex-row flex-wrap justify-center items-center gap-1">
-                    {ungrouped?.map((team) => 
-                        <TeamLink key={team.id} team={team} useFullName={true} isDarkMode={isDarkMode} />
-                    )}
-                </ul>
+type TeamsProps = PageProps & {}
+
+export default function TeamsPage({ teams, players }: TeamsProps) {
+    console.log(players)
+    return (
+        <div className="overflow-auto">
+            {teams && teams.length > 0 && <table className="table-auto">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Division</th>
+                        <th>Emoji</th>
+                        <th>Shorthand</th>
+                        <th>Name</th>
+                        <th>Slogan</th>
+                        <th>Batting</th>
+                        <th>Pitching</th>
+                        <th>Defense</th>
+                        <th>Running</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {teams.map((team) => <tr key={team.id}>
+                        <td>{team.id}</td>
+                        <td></td>
+                        <td><Emoji emoji={team.emoji} /></td>
+                        <td>{team.shorthand}</td>
+                        <td><Link href={`team/${team.id}`}>{team.name}</Link></td>
+                        <td>{team.slogan}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>)}
+                </tbody>
+            </table>}
+            <div className="px-2 py-1 mt-4">
+                <span>Don&apos;t see what you&apos;re looking for? </span> 
+                <Link href="/legacy/teams">Maybe try the legacy version.</Link>
             </div>
-        </section>
-	)
+        </div>
+    )
 }
 
 TeamsPage.getLayout = function getLayout(page: ReactElement, props?: PageProps) {
 	return (
-		<Layout 
-            title="The Teams - Astrology" 
-            description="Choose a team to begin navigating their star charts."
-            {...props}
-        >
+		<Layout {...props}>
 			{page}
 		</Layout>
 	)

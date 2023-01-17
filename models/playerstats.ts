@@ -1,6 +1,6 @@
-import Item from "./item"
-import Player from "./player"
-import { ChroniclerItem, PlayerState } from "./chronicler"
+import Item from "@models/item"
+import Player from "@models/player"
+import { ChroniclerItem, PlayerState } from "@models/chronicler"
 
 export const reverseAttributes = ["name", "rank", "team", "patheticism", "tragicness", "pressurization"]
 

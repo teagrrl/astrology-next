@@ -1,7 +1,7 @@
-import Player from './player'
-import { reverseAttributes } from './playerstats'
-import { ItemPart, ChroniclerItem, ItemAdjustment } from './chronicler'
-import { getReverseAttributes, itemColumns } from './columns'
+import Player from '@models/player'
+import { reverseAttributes } from '@models/playerstats'
+import { ItemPart, ChroniclerItem, ItemAdjustment } from '@models/chronicler'
+import { getReverseAttributes, itemColumns } from '@models/columns'
 
 export const reverseItemAttributes = getReverseAttributes(itemColumns)
 

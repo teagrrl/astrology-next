@@ -1,53 +1,42 @@
-import Player, { PlayerPosition } from "../models/player"
-import { CategoryAttributes, ColumnAttributes, playerColumns } from "../models/columns"
-import Emoji from "./emoji"
-import Link from "next/link"
 import { Fragment } from "react"
-import PlayerStat from "./playerstat"
-import ModificationList from "./modificationlist"
-import AstrologyLoader from "./loader"
-import AverageStat from "./averagestat"
-import PlayerTableItems from "./playertableitems"
-import StatTableHeader, { StatTableHeaderProps } from "./stattableheader"
-import ExportCSV, { ExportCSVProps } from "./exportcsv"
+import Link from "next/link"
+import Player from "@models/player2"
+import { CategoryAttributes, ColumnAttributes, playerColumns } from "@models/columns2"
+import AstrologyLoader from "@components/loader"
+import Emoji from "@components/emoji"
+import StatTableHeader, { StatTableHeaderProps } from "@components/stattableheader"
+import Tooltip from "./tooltip"
 
 type PlayerTableProps = PlayerTableBodyProps & StatTableHeaderProps & {
-    exportData?: ExportCSVProps,
+    //exportData?: ExportCSVProps,
 }
 
 type PlayerTableBodyProps = {
     header?: string,
     players: Player[],
-    positions: Record<string, PlayerPosition>,
-    averages?: Record<string, number>[],
+    averages?: Record<string, number>,
     isShowSimplified?: boolean,
     isItemApplied?: boolean,
 }
 
 type PlayerTableCellProps = {
     player: Player,
-    positions?: Record<string, PlayerPosition>,
     category: CategoryAttributes,
     column?: ColumnAttributes,
     isShowSimplified?: boolean,
     isItemApplied?: boolean,
-}
-
-type PlayerPositionProps = {
-    id: string,
-    positions: Record<string, PlayerPosition> | undefined,
 }
 
 type AverageTableCellProps = {
     header?: string,
-    averages: Record<string, number>[],
+    averages: Record<string, number>,
     category: CategoryAttributes,
     column?: ColumnAttributes,
     isShowSimplified?: boolean,
     isItemApplied?: boolean,
 }
 
-export default function PlayerTable({ header, players, positions, averages, sort, direction, triggerSort, isShowSimplified, isItemApplied, exportData }: PlayerTableProps) {
+export default function PlayerTable({ header, players, averages, sort, direction, triggerSort, isShowSimplified, isItemApplied/*, exportData*/ }: PlayerTableProps) {
     if(!players) {
         return <AstrologyLoader />
     }
@@ -56,21 +45,21 @@ export default function PlayerTable({ header, players, positions, averages, sort
     }
     return (
         <>
-            {(header || exportData) && <div className="flex flex-row justify-end p-2">
+            {(header/* || exportData*/) && <div className="flex flex-row justify-end p-2">
                 {!!header && <h1 className="flex grow justify-center text-2xl font-bold">{header}</h1>}
-                {exportData && <ExportCSV {...exportData} />}
+                {/*exportData && <ExportCSV {...exportData} />*/}
             </div>}
             <div className="overflow-auto">
                 <table className="table-auto">
                     <StatTableHeader sort={sort} direction={direction} triggerSort={triggerSort} isShowSimplified={isShowSimplified} />
-                    <PlayerTableBody header={header} players={players} positions={positions} averages={averages} isShowSimplified={isShowSimplified} isItemApplied={isItemApplied} />
+                    <PlayerTableBody header={header} players={players} averages={averages} isShowSimplified={isShowSimplified} isItemApplied={isItemApplied} />
                 </table>
             </div>
         </>
     )
 }
 
-function PlayerTableBody({ header, players, positions, averages, isShowSimplified, isItemApplied }: PlayerTableBodyProps) {
+function PlayerTableBody({ header, players, averages, isShowSimplified, isItemApplied }: PlayerTableBodyProps) {
     return (
         <tbody>
             {players.map((player) => 
@@ -79,7 +68,7 @@ function PlayerTableBody({ header, players, positions, averages, isShowSimplifie
                         <Fragment key={`${player.id}_${category.id}`}>
                             {category.hasRating && <PlayerTableCell player={player} category={category} isItemApplied={isItemApplied} />}
                             {(category.id === "general" || !isShowSimplified) && category.columns.map((column) => 
-                                <PlayerTableCell key={`${player.id}_${column.id}`} player={player} positions={positions} category={category} column={column} isItemApplied={isItemApplied} />
+                                <PlayerTableCell key={`${player.id}_${column.id}`} player={player} category={category} column={column} isItemApplied={isItemApplied} />
                             )}
                         </Fragment>
                     )}
@@ -99,140 +88,204 @@ function PlayerTableBody({ header, players, positions, averages, isShowSimplifie
     )
 }
 
-function PlayerTableCell({ player, positions, category, column, isItemApplied }: PlayerTableCellProps) {
+function AverageTableCell({ header, averages, category, column, isShowSimplified, isItemApplied }: AverageTableCellProps) {
+    if(column) {
+        switch(column.id) {
+            case "team":
+                return (
+                    <td colSpan={4} className="px-1.5 py-1 font-bold">{header} Average</td>
+                )
+            case "name":
+            case "location":
+            case "position":
+                return (
+                    <></>
+                )
+            default:
+                return (
+                    <AverageAttribute header={header} averages={averages} id={column.id} name={column.name} isRating={column.id === "overall"} />
+                )
+        }
+    } else {
+        return (
+            <AverageAttribute header={header} averages={averages} id={category.id} name={category.name} isRating={true} />
+        )
+    }
+}
+
+type AverageAttributeProps = {
+    header?: string,
+    averages: Record<string, number>,
+    id: string,
+    name: string,
+    isRating?: boolean,
+}
+
+function AverageAttribute({ header, averages, id, name, isRating }: AverageAttributeProps) {
+    const rawValue = averages[id]
+    let visibleValue = rawValue
+    if(isRating) visibleValue *= 5
+    return (
+        <td className={`px-1.5 py-1 text-center ${getColorClassForValue(rawValue)}`}>
+            <Tooltip content={
+                <div className="flex flex-col justify-center items-center">
+                    <h3 className="font-bold">{header} Average</h3>
+                    <div className="flex flex-col justify-center items-center">
+                        <div>
+                            <span className="font-semibold">{name}: </span><span>{visibleValue} {isRating && "Stars"}</span>
+                        </div>
+                    </div>
+                </div>
+            }>
+                <span>{Math.round(visibleValue * 1000) / 1000}</span>
+            </Tooltip>
+        </td>
+    )
+}
+
+function PlayerTableCell({ player, category, column, isItemApplied }: PlayerTableCellProps) {
     if(column) {
         switch(column.id) {
             case "name":
                 return (
                     <>
                         <td className="px-1.5 py-1 whitespace-nowrap">
-                            {player.data.deceased && <Emoji emoji="0x1F480" emojiClass="inline min-w-[1em] h-4 mr-1" />}
-                            <Link href={{
-                                pathname: "/player/[slugOrId]",
+                            {/*player.data.deceased && <Emoji emoji="0x1F480" emojiClass="inline min-w-[1em] h-4 mr-1" />*/}
+                            {/*<Link href={{
+                                pathname: "/player/[id]",
                                 query: {
-                                    slugOrId: player.slug()
+                                    id: player.id
                                 }
                             }}>
-                                <a className="font-bold">{player.canonicalName()}</a>
-                            </Link>
-                        </td>
-                        <td className="px-1.5 py-1">
-                            <div className="flex flex-row">
-                                <Link href={{
-                                    pathname: "/player/[slugOrId]/history",
-                                    query: {
-                                        slugOrId: player.slug()
-                                    }
-                                }}>
-                                    <a title={`See the history of changes for ${player.canonicalName()}`}><Emoji emoji="0x1F4CA" emojiClass="min-w-[1em] h-4 m-0.5" /></a>
-                                </Link>
-                                <a href={`https://blaseball.com/player/${player.id}`} title={`Go to official player page for ${player.canonicalName()}`}>
-                                    <Emoji emoji="0x1F517" emojiClass="min-w-[1em] h-4 m-0.5" />
-                                </a>
-                            </div>
+                                <a className="font-bold">{player.name}</a>
+                            </Link>*/}
+                            <span className="font-bold">{player.name}</span>
                         </td>
                     </>
                 )
             case "team":
                 return (
-				    <td className="px-1.5 py-1 whitespace-nowrap"><PlayerTableTeam id={player.id} positions={positions} /></td>
+				    <td className="px-1.5 py-1">
+                        <Link href={{
+                            pathname: "/team/[id]",
+                            query: {
+                                id: player.team.id
+                            }
+                        }}>
+                            <a className="flex justify-center">
+                                <Emoji 
+                                    emoji={player.team.emoji} 
+                                    emojiClass="w-4 h-4" 
+                                    className="h-7 w-7 flex justify-center items-center rounded-full"
+                                    style={{ backgroundColor: player.team.primaryColor }}
+                                />
+                            </a>
+                        </Link>
+                    </td>
+                )
+            case "location":
+                return (
+                    <td className="px-1.5 py-1 text-center whitespace-nowrap">{player.rosterSlots.map((slot) => slot.location)}</td>
                 )
             case "position":
+                // TODO: draw the triangles out correctly
                 return (
-                    <td className="px-1.5 py-1 text-center whitespace-nowrap"><PlayerTablePosition id={player.id} positions={positions} /></td>
+                    <td className="px-1.5 py-1 text-center whitespace-nowrap">
+                        {player.positions.map((position, index) => <div key={`pos_${index}`}>
+                            <Tooltip content={
+                                <div>
+                                    <svg width={64} height={40}>
+                                        <g transform="translate(10, 2)">
+                                            <g transform="scale(1, 0.6)">
+                                                <g transform="rotate(-45, 32, 24)">
+                                                    <rect width={42} height={42} stroke="black" fill="white" />
+                                                    <rect x={position.x * 7} y={(5 - position.y) * 7} width={7} height={7} fill="black" />
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </div>
+                            }>
+                                <span>{position.name}</span>
+                            </Tooltip>
+                        </div>)}
+                    </td>
                 )
             case "modifications":
                 return (
                     <td className="px-1.5 py-1 text-center">
-                        {player.modifications().length > 0 
-                            ? <ModificationList 
-                                type="player" 
-                                permanent={player.data.permAttr} 
-                                season={player.data.seasAttr} 
-                                week={player.data.weekAttr} 
-                                game={player.data.gameAttr} 
-                                item={(player.data.itemAttr ?? []).concat(player.oldMods)} 
-                            />
-                            : <>-</>
-                        }
+                        -
                     </td>
                 )
             case "items":
                 return (
                     <td className="px-1.5 py-1 text-center whitespace-nowrap">
-                        <PlayerTableItems items={player.items} />
+                        -
                     </td>
                 )
-            case "combined":
+            case "overall":
                 return (
-                    <PlayerStat player={player} id="combined" hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
+                    <PlayerAttribute player={player} id={"overall"} name={"Overall Rating"} isRating={true} />
                 )
             default:
                 return (
-                    <PlayerStat player={player} stat={column} hasColorScale={category.id !== "misc"} isStarRating={category.id === "sibrmetrics"} isItemApplied={isItemApplied} />
+                    <PlayerAttribute player={player} id={column.id} name={column.name} />
                 )
         }
     } else {
         return (
-            <PlayerStat player={player} stat={category} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
+            <PlayerAttribute player={player} id={category.id} name={category.name} isRating={true} />
         )
     }
 }
 
-function AverageTableCell({ header, averages, category, column, isItemApplied }: AverageTableCellProps) {
-    if(column) {
-        switch(column.id) {
-            case "name":
-                return (
-                    <td colSpan={6} className="px-1.5 py-1 font-bold">{header} Average</td>
-                )
-            case "team":
-            case "position":
-            case "modifications":
-            case "items":
-                return <></>
-            case "combined":
-                return (
-                    <AverageStat header={header} averages={averages} id="combined" hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
-                )
-            default:
-                return (
-                    <AverageStat header={header} averages={averages} stat={column} hasColorScale={category.id !== "misc" || column.id === "peanutAllergy"} isStarRating={category.id === "sibrmetrics"} isItemApplied={isItemApplied} />
-                )
-        }
+type PlayerAttributeProps = {
+    player: Player,
+    id: string,
+    name: string,
+    isRating?: boolean,
+}
+
+function PlayerAttribute({ player, id, name, isRating }: PlayerAttributeProps) {
+    const rawValue = player.attributes[id]
+    let visibleValue = rawValue
+    if(isRating) visibleValue *= 5
+    return (
+        <td className={`px-1.5 py-1 text-center ${getColorClassForValue(rawValue)}`}>
+            <Tooltip content={
+                <div className="flex flex-col justify-center items-center">
+                    <h3 className="font-bold">{player.name}</h3>
+                    <div className="flex flex-col justify-center items-center">
+                        <div>
+                            <span className="font-semibold">{name}: </span><span>{visibleValue} {isRating && "Stars"}</span>
+                        </div>
+                    </div>
+                </div>
+            }>
+                <span>{Math.round(visibleValue * 1000) / 1000}</span>
+            </Tooltip>
+        </td>
+    )
+}
+
+export function getColorClassForValue(value: number) {
+    if(value > 1.45) {
+        return "bg-fuchsia-400/50"
+    } else if(value > 1.15) {
+        return "bg-violet-300/50"
+    } else if(value > 0.95) {
+        return "bg-blue-300/60"
+    } else if(value > 0.85) {
+        return "bg-teal-400/50"
+    } else if(value > 0.65) {
+        return "bg-green-300/50"
+    }  else if(value < 0.15) {
+        return "bg-red-500/60"
+    } else if(value < 0.25) {
+        return "bg-orange-400/60"
+    } else if(value < 0.45) {
+        return "bg-amber-300/60"
     } else {
-        return (
-            <AverageStat header={header} averages={averages} stat={category} hasColorScale={true} isStarRating={true} isItemApplied={isItemApplied} />
-        )
+        return "bg-lime-300/50"
     }
-}
-
-function PlayerTableTeam({ id, positions }: PlayerPositionProps) {
-    if(positions) {
-        const team = positions[id].team
-        if(team) {
-            return (
-                <Link href={{
-                    pathname: "/team/[slugOrId]",
-                    query: {
-                        slugOrId: team.slug()
-                    }
-                }}>
-                    <a><Emoji emoji={team.data.emoji} emojiClass="inline min-w-[1em] h-4 mr-1" />
-                    {team.canonicalNickname()}</a>
-                </Link>
-            )
-        }
-    }
-    return <div className="text-center">-</div>
-}
-
-function PlayerTablePosition({ id, positions }: PlayerPositionProps) {
-    if(positions) {
-        const position = positions[id].position
-        if(position) {
-            return <>{position[0].toUpperCase() + position.slice(1)}</>
-        }
-    }
-    return <>-</>
 }

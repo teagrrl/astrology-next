@@ -1,7 +1,7 @@
-import getConfig from "next/config";
-import Link from "next/link";
-import { ReactNode } from "react";
-import ExportCSV, { ExportCSVProps } from "./exportcsv";
+import { ReactNode } from "react"
+import getConfig from "next/config"
+import Link from "next/link"
+import ExportCSV, { ExportCSVProps } from "@components/legacy/exportcsv"
 
 const { publicRuntimeConfig } = getConfig()
 

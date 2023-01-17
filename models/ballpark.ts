@@ -1,6 +1,6 @@
-import { ChroniclerEntity, ChroniclerBallpark } from "./chronicler"
-import { ballparkColumns, getReverseAttributes } from "./columns"
-import Team from "./team"
+import { ChroniclerEntity, ChroniclerBallpark } from "@models/chronicler"
+import { ballparkColumns, getReverseAttributes } from "@models/columns"
+import Team from "@models/team"
 
 export const ballparkAttributeIds = ballparkColumns.find((category) => category.id === "stats")?.columns.map((column) => column.id) ?? []
 export const reverseBallparkAttributes = getReverseAttributes(ballparkColumns)

@@ -1,7 +1,7 @@
 import { Fragment } from "react";
-import { CategoryAttributes, playerColumns } from "../models/columns";
-import Emoji from "./emoji";
-import TableHeader from "./tableheader";
+import { CategoryAttributes, playerColumns } from "@models/columns2";
+import Emoji from "@components/emoji";
+import TableHeader from "@components/tableheader";
 
 export type StatTableHeaderProps = {
     columns?: CategoryAttributes[],
@@ -18,12 +18,12 @@ export default function StatTableHeader({ columns, sort, direction, triggerSort,
     return (
         <>
             {columns.map((category) => 
-                (category.isSimple || category.hasRating || !isShowSimplified) && <colgroup key={category.id} span={(category.hasRating ? 1 : 0) + (category.isSimple || !isShowSimplified ? category.columns.length : 0) + (category.id === "general" ? 1 : 0)} className="border-r-2 border-black dark:border-white last-of-type:border-0"></colgroup>
+                (category.isSimple || category.hasRating || !isShowSimplified) && <colgroup key={category.id} span={(category.hasRating ? 1 : 0) + (category.isSimple || !isShowSimplified ? category.columns.length : 0)} className="border-r-2 border-black dark:border-white last-of-type:border-0"></colgroup>
             )}
             <thead>
                 <tr className="border-b-[1px] border-black dark:border-zinc-500">
                     {columns.map((category) => 
-                        (category.isSimple || category.hasRating || !isShowSimplified) && <TableHeader key={`header_${category.id}`} colSpan={(category.hasRating ? 1 : 0) + (category.isSimple || !isShowSimplified ? category.columns.length : 0) + (category.id === "general" ? 1 : 0)}>{category.name}</TableHeader>
+                        (category.isSimple || category.hasRating || !isShowSimplified) && <TableHeader key={`header_${category.id}`} colSpan={(category.hasRating ? 1 : 0) + (category.isSimple || !isShowSimplified ? category.columns.length : 0)}>{category.name}</TableHeader>
                     )}
                 </tr>
                 <tr className="border-b-[1px] border-black dark:border-zinc-500">
@@ -31,7 +31,7 @@ export default function StatTableHeader({ columns, sort, direction, triggerSort,
                         <Fragment key={`header_${category.id}`}>
                             {category.hasRating && <TableHeader title={`${category.name} Stars`} sortId={category.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}><Emoji emoji="0x2B50" emojiClass="inline w-4 h-4" /></TableHeader>}
                             {(category.isSimple || !isShowSimplified) && category.columns.map((column) => 
-                                <TableHeader key={`header_${column.id}`} colSpan={column.id === "name" ? 2 : 1} title={column.name} sortId={column.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}>{column.id === "combined" ? <Emoji emoji="0x1F31F" emojiClass="inline w-4 h-4" /> : column.shorthand}</TableHeader>
+                                <TableHeader key={`header_${column.id}`} title={column.name} sortId={column.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}>{column.name}</TableHeader>
                             )}
                         </Fragment>
                     )}

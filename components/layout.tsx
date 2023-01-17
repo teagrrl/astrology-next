@@ -1,9 +1,7 @@
 import Head from 'next/head'
 import { ReactNode } from 'react'
-import { PageProps } from '../pages/_app'
-import Footer from './footer'
-import Metadata, { MetadataProps } from './metadata'
-import Navigation from './navigation'
+import { PageProps } from '@pages/_app'
+import Metadata, { MetadataProps } from '@components/metadata'
 
 type LayoutProps = PageProps & MetadataProps & {
     children?: ReactNode, 
@@ -26,18 +24,7 @@ export default function Layout({ children, title, description, image, hasFooter,
                 <meta name="msapplication-config" content="/icons/browserconfig.xml" />
                 <meta name="theme-color" content="#2b2b2b" />
             </Head>
-            <Navigation leagueData={leagueData} isDarkMode={isDarkMode} />
             <main className="flex flex-col grow overflow-hidden">{children}</main>
-            <Footer 
-                isSimpleFooter={hasFooter}
-                isDarkMode={isDarkMode}
-                isItemApplied={isItemApplied} 
-                isShowSimplified={isShowSimplified} 
-                toggleItemAdjustments={toggleItemAdjustments} 
-                toggleHelp={toggleHelp}
-                toggleLights={toggleLights}
-                toggleSimpleStats={toggleSimpleStats} 
-            />
         </div>
     )
 }

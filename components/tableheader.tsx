@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import Tooltip from "./tooltip";
+import Tooltip from "@components/tooltip";
 
 type SortProps = {
     id?: string,
