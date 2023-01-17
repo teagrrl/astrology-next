@@ -9,7 +9,7 @@ import TeamHeader from '@components/legacy/teamheader'
 import Player, { PlayerComparator } from '@models/player'
 import { reverseAttributes } from '@models/playerstats'
 import { TheHall } from '@models/team'
-import { useChroniclerToFetchTributes } from '@legacyapi/chronicler'
+import { useChroniclerToFetchTributes } from '@models/api'
 import { PageProps } from '@pages/_app'
 
 export default function PlayerTributesPage({ leagueData, isShowSimplified, isItemApplied }: PageProps) {

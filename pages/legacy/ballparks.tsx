@@ -10,7 +10,7 @@ import Pagination from "@components/pagination";
 import TeamHeader from "@components/legacy/teamheader";
 import { BallparkComparator, reverseBallparkAttributes } from "@models/ballpark";
 import { AllBallparks } from "@models/team";
-import { useChroniclerToFetchBallparks } from "@legacyapi/chronicler";
+import { useChroniclerToFetchBallparks } from "@models/api";
 import { PageProps } from "@pages/_app";
 
 const { publicRuntimeConfig } = getConfig()

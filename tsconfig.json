@@ -7,7 +7,6 @@
 			"@models/*": ["models/*"],
 			"@pages/*": ["pages/*"],
 			"@legacy/*": ["pages/legacy/*"],
-			"@legacyapi/*": ["pages/legacy/api/*"],
 		},
 		"target": "es5",
 		"lib": ["dom", "dom.iterable", "esnext"],

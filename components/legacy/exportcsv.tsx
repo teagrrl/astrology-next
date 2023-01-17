@@ -5,7 +5,7 @@ import Item from "@models/item"
 import Player, { PlayerPosition } from "@models/player"
 import PlayerStats from "@models/playerstats"
 import Team from "@models/team"
-import { Averages, EntityHistory } from "@pages/legacy/api/chronicler"
+import { Averages, EntityHistory } from "@models/api"
 import Emoji from "@components/emoji"
 
 export type ExportCSVProps = {

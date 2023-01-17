@@ -5,7 +5,7 @@ import '../styles/globals.css'
 import useSWR from 'swr'
 import { leagueFetcher } from '@models/api2'
 import Player from '@models/player2'
-import { LeagueData, useChroniclerToFetchLeagueData } from '@legacyapi/chronicler'
+import { LeagueData, useChroniclerToFetchLeagueData } from '@models/api'
 import Team from '@models/team2'
 
 type NextPageWithLayout = NextPage & {

@@ -10,7 +10,7 @@ import Metadata from '@components/metadata'
 import SqueezerTable from '@components/legacy/squeezertable'
 import TeamHeader from '@components/legacy/teamheader'
 import Team, { groupTeams, StatSqueezer } from '@models/team'
-import { Averages } from '@legacyapi/chronicler'
+import { Averages } from '@models/api'
 import { PageProps } from '@pages/_app'
 
 const AverageComparator = (averages: Record<string, Averages>, ranks: Record<string, number>, column: string, direction?: "asc" | "desc", isItemApplied?: boolean) => {

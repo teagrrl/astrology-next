@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Fragment } from "react";
 import { CategoryAttributes, ColumnAttributes, squeezerColumns } from "@models/columns";
 import Team from "@models/team";
-import { Averages } from "@legacyapi/chronicler";
+import { Averages } from "@models/api";
 import AverageStat from "./averagestat";
 import Emoji from "@components/emoji";
 import ModificationList from "@components/legacy/modificationlist";
