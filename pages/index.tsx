@@ -15,11 +15,18 @@ export default function IndexPage({}: IndexProps) {
 
 	return (
 		<section className="flex flex-col grow justify-center text-center">
-			<h1 className="text-6xl sm:text-8xl font-bold mb-4">Astrology</h1>
+            <div className="relative flex justify-center">
+			    <h1 className="text-6xl sm:text-8xl font-bold mb-4">
+                    <span className="absolute text-base font-bold -rotate-12">NEW!</span>
+                    Astrology
+                </h1>
+            </div>
 			<h2 className="text-2xl p-4 font-semibold">
-				<span className="p-0.5">Peer deeper into Blaseball.</span> 
-				<Link href="/teams"><a className="p-0.5 hover:px-2 rounded-md transition-all hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white">Read your team&apos;s star charts.</a></Link>
+				<Link href="/teams"><a className="p-0.5 hover:px-2 rounded-md transition-all hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white">Peer deeper into Blaseball.</a></Link> 
+                <span> </span>
+				<Link href="/players"><a className="p-0.5 hover:px-2 rounded-md transition-all hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white">Read the star charts.</a></Link>
 			</h2>
+            <p className="text-xs pb-2.5">NEW! Astrology is a work in progress. If you discover any bugs or have feature requests, let me know via twitter or the SIBR discord.</p>
 			<p className="flex justify-center items-center">
 				<span className="p-1.5 mx-1.5">@yooori#1569</span> 
 				<span> &#x2022; </span>
