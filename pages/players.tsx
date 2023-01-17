@@ -19,13 +19,16 @@ const { publicRuntimeConfig } = getConfig()
 
 const reverseAttributes = getReverseAttributes(playerColumns)
 
-export default function PlayersPage({ players, isShowSimplified, isItemApplied }: PageProps) {
+export default function PlayersPage({ players, error, isShowSimplified, isItemApplied }: PageProps) {
     const router = useRouter()
     const { page, sort, direction } = router.query
             
 	if(!players) {
 		return <AstrologyLoader />
 	}
+    if(error) {
+        return <AstrologyError code={400} message={`Astrology encountered an error: ${error}`} />
+    }
 
     const currentPage = page ? parseInt(page.toString()) : 0
     const currentSort = sort ? sort.toString() : "id"

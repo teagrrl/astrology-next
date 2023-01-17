@@ -20,6 +20,7 @@ export type PageProps = {
     leagueData?: LeagueData,
 	teams?: Team[],
     players?: Player[],
+	error?: string,
 	isDarkMode?: boolean,
 	isItemApplied?: boolean,
 	isShowSimplified?: boolean,
@@ -36,18 +37,22 @@ function Astrology({ Component, pageProps }: AppPropsWithLayout) {
     
     const { data, error } = useSWR("leaguedata2", leagueFetcher)
 
-	const [isShowSimplified, setIsShowSimplified] = useState<boolean>(checkLocalStorage("isShowSimplified", true));
-	//const [canSeeRealStars, setCanSeeRealStars] = useState<boolean>(checkLocalStorage("canSeeRealStars", false));
-	const [isDarkMode, setIsDarkMode] = useState<boolean>(checkLocalStorage("isDarkMode", true));
-	const [isItemApplied, setIsItemApplied] = useState<boolean>(checkLocalStorage("isItemApplied", false));
+	const [isShowSimplified, setIsShowSimplified] = useState<boolean>(true)
+	//const [canSeeRealStars, setCanSeeRealStars] = useState<boolean>(false)
+	const [isDarkMode, setIsDarkMode] = useState<boolean>(true)
+	const [isItemApplied, setIsItemApplied] = useState<boolean>(false)
 
 	useEffect(() => {
+		setIsShowSimplified(checkLocalStorage("isShowSimplified", true))
+		//setCanSeeRealStars(checkLocalStorage("canSeeRealStars", false))
+		setIsDarkMode(checkLocalStorage("isDarkMode", true))
+		setIsItemApplied(checkLocalStorage("isItemApplied", false))
 		if(isDarkMode) {
 			document.documentElement.classList.add("dark")
 		} else {
 			document.documentElement.classList.remove("dark")
 		}
-	})
+	}, [isDarkMode])
 	pageProps.isShowSimplified = isShowSimplified
 	//pageProps.canSeeRealStars = canSeeRealStars
 	pageProps.isDarkMode = isDarkMode
@@ -72,6 +77,7 @@ function Astrology({ Component, pageProps }: AppPropsWithLayout) {
     pageProps.leagueData = leagueData
     pageProps.players = data?.players
 	pageProps.teams = data?.teams
+	pageProps.error = error?.toString()
 
 	return getLayout(<Component {...pageProps} />, pageProps)
 }

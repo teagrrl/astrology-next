@@ -21,9 +21,9 @@ export default class Player {
         this.name = data.name
         this.team = new PlayerTeam(data.team)
         
-        this.stars["overall"] = data.overallRating
+        this.stars["overall"] = data.overallRating / 5
         data.categoryRatings.forEach((category) => {
-            this.stars[category.name] = category.stars
+            this.stars[category.name] = category.stars / 5
         })
         data.attributes.forEach((attribute) => {
             this.attributes[attribute.name.toLowerCase()] = attribute.value
@@ -84,15 +84,15 @@ function calculatePositionName(x: number, y: number) {
     const positionVal = x * 6 + y
     switch(positionVal) {
         case 0:
-            return "4th base"
+            return "4th Base"
         case 1:
             return "Left Guard"
         case 2:
-            return "3rd base"
+            return "3rd Base"
         case 3:
             return "Liner (Left)"
         case 4:
-            return "5th base"
+            return "5th Base"
         case 5:
             return "Corner Fielder (Left)"
         case 6:
@@ -100,19 +100,19 @@ function calculatePositionName(x: number, y: number) {
         case 7:
             return "Center Infielder"
         case 8:
-            return "Short stop"
+            return "Shortstop"
         case 9:
-            return "Mid stop"
+            return "Midstop"
         case 10:
-            return "Long stop"
+            return "Longstop"
         case 11:
-            return "Back stop"
+            return "Backstop"
         case 12:
-            return "1st base"
+            return "1st Base"
         case 13:
             return "Flanker"
         case 14:
-            return "2nd base"
+            return "2nd Base"
         case 15:
             return "Left Mid Fielder"
         case 16:
@@ -132,7 +132,7 @@ function calculatePositionName(x: number, y: number) {
         case 23:
             return "Outer Fielder (Left)"
         case 24:
-            return "0th base"
+            return "0th Base"
         case 25:
             return "Long Flanker"
         case 26:

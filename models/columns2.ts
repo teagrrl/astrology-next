@@ -1,5 +1,5 @@
 type CategoryId = "general" | "batting" | "pitching" | "defense" | "running" | "vibes"
-type GeneralId = "name" | "team" | "location" | "position" | "modifications" | "items" | "overall"
+type GeneralId = "name" | "team" | "location" | "position" | "modifications" | "items" | "overall" | "division" | "wins" | "losses"
 type AttributeId = "sight" | "thwack" | "ferocity" | "control" | "stuff" | "guile" | "reach" | "magnet" | "reflex"
     | "hustle" | "stealth" | "dodge" | "thrive" | "survive" | "drama"
 type PlayerGroup = "LINEUP" | "ROTATION" | "ROSTER"
@@ -23,11 +23,11 @@ export type ColumnAttributes = {
 }
 
 export const getReverseAttributes = (columns: CategoryAttributes[]): string[] => {
-    return columns.map((category) => 
+    return ["id", ...columns.map((category) => 
         category.columns.filter((column) => 
             column.direction === "asc"
         ).map((column) => column.id)
-    ).flat()
+    ).flat()]
 }
 
 export const playerStatColumns: CategoryAttributes[] = [
@@ -38,17 +38,17 @@ export const playerStatColumns: CategoryAttributes[] = [
         group: "LINEUP",
         columns: [
             {
-                direction: "asc",
+                direction: "desc",
                 id: "sight",
                 name: "Sight",
             },
             {
-                direction: "asc",
+                direction: "desc",
                 id: "thwack",
                 name: "Thwack",
             },
             {
-                direction: "asc",
+                direction: "desc",
                 id: "ferocity",
                 name: "Ferocity",
             },
@@ -61,17 +61,17 @@ export const playerStatColumns: CategoryAttributes[] = [
         group: "ROTATION",
         columns: [
             {
-                direction: "asc",
+                direction: "desc",
                 id: "control",
                 name: "Control",
             },
             {
-                direction: "asc",
+                direction: "desc",
                 id: "stuff",
                 name: "Stuff",
             },
             {
-                direction: "asc",
+                direction: "desc",
                 id: "guile",
                 name: "Guile",
             },
@@ -84,17 +84,17 @@ export const playerStatColumns: CategoryAttributes[] = [
         group: "LINEUP",
         columns: [
             {
-                direction: "asc",
+                direction: "desc",
                 id: "reach",
                 name: "Reach",
             },
             {
-                direction: "asc",
+                direction: "desc",
                 id: "magnet",
                 name: "Magnet",
             },
             {
-                direction: "asc",
+                direction: "desc",
                 id: "reflex",
                 name: "Reflex",
             },
@@ -107,17 +107,17 @@ export const playerStatColumns: CategoryAttributes[] = [
         group: "LINEUP",
         columns: [
             {
-                direction: "asc",
+                direction: "desc",
                 id: "hustle",
                 name: "Hustle",
             },
             {
-                direction: "asc",
+                direction: "desc",
                 id: "stealth",
                 name: "Stealth",
             },
             {
-                direction: "asc",
+                direction: "desc",
                 id: "dodge",
                 name: "Dodge",
             },
@@ -130,24 +130,23 @@ export const playerStatColumns: CategoryAttributes[] = [
         group: "ROSTER",
         columns: [
             {
-                direction: "asc",
+                direction: "desc",
                 id: "thrive",
                 name: "Thrive",
             },
             {
-                direction: "asc",
+                direction: "desc",
                 id: "survive",
                 name: "Survive",
             },
             {
-                direction: "asc",
+                direction: "desc",
                 id: "drama",
                 name: "Drama",
             },
         ],
     }
 ]
-
 
 export const playerColumns: CategoryAttributes[] = [
     {
@@ -183,6 +182,48 @@ export const playerColumns: CategoryAttributes[] = [
             {
                 id: "items",
                 name: "Items",
+                direction: "desc",
+            },*/
+            {
+                id: "overall",
+                name: "Overall",
+                direction: "desc",
+                group: "ROSTER",
+            },
+        ]
+    },
+    ...playerStatColumns,
+]
+
+export const teamColumns: CategoryAttributes[] = [
+    {
+        id: "general",
+        name: "General",
+        isSimple: true,
+        columns: [
+            {
+                id: "name",
+                name: "Name",
+                direction: "asc",
+            },
+            {
+                id: "division",
+                name: "Division",
+                direction: "asc",
+            },
+            {
+                id: "wins",
+                name: "Wins",
+                direction: "desc",
+            },
+            {
+                id: "losses",
+                name: "Losses",
+                direction: "desc",
+            },
+            /*{
+                id: "modifications",
+                name: "Modifications",
                 direction: "desc",
             },*/
             {

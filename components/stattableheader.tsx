@@ -29,9 +29,9 @@ export default function StatTableHeader({ columns, sort, direction, triggerSort,
                 <tr className="border-b-[1px] border-black dark:border-zinc-500">
                     {columns.map((category) => 
                         <Fragment key={`header_${category.id}`}>
-                            {category.hasRating && <TableHeader title={`${category.name} Stars`} sortId={category.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}><Emoji emoji="0x2B50" emojiClass="inline w-4 h-4" /></TableHeader>}
+                            {category.hasRating && <TableHeader title={`${category.name} Rating`} sortId={category.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}><Emoji emoji="0x2B50" emojiClass="inline w-4 h-4" /></TableHeader>}
                             {(category.isSimple || !isShowSimplified) && category.columns.map((column) => 
-                                <TableHeader key={`header_${column.id}`} title={column.name} sortId={column.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}>{column.name}</TableHeader>
+                                <TableHeader key={`header_${column.id}`} title={`${column.name}${column.id === "overall" ? " Rating" : ""}`} sortId={column.id} sortBy={{ id: sort, direction: direction }} triggerSort={triggerSort}>{column.name}</TableHeader>
                             )}
                         </Fragment>
                     )}

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
-import { PageProps, removeDiacritics } from '@pages/_app'
+import { PageProps } from '@pages/_app'
 import Layout from '@components/layout'
 import AstrologyLoader from '@components/loader'
 import AstrologyError from '@components/error'
@@ -15,17 +15,21 @@ type TeamPageProps = PageProps & {}
 
 const reverseAttributes = getReverseAttributes(playerColumns)
 
-export default function TeamPage({ teams, players, isItemApplied, isShowSimplified }: TeamPageProps) {
+export default function TeamPage({ teams, error, isItemApplied, isShowSimplified }: TeamPageProps) {
     const router = useRouter()
     const { id, sort, direction } = router.query
 
-	if(!teams || !players) {
+	if(!teams) {
 		return <AstrologyLoader />
 	}
 	const team = teams.find((team) => team.id === id)
 	if(!team) {
 		return <AstrologyError code={404} message="Astrology was unable to find data about any such team" />
 	}
+    if(error) {
+        return <AstrologyError code={400} message={`Astrology encountered an error: ${error}`} />
+    }
+
     const currentSort = sort ? sort.toString() : undefined
     const currentDirection = direction 
         ? (direction.toString() as "asc" | "desc") 
@@ -44,7 +48,6 @@ export default function TeamPage({ teams, players, isItemApplied, isShowSimplifi
     }
 
     const comparator = currentSort ? PlayerComparator(currentSort, currentDirection, isItemApplied) : undefined
-	
     
     const rosterData = [
         {
@@ -117,7 +120,7 @@ export default function TeamPage({ teams, players, isItemApplied, isShowSimplifi
             )}
             <div className="px-2 py-1 mt-4">
                 <span>Don&apos;t see what you&apos;re looking for? </span> 
-                <Link href={`/legacy/teams/${team.id}`}>Maybe try the legacy version.</Link>
+                <Link href={`/legacy/team/${team.id}`}>Maybe try the legacy version.</Link>
             </div>
 		</section>
 	)

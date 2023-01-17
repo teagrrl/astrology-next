@@ -5,7 +5,8 @@ import { CategoryAttributes, ColumnAttributes, playerColumns } from "@models/col
 import AstrologyLoader from "@components/loader"
 import Emoji from "@components/emoji"
 import StatTableHeader, { StatTableHeaderProps } from "@components/stattableheader"
-import Tooltip from "./tooltip"
+import Tooltip from "@components/tooltip"
+import TableStatCell from "@components/tablestatcell"
 
 type PlayerTableProps = PlayerTableBodyProps & StatTableHeaderProps & {
     //exportData?: ExportCSVProps,
@@ -32,7 +33,6 @@ type AverageTableCellProps = {
     averages: Record<string, number>,
     category: CategoryAttributes,
     column?: ColumnAttributes,
-    isShowSimplified?: boolean,
     isItemApplied?: boolean,
 }
 
@@ -49,7 +49,7 @@ export default function PlayerTable({ header, players, averages, sort, direction
                 {!!header && <h1 className="flex grow justify-center text-2xl font-bold">{header}</h1>}
                 {/*exportData && <ExportCSV {...exportData} />*/}
             </div>}
-            <div className="overflow-auto">
+            <div className="overflow-auto mb-4">
                 <table className="table-auto">
                     <StatTableHeader sort={sort} direction={direction} triggerSort={triggerSort} isShowSimplified={isShowSimplified} />
                     <PlayerTableBody header={header} players={players} averages={averages} isShowSimplified={isShowSimplified} isItemApplied={isItemApplied} />
@@ -66,9 +66,9 @@ function PlayerTableBody({ header, players, averages, isShowSimplified, isItemAp
                 <tr key={player.id} className="duration-300 hover:bg-zinc-400/20 dark:hover:bg-zinc-400/20">
                     {playerColumns.map((category) => 
                         <Fragment key={`${player.id}_${category.id}`}>
-                            {category.hasRating && <PlayerTableCell player={player} category={category} isItemApplied={isItemApplied} />}
+                            {category.hasRating && <PlayerTableCell player={player} category={category} isItemApplied={isItemApplied} isShowSimplified={isShowSimplified} />}
                             {(category.id === "general" || !isShowSimplified) && category.columns.map((column) => 
-                                <PlayerTableCell key={`${player.id}_${column.id}`} player={player} category={category} column={column} isItemApplied={isItemApplied} />
+                                <PlayerTableCell key={`${player.id}_${column.id}`} player={player} category={category} column={column} isItemApplied={isItemApplied} isShowSimplified={isShowSimplified} />
                             )}
                         </Fragment>
                     )}
@@ -88,7 +88,7 @@ function PlayerTableBody({ header, players, averages, isShowSimplified, isItemAp
     )
 }
 
-function AverageTableCell({ header, averages, category, column, isShowSimplified, isItemApplied }: AverageTableCellProps) {
+function AverageTableCell({ header, averages, category, column, isItemApplied }: AverageTableCellProps) {
     if(column) {
         switch(column.id) {
             case "team":
@@ -103,47 +103,17 @@ function AverageTableCell({ header, averages, category, column, isShowSimplified
                 )
             default:
                 return (
-                    <AverageAttribute header={header} averages={averages} id={column.id} name={column.name} isRating={column.id === "overall"} />
+                    <TableStatCell header={header} values={averages} statId={column.id} statName={column.name} isRating={column.id === "overall"} />
                 )
         }
     } else {
         return (
-            <AverageAttribute header={header} averages={averages} id={category.id} name={category.name} isRating={true} />
+            <TableStatCell header={header} values={averages} statId={category.id} statName={category.name} isRating={true} />
         )
     }
 }
 
-type AverageAttributeProps = {
-    header?: string,
-    averages: Record<string, number>,
-    id: string,
-    name: string,
-    isRating?: boolean,
-}
-
-function AverageAttribute({ header, averages, id, name, isRating }: AverageAttributeProps) {
-    const rawValue = averages[id]
-    let visibleValue = rawValue
-    if(isRating) visibleValue *= 5
-    return (
-        <td className={`px-1.5 py-1 text-center ${getColorClassForValue(rawValue)}`}>
-            <Tooltip content={
-                <div className="flex flex-col justify-center items-center">
-                    <h3 className="font-bold">{header} Average</h3>
-                    <div className="flex flex-col justify-center items-center">
-                        <div>
-                            <span className="font-semibold">{name}: </span><span>{visibleValue} {isRating && "Stars"}</span>
-                        </div>
-                    </div>
-                </div>
-            }>
-                <span>{Math.round(visibleValue * 1000) / 1000}</span>
-            </Tooltip>
-        </td>
-    )
-}
-
-function PlayerTableCell({ player, category, column, isItemApplied }: PlayerTableCellProps) {
+function PlayerTableCell({ player, category, column, isItemApplied, isShowSimplified }: PlayerTableCellProps) {
     if(column) {
         switch(column.id) {
             case "name":
@@ -172,7 +142,7 @@ function PlayerTableCell({ player, category, column, isItemApplied }: PlayerTabl
                                 id: player.team.id
                             }
                         }}>
-                            <a className="flex justify-center">
+                            <a className="flex justify-center" title={player.team.name}>
                                 <Emoji 
                                     emoji={player.team.emoji} 
                                     emojiClass="w-4 h-4" 
@@ -191,24 +161,28 @@ function PlayerTableCell({ player, category, column, isItemApplied }: PlayerTabl
                 // TODO: draw the triangles out correctly
                 return (
                     <td className="px-1.5 py-1 text-center whitespace-nowrap">
-                        {player.positions.map((position, index) => <div key={`pos_${index}`}>
-                            <Tooltip content={
-                                <div>
-                                    <svg width={64} height={40}>
-                                        <g transform="translate(10, 2)">
-                                            <g transform="scale(1, 0.6)">
-                                                <g transform="rotate(-45, 32, 24)">
-                                                    <rect width={42} height={42} stroke="black" fill="white" />
-                                                    <rect x={position.x * 7} y={(5 - position.y) * 7} width={7} height={7} fill="black" />
+                        {player.positions.length 
+                            ? player.positions.map((position, index) => <div key={`pos_${index}`}>
+                                <Tooltip content={
+                                    <div>
+                                        <svg width={64} height={40}>
+                                            <g transform="translate(10, 2)">
+                                                <g transform="scale(1, 0.6)">
+                                                    <g transform="rotate(-45, 32, 24)">
+                                                        <rect width={42} height={42} stroke="black" fill="#eeeeee" />
+                                                        <rect y={21} width={21} height={21} fill="#bbbbbb" />
+                                                        <rect x={position.x * 7} y={(5 - position.y) * 7} width={7} height={7} stroke="black" fill="white" />
+                                                    </g>
                                                 </g>
                                             </g>
-                                        </g>
-                                    </svg>
-                                </div>
-                            }>
-                                <span>{position.name}</span>
-                            </Tooltip>
-                        </div>)}
+                                        </svg>
+                                    </div>
+                                }>
+                                    <span>{position.name}</span>
+                                </Tooltip>
+                            </div>)
+                            : <span>Somewhere</span>
+                        }
                     </td>
                 )
             case "modifications":
@@ -225,67 +199,16 @@ function PlayerTableCell({ player, category, column, isItemApplied }: PlayerTabl
                 )
             case "overall":
                 return (
-                    <PlayerAttribute player={player} id={"overall"} name={"Overall Rating"} isRating={true} />
+                    <TableStatCell header={player.name} values={isShowSimplified ? player.stars : player.attributes} statId={"overall"} statName={"Overall Rating"} isRating={true} />
                 )
             default:
                 return (
-                    <PlayerAttribute player={player} id={column.id} name={column.name} />
+                    <TableStatCell header={player.name} values={player.attributes} statId={column.id} statName={column.name} />
                 )
         }
     } else {
         return (
-            <PlayerAttribute player={player} id={category.id} name={category.name} isRating={true} />
+            <TableStatCell header={player.name} values={isShowSimplified ? player.stars : player.attributes} statId={category.id} statName={category.name} isRating={true} />
         )
-    }
-}
-
-type PlayerAttributeProps = {
-    player: Player,
-    id: string,
-    name: string,
-    isRating?: boolean,
-}
-
-function PlayerAttribute({ player, id, name, isRating }: PlayerAttributeProps) {
-    const rawValue = player.attributes[id]
-    let visibleValue = rawValue
-    if(isRating) visibleValue *= 5
-    return (
-        <td className={`px-1.5 py-1 text-center ${getColorClassForValue(rawValue)}`}>
-            <Tooltip content={
-                <div className="flex flex-col justify-center items-center">
-                    <h3 className="font-bold">{player.name}</h3>
-                    <div className="flex flex-col justify-center items-center">
-                        <div>
-                            <span className="font-semibold">{name}: </span><span>{visibleValue} {isRating && "Stars"}</span>
-                        </div>
-                    </div>
-                </div>
-            }>
-                <span>{Math.round(visibleValue * 1000) / 1000}</span>
-            </Tooltip>
-        </td>
-    )
-}
-
-export function getColorClassForValue(value: number) {
-    if(value > 1.45) {
-        return "bg-fuchsia-400/50"
-    } else if(value > 1.15) {
-        return "bg-violet-300/50"
-    } else if(value > 0.95) {
-        return "bg-blue-300/60"
-    } else if(value > 0.85) {
-        return "bg-teal-400/50"
-    } else if(value > 0.65) {
-        return "bg-green-300/50"
-    }  else if(value < 0.15) {
-        return "bg-red-500/60"
-    } else if(value < 0.25) {
-        return "bg-orange-400/60"
-    } else if(value < 0.45) {
-        return "bg-amber-300/60"
-    } else {
-        return "bg-lime-300/50"
     }
 }

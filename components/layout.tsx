@@ -2,6 +2,7 @@ import Head from 'next/head'
 import { ReactNode } from 'react'
 import { PageProps } from '@pages/_app'
 import Metadata, { MetadataProps } from '@components/metadata'
+import Footer from '@components/footer'
 
 type LayoutProps = PageProps & MetadataProps & {
     children?: ReactNode, 
@@ -25,6 +26,16 @@ export default function Layout({ children, title, description, image, hasFooter,
                 <meta name="theme-color" content="#2b2b2b" />
             </Head>
             <main className="flex flex-col grow overflow-hidden">{children}</main>
+            <Footer 
+                isSimpleFooter={hasFooter}
+                isDarkMode={isDarkMode}
+                isItemApplied={isItemApplied} 
+                isShowSimplified={isShowSimplified} 
+                toggleItemAdjustments={toggleItemAdjustments} 
+                toggleHelp={toggleHelp}
+                toggleLights={toggleLights}
+                toggleSimpleStats={toggleSimpleStats} 
+            />
         </div>
     )
 }

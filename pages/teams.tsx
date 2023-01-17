@@ -3,43 +3,80 @@ import { PageProps } from "@pages/_app"
 import Layout from "@components/layout"
 import Emoji from "@components/emoji"
 import Link from "next/link"
+import TeamTable from "@components/teamtable"
+import { useRouter } from "next/router"
+import AstrologyLoader from "@components/loader"
+import AstrologyError from "@components/error"
+import { getReverseAttributes, teamColumns } from "@models/columns2"
+import { TeamComparator } from "@models/team2"
 
 type TeamsProps = PageProps & {}
 
-export default function TeamsPage({ teams, players }: TeamsProps) {
-    console.log(players)
+const reverseAttributes = getReverseAttributes(teamColumns)
+
+export default function TeamsPage({ teams, error, isItemApplied, isShowSimplified }: TeamsProps) {
+    const router = useRouter()
+    const { sort, direction } = router.query
+
+	if(!teams) {
+		return <AstrologyLoader />
+	}
+    if(error) {
+        return <AstrologyError code={400} message={`Astrology encountered an error: ${error}`} />
+    }
+
+    const currentSort = sort ? sort.toString() : "id"
+    const currentDirection = direction 
+        ? (direction.toString() as "asc" | "desc") 
+        : currentSort 
+            ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
+            : "desc"
+
+    const sortedTeams = currentSort ? Array.from(teams).sort(TeamComparator(currentSort, currentDirection, isItemApplied)) : teams
+
+    const sortTeams = (newSort: string) => {
+        let newDirection: "asc" | "desc" | null = null;
+        if(newSort === currentSort) {
+            switch(currentDirection) {
+                case "asc":
+                    newDirection = reverseAttributes.includes(newSort) ? "desc" : null
+                    break;
+                case "desc":
+                    newDirection = reverseAttributes.includes(newSort) ? null : "asc"
+                    break;
+            }
+        } else {
+            newDirection = reverseAttributes.includes(newSort) ? "asc" : "desc"
+        }
+        const routerQuery: Record<string, string | string[]> = {}
+        if(newDirection) {
+            routerQuery["sort"] = newSort
+            routerQuery["direction"] = newDirection
+        } 
+        router.push({
+            query: routerQuery
+        }, undefined, { shallow: true })
+    }
+
     return (
         <div className="overflow-auto">
-            {teams && teams.length > 0 && <table className="table-auto">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Division</th>
-                        <th>Emoji</th>
-                        <th>Shorthand</th>
-                        <th>Name</th>
-                        <th>Slogan</th>
-                        <th>Batting</th>
-                        <th>Pitching</th>
-                        <th>Defense</th>
-                        <th>Running</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {teams.map((team) => <tr key={team.id}>
-                        <td>{team.id}</td>
-                        <td></td>
-                        <td><Emoji emoji={team.emoji} /></td>
-                        <td>{team.shorthand}</td>
-                        <td><Link href={`team/${team.id}`}>{team.name}</Link></td>
-                        <td>{team.slogan}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>)}
-                </tbody>
-            </table>}
+            <div className="flex justify-center items-center text-center p-5">
+                <Emoji className="h-14 w-14 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: "#8f3232" }} emoji={"0x1FA78"} emojiClass="h-8 w-8" />
+                <div>
+                    <div className="text-3xl font-bold">
+                        <span>The Teams</span>
+                    </div>
+                    <div className="text-xl italic before:content-[open-quote] after:content-[close-quote]">Pick your favorite.</div>
+                </div>
+            </div>
+            {teams && teams.length > 0 && <TeamTable 
+                teams={sortedTeams}
+                sort={currentSort}
+                direction={currentDirection}
+                triggerSort={sortTeams}
+                isItemApplied={isItemApplied}
+                isShowSimplified={isShowSimplified} 
+            />}
             <div className="px-2 py-1 mt-4">
                 <span>Don&apos;t see what you&apos;re looking for? </span> 
                 <Link href="/legacy/teams">Maybe try the legacy version.</Link>
@@ -50,7 +87,7 @@ export default function TeamsPage({ teams, players }: TeamsProps) {
 
 TeamsPage.getLayout = function getLayout(page: ReactElement, props?: PageProps) {
 	return (
-		<Layout {...props}>
+		<Layout hasFooter={true} {...props}>
 			{page}
 		</Layout>
 	)
