@@ -10,19 +10,23 @@ type TeamTableProps = TeamTableBodyProps & StatTableHeaderProps
 
 type TeamTableBodyProps = {
     teams: Team[],
+    isShowColors?: boolean,
     isItemApplied?: boolean,
     isShowSimplified?: boolean,
+    scaleColors?: string[],
 }
 
 type TeamTableCellProps = {
     team: Team,
     category: CategoryAttributes,
     column?: ColumnAttributes,
-    isShowSimplified?: boolean,
+    isShowColors?: boolean,
     isItemApplied?: boolean,
+    isShowSimplified?: boolean,
+    scaleColors?: string[],
 }
 
-export default function TeamTable({teams, sort, direction, triggerSort, isItemApplied, isShowSimplified}: TeamTableProps) {
+export default function TeamTable({teams, sort, direction, triggerSort, isShowColors, isItemApplied, isShowSimplified, scaleColors}: TeamTableProps) {
     if(!teams) {
         return <h1 className="flex justify-center text-xl">Loading...</h1>
     }
@@ -33,23 +37,23 @@ export default function TeamTable({teams, sort, direction, triggerSort, isItemAp
         <div className="overflow-auto mb-4">
             <table className="table-auto">
                 <StatTableHeader columns={teamColumns} sort={sort} direction={direction} triggerSort={triggerSort} isShowSimplified={isShowSimplified} />
-                <TeamTableBody teams={teams} isShowSimplified={isShowSimplified} isItemApplied={isItemApplied} />
+                <TeamTableBody teams={teams} isShowColors={isShowColors} isItemApplied={isItemApplied} isShowSimplified={isShowSimplified} scaleColors={scaleColors} />
             </table>
         </div>
     )
 }
 
 
-function TeamTableBody({ teams, isShowSimplified, isItemApplied }: TeamTableBodyProps) {
+function TeamTableBody({ teams, isShowColors, isItemApplied, isShowSimplified, scaleColors }: TeamTableBodyProps) {
     return (
         <tbody>
             {teams.map((team) => 
                 <tr key={team.id} className="duration-300 hover:bg-zinc-400/20 dark:hover:bg-zinc-400/20">
                     {teamColumns.map((category) => 
                         <Fragment key={`${team.id}_${category.id}`}>
-                            {category.hasRating && <TeamTableCell team={team} category={category} isItemApplied={isItemApplied} isShowSimplified={isShowSimplified} />}
+                            {category.hasRating && <TeamTableCell team={team} category={category} isShowColors={isShowColors} isItemApplied={isItemApplied} isShowSimplified={isShowSimplified} scaleColors={scaleColors} />}
                             {(category.id === "general" || !isShowSimplified) && category.columns.map((column) => 
-                                <TeamTableCell key={`${team.id}_${column.id}`} team={team} category={category} column={column} isItemApplied={isItemApplied} isShowSimplified={isShowSimplified} />
+                                <TeamTableCell key={`${team.id}_${column.id}`} team={team} category={category} column={column} isShowColors={isShowColors} isItemApplied={isItemApplied} isShowSimplified={isShowSimplified} scaleColors={scaleColors} />
                             )}
                         </Fragment>
                     )}
@@ -59,7 +63,7 @@ function TeamTableBody({ teams, isShowSimplified, isItemApplied }: TeamTableBody
     )
 }
 
-function TeamTableCell({ team, category, column, isItemApplied, isShowSimplified }: TeamTableCellProps) {
+function TeamTableCell({ team, category, column, isShowColors, isItemApplied, isShowSimplified, scaleColors }: TeamTableCellProps) {
     if(column) {
         switch(column.id) {
             case "name":
@@ -82,6 +86,10 @@ function TeamTableCell({ team, category, column, isItemApplied, isShowSimplified
                             </a>
                         </Link>
                     </td>
+                )
+            case "shorthand":
+                return (
+                    <td className="px-1.5 py-1 text-center">{team.shorthand}</td>
                 )
             case "division":
                 return (
@@ -112,16 +120,16 @@ function TeamTableCell({ team, category, column, isItemApplied, isShowSimplified
                 )*/
             case "overall":
                 return (
-                    <TableStatCell header={team.name} values={team.averages} statId={"overall"} statName={"Overall Rating"} isRating={true} />
+                    <TableStatCell header={team.name} values={team.averages} statId={"overall"} statName={"Overall Rating"} isRating={true} isShowColors={isShowColors} scaleColors={scaleColors} />
                 )
             default:
                 return (
-                    <TableStatCell header={team.name} values={team.averages} statId={column.id} statName={column.name} />
+                    <TableStatCell header={team.name} values={team.averages} statId={column.id} statName={column.name} isShowColors={isShowColors} scaleColors={scaleColors} />
                 )
         }
     } else {
         return (
-            <TableStatCell header={team.name} values={isShowSimplified ? team.stars : team.averages} statId={category.id} statName={category.name} isRating={true} />
+            <TableStatCell header={team.name} values={/*isShowSimplified ? team.stars : */team.averages} statId={category.id} statName={category.name} isRating={true} isShowColors={isShowColors} scaleColors={scaleColors} />
         )
     }
 }

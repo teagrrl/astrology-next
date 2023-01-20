@@ -1,5 +1,6 @@
 import { BlaseballPlayer, BlaseballPlayerPosition, BlaseballRosterSlot, BlaseballTeam } from "@models/api2"
 import { getReverseAttributes, playerColumns } from "@models/columns2"
+import Modification from "@models/modification2"
 
 const reverseAttributes = getReverseAttributes(playerColumns)
 
@@ -7,6 +8,8 @@ export default class Player {
     public readonly id: string
     public readonly name: string
     public readonly team: PlayerTeam
+
+    public readonly modifications: Modification[] = []
     
     public readonly attributes: Record<string, number> = {}
     public readonly stars: Record<string, number> = {}
@@ -20,6 +23,8 @@ export default class Player {
         this.id = data.id
         this.name = data.name
         this.team = new PlayerTeam(data.team)
+
+        this.modifications = data.modifications.map((mod) => new Modification(mod.modification))
         
         this.stars["overall"] = data.overallRating / 5
         data.categoryRatings.forEach((category) => {

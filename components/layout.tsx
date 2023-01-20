@@ -2,6 +2,7 @@ import Head from 'next/head'
 import { ReactNode } from 'react'
 import { PageProps } from '@pages/_app'
 import Metadata, { MetadataProps } from '@components/metadata'
+import Navigation from '@components/navigation'
 import Footer from '@components/footer'
 
 type LayoutProps = PageProps & MetadataProps & {
@@ -9,7 +10,7 @@ type LayoutProps = PageProps & MetadataProps & {
     hasFooter?: boolean, 
 }
 
-export default function Layout({ children, title, description, image, hasFooter, leagueData, isDarkMode, isItemApplied, isShowSimplified, toggleItemAdjustments, toggleHelp, toggleLights, toggleSimpleStats } : LayoutProps) {
+export default function Layout({ children, title, description, image, hasFooter, isDarkMode, isShowColors, isItemApplied, isShowSimplified, scaleColors, toggleLights, toggleColors, toggleItemAdjustments, toggleSimpleStats } : LayoutProps) {
     return (
         <div className="flex flex-col h-screen w-screen bg-white dark:bg-zinc-900 text-black dark:text-white transition">
             <Metadata title={title} description={description} image={image} />
@@ -25,14 +26,17 @@ export default function Layout({ children, title, description, image, hasFooter,
                 <meta name="msapplication-config" content="/icons/browserconfig.xml" />
                 <meta name="theme-color" content="#2b2b2b" />
             </Head>
+            <Navigation isDarkMode={isDarkMode} />
             <main className="flex flex-col grow overflow-hidden">{children}</main>
             <Footer 
                 isSimpleFooter={hasFooter}
                 isDarkMode={isDarkMode}
+                isShowColors={isShowColors}
                 isItemApplied={isItemApplied} 
                 isShowSimplified={isShowSimplified} 
+                scaleColors={scaleColors}
                 toggleItemAdjustments={toggleItemAdjustments} 
-                toggleHelp={toggleHelp}
+                toggleColors={toggleColors}
                 toggleLights={toggleLights}
                 toggleSimpleStats={toggleSimpleStats} 
             />

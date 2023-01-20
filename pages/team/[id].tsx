@@ -1,5 +1,5 @@
-import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
+import { useRouter } from 'next/router'
 import { PageProps } from '@pages/_app'
 import Layout from '@components/layout'
 import AstrologyLoader from '@components/loader'
@@ -10,12 +10,14 @@ import PlayerTable from '@components/playertable'
 import Player, { PlayerComparator } from '@models/player2'
 import { getReverseAttributes, playerColumns } from '@models/columns2'
 import TeamHeader from '@components/teamheader'
+import ExportCSV, { exportPlayerData } from '@components/exportcsv'
+import Tooltip from '@components/tooltip'
 
 type TeamPageProps = PageProps & {}
 
 const reverseAttributes = getReverseAttributes(playerColumns)
 
-export default function TeamPage({ teams, error, isItemApplied, isShowSimplified }: TeamPageProps) {
+export default function TeamPage({ teams, error, isShowColors, isItemApplied, isShowSimplified, scaleColors }: TeamPageProps) {
     const router = useRouter()
     const { id, sort, direction } = router.query
 
@@ -105,6 +107,18 @@ export default function TeamPage({ teams, error, isItemApplied, isShowSimplified
 				description={`Read the star charts for the ${team.name}.`} 
 			/>
             <TeamHeader team={team} />
+            <div className="flex flex-row p-2 gap-2">
+                <div className="flex flex-row flex-grow gap-2 items-center">
+                    {team.modifications.map((mod, index) =>
+                        <Tooltip key={`modification_${index}`} content={mod.description}>
+                            <div className="px-3 py-1 border-2 rounded-md font-bold cursor-default" style={{ borderColor: mod.color, backgroundColor: mod.backgroundColor, color: mod.textColor }}>
+                                {mod.name[0].toUpperCase() + mod.name.substring(1) /* why, Joel? */}
+                            </div>
+                        </Tooltip>
+                    )}
+                </div>
+                <ExportCSV data={exportPlayerData(rosterData.map((data) => data.players).flat(), isItemApplied)} filename={team.id} />
+            </div>
             {rosterData.map((data, index) =>
                 <PlayerTable 
                     key={`table_${index}`} 
@@ -114,8 +128,10 @@ export default function TeamPage({ teams, error, isItemApplied, isShowSimplified
                     sort={currentSort} 
                     direction={currentDirection} 
                     triggerSort={sortPlayers}
+                    isShowColors={isShowColors}
                     isShowSimplified={isShowSimplified} 
                     isItemApplied={isItemApplied} 
+                    scaleColors={scaleColors}
                 />
             )}
             <div className="px-2 py-1 mt-4">

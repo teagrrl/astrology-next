@@ -10,7 +10,7 @@ type LayoutProps = PageProps & MetadataProps & {
     hasFooter?: boolean, 
 }
 
-export default function Layout({ children, title, description, image, hasFooter, leagueData, isDarkMode, isItemApplied, isShowSimplified, toggleItemAdjustments, toggleHelp, toggleLights, toggleSimpleStats } : LayoutProps) {
+export default function Layout({ children, title, description, image, hasFooter, leagueData, isDarkMode, isItemApplied, isShowSimplified, toggleItemAdjustments, toggleLights, toggleSimpleStats } : LayoutProps) {
     return (
         <div className="flex flex-col h-screen w-screen bg-white dark:bg-zinc-900 text-black dark:text-white transition">
             <Metadata title={title} description={description} image={image} />
@@ -34,7 +34,6 @@ export default function Layout({ children, title, description, image, hasFooter,
                 isItemApplied={isItemApplied} 
                 isShowSimplified={isShowSimplified} 
                 toggleItemAdjustments={toggleItemAdjustments} 
-                toggleHelp={toggleHelp}
                 toggleLights={toggleLights}
                 toggleSimpleStats={toggleSimpleStats} 
             />

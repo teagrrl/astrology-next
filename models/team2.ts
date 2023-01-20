@@ -1,6 +1,7 @@
 import { BlaseballStandings, BlaseballTeam } from "@models/api2"
 import Player from "@models/player2"
 import { getReverseAttributes, playerStatColumns, teamColumns } from "@models/columns2"
+import Modification from "@models/modification2"
 
 const reverseAttributes = getReverseAttributes(teamColumns)
 const lineupStats = ["overall", ...playerStatColumns
@@ -24,6 +25,8 @@ export default class Team {
     public readonly primaryColor: string
     public readonly secondaryColor: string
 
+    public readonly modifications: Modification[] = []
+
     public readonly division: string
     public readonly standings: TeamStandings[]
     public readonly wins: number
@@ -46,6 +49,8 @@ export default class Team {
 
         this.primaryColor = data.primaryColor
         this.secondaryColor = data.secondaryColor
+
+        this.modifications = data.modifications.map((mod) => new Modification(mod.modification))
 
         this.division = data.division.name
         this.standings = data.standings.map((standings) => new TeamStandings(standings))
@@ -81,22 +86,24 @@ export default class Team {
             .map((id) => players.find((player) => player.id === id))
             .filter((player): player is Player => player !== undefined)
         
-        for(const player of [...this.lineup, ...this.rotation]) {
-            for(const [name, value] of Object.entries(player.attributes)) {
-                this.averages[name] = this.averages[name] ?? 0
-                if(lineupStats.includes(name) && player.rosterSlots.filter((slot) => slot.location === "LINEUP").length > 0) {
-                    this.averages[name] += value
-                }
-                if(rotationStats.includes(name) && player.rosterSlots.filter((slot) => slot.location === "ROTATION").length > 0) {
-                    this.averages[name] += value
+        if(this.lineup.length || this.rotation.length) {
+            for(const player of [...this.lineup, ...this.rotation]) {
+                for(const [name, value] of Object.entries(player.attributes)) {
+                    this.averages[name] = this.averages[name] ?? 0
+                    if(lineupStats.includes(name) && player.rosterSlots.filter((slot) => slot.location === "LINEUP").length > 0) {
+                        this.averages[name] += value
+                    }
+                    if(rotationStats.includes(name) && player.rosterSlots.filter((slot) => slot.location === "ROTATION").length > 0) {
+                        this.averages[name] += value
+                    }
                 }
             }
-        }
-        for(const name of Object.keys(this.averages)) {
-            let playerCount = 0
-            if(lineupStats.includes(name)) playerCount += this.lineup.length
-            if(rotationStats.includes(name)) playerCount += this.rotation.length
-            if(playerCount > 0) this.averages[name] /= playerCount
+            for(const name of Object.keys(this.averages)) {
+                let playerCount = 0
+                if(lineupStats.includes(name)) playerCount += this.lineup.length
+                if(rotationStats.includes(name)) playerCount += this.rotation.length
+                if(playerCount > 0) this.averages[name] /= playerCount
+            }
         }
 
         data.categoryRatings.forEach((category) => {
@@ -106,7 +113,6 @@ export default class Team {
         this.stars["overall"] = this.averages["overall"]
     }
 }
-
 class TeamStandings {
     public readonly season: string
     public readonly wins: number
@@ -125,6 +131,8 @@ function getComparatorValue(team: Team, attribute: string, isItemApplied?: boole
             return team.id
         case "name":
             return team.name
+        case "shorthand":
+            return team.shorthand
         case "division":
             return team.division
         case "wins":

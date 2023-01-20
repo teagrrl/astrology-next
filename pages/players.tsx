@@ -1,32 +1,30 @@
-import fuzzysort from 'fuzzysort'
+import type { ReactElement } from 'react'
 import getConfig from 'next/config'
 import { useRouter } from 'next/router'
-import type { ReactElement } from 'react'
+import Link from 'next/link'
+import { PlayerComparator } from '@models/player2'
+import { getReverseAttributes, playerColumns } from '@models/columns2'
+import { PageProps } from '@pages/_app'
 import AstrologyError from '@components/error'
 import Layout from '@components/layout'
 import AstrologyLoader from '@components/loader'
 import PlayerTable from '@components/playertable'
-import TeamHeader from '@components/teamheader'
-import Player, { PlayerComparator } from '@models/player2'
-import Team from '@models/team2'
-import { PageProps, removeDiacritics } from '@pages/_app'
-import { getReverseAttributes, playerColumns } from '@models/columns2'
 import Emoji from '@components/emoji'
 import Pagination from '@components/pagination'
-import Link from 'next/link'
+import { exportPlayerData } from '@components/exportcsv'
 
 const { publicRuntimeConfig } = getConfig()
 
 const reverseAttributes = getReverseAttributes(playerColumns)
 
-export default function PlayersPage({ players, error, isShowSimplified, isItemApplied }: PageProps) {
+export default function PlayersPage({ players, error, isShowColors, isShowSimplified, isItemApplied, scaleColors }: PageProps) {
     const router = useRouter()
     const { page, sort, direction } = router.query
             
 	if(!players) {
 		return <AstrologyLoader />
 	}
-    if(error) {
+    if(error) { 
         return <AstrologyError code={400} message={`Astrology encountered an error: ${error}`} />
     }
 
@@ -86,6 +84,10 @@ export default function PlayersPage({ players, error, isShowSimplified, isItemAp
                         direction: currentSort ? currentDirection : undefined,
                     },
                 }} 
+                exportData={{
+                    data: exportPlayerData(sortedPlayers, isItemApplied), 
+                    filename: "players",
+                }}
                 currentPage={currentPage}
                 numPages={numPages} 
             />
@@ -95,8 +97,10 @@ export default function PlayersPage({ players, error, isShowSimplified, isItemAp
                     sort={currentSort} 
                     direction={currentDirection} 
                     triggerSort={sortPlayers}
+                    isShowColors={isShowColors}
                     isShowSimplified={isShowSimplified} 
                     isItemApplied={isItemApplied} 
+                    scaleColors={scaleColors}
                 /> 
                 : <h1 className="text-3xl text-center font-bold p-5">Huh, it looks like not enough players with that criteria exist.</h1>
             }
@@ -108,6 +112,10 @@ export default function PlayersPage({ players, error, isShowSimplified, isItemAp
                         direction: currentSort ? currentDirection : undefined,
                     },
                 }} 
+                exportData={{
+                    data: exportPlayerData(sortedPlayers, isItemApplied), 
+                    filename: "players",
+                }}
                 currentPage={currentPage}
                 numPages={numPages} 
             />

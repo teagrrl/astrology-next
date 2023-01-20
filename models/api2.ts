@@ -30,7 +30,7 @@ export interface BlaseballTeam {
     emoji: string,
     id: string,
     locationName: string,
-    modifications: BlaseballModification[],
+    modifications: { modification: BlaseballModification, teamId: string, }[],
     name: string,
     nickname: string,
     primaryColor: string,
@@ -46,16 +46,13 @@ interface BlaseballCategoryRating {
     stars: number,
 }
 
-interface BlaseballModification {
-    modification: {
-        backgroundColor: string,
-        color: string,
-        description: string,
-        icon: string,
-        name: string,
-        textColor: string,
-    },
-    teamId: string,
+export interface BlaseballModification {
+    backgroundColor: string,
+    color: string,
+    description: string,
+    icon: string,
+    name: string,
+    textColor: string,
 }
 
 export interface BlaseballPlayer {
@@ -64,7 +61,7 @@ export interface BlaseballPlayer {
     categoryRatings: BlaseballCategoryRating[],
     id: string,
     //items: [],
-    modifications: BlaseballModification[],
+    modifications: { modification: BlaseballModification, playerId: string, }[],
     name: string,
     overallRating: number,
     playerHeatMaps: BlaseballPlayerHeatMap[],

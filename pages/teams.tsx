@@ -1,20 +1,21 @@
 import { ReactElement } from "react"
-import { PageProps } from "@pages/_app"
-import Layout from "@components/layout"
-import Emoji from "@components/emoji"
 import Link from "next/link"
-import TeamTable from "@components/teamtable"
 import { useRouter } from "next/router"
-import AstrologyLoader from "@components/loader"
-import AstrologyError from "@components/error"
 import { getReverseAttributes, teamColumns } from "@models/columns2"
 import { TeamComparator } from "@models/team2"
+import { PageProps } from "@pages/_app"
+import Layout from "@components/layout"
+import AstrologyLoader from "@components/loader"
+import AstrologyError from "@components/error"
+import Emoji from "@components/emoji"
+import TeamTable from "@components/teamtable"
+import ExportCSV, { exportTeamData } from "@components/exportcsv"
 
 type TeamsProps = PageProps & {}
 
 const reverseAttributes = getReverseAttributes(teamColumns)
 
-export default function TeamsPage({ teams, error, isItemApplied, isShowSimplified }: TeamsProps) {
+export default function TeamsPage({ teams, error, isShowColors, isItemApplied, isShowSimplified, scaleColors }: TeamsProps) {
     const router = useRouter()
     const { sort, direction } = router.query
 
@@ -69,13 +70,18 @@ export default function TeamsPage({ teams, error, isItemApplied, isShowSimplifie
                     <div className="text-xl italic before:content-[open-quote] after:content-[close-quote]">Pick your favorite.</div>
                 </div>
             </div>
+            <div className="flex flex-row justify-end p-2">
+                <ExportCSV data={exportTeamData(sortedTeams, isItemApplied)} filename={"teams"} />
+            </div>
             {teams && teams.length > 0 && <TeamTable 
                 teams={sortedTeams}
                 sort={currentSort}
                 direction={currentDirection}
                 triggerSort={sortTeams}
+                isShowColors={isShowColors}
                 isItemApplied={isItemApplied}
                 isShowSimplified={isShowSimplified} 
+                scaleColors={scaleColors}
             />}
             <div className="px-2 py-1 mt-4">
                 <span>Don&apos;t see what you&apos;re looking for? </span> 

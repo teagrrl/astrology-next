@@ -7,25 +7,30 @@ import Emoji from "@components/emoji"
 import StatTableHeader, { StatTableHeaderProps } from "@components/stattableheader"
 import Tooltip from "@components/tooltip"
 import TableStatCell from "@components/tablestatcell"
+import ExportCSV, { ExportCSVProps } from "@components/exportcsv"
 
 type PlayerTableProps = PlayerTableBodyProps & StatTableHeaderProps & {
-    //exportData?: ExportCSVProps,
+    exportData?: ExportCSVProps,
 }
 
 type PlayerTableBodyProps = {
     header?: string,
     players: Player[],
     averages?: Record<string, number>,
+    isShowColors?: boolean,
     isShowSimplified?: boolean,
     isItemApplied?: boolean,
+    scaleColors?: string[],
 }
 
 type PlayerTableCellProps = {
     player: Player,
     category: CategoryAttributes,
     column?: ColumnAttributes,
+    isShowColors?: boolean,
     isShowSimplified?: boolean,
     isItemApplied?: boolean,
+    scaleColors?: string[],
 }
 
 type AverageTableCellProps = {
@@ -33,10 +38,12 @@ type AverageTableCellProps = {
     averages: Record<string, number>,
     category: CategoryAttributes,
     column?: ColumnAttributes,
+    isShowColors?: boolean,
     isItemApplied?: boolean,
+    scaleColors?: string[],
 }
 
-export default function PlayerTable({ header, players, averages, sort, direction, triggerSort, isShowSimplified, isItemApplied/*, exportData*/ }: PlayerTableProps) {
+export default function PlayerTable({ header, players, averages, sort, direction, triggerSort, isShowColors, isShowSimplified, isItemApplied, scaleColors, exportData }: PlayerTableProps) {
     if(!players) {
         return <AstrologyLoader />
     }
@@ -45,30 +52,30 @@ export default function PlayerTable({ header, players, averages, sort, direction
     }
     return (
         <>
-            {(header/* || exportData*/) && <div className="flex flex-row justify-end p-2">
+            {(header || exportData) && <div className="flex flex-row justify-end p-2">
                 {!!header && <h1 className="flex grow justify-center text-2xl font-bold">{header}</h1>}
-                {/*exportData && <ExportCSV {...exportData} />*/}
+                {exportData && <ExportCSV {...exportData} />}
             </div>}
             <div className="overflow-auto mb-4">
                 <table className="table-auto">
                     <StatTableHeader sort={sort} direction={direction} triggerSort={triggerSort} isShowSimplified={isShowSimplified} />
-                    <PlayerTableBody header={header} players={players} averages={averages} isShowSimplified={isShowSimplified} isItemApplied={isItemApplied} />
+                    <PlayerTableBody header={header} players={players} averages={averages} isShowColors={isShowColors} isShowSimplified={isShowSimplified} isItemApplied={isItemApplied} scaleColors={scaleColors} />
                 </table>
             </div>
         </>
     )
 }
 
-function PlayerTableBody({ header, players, averages, isShowSimplified, isItemApplied }: PlayerTableBodyProps) {
+function PlayerTableBody({ header, players, averages, isShowColors, isShowSimplified, isItemApplied, scaleColors }: PlayerTableBodyProps) {
     return (
         <tbody>
             {players.map((player) => 
                 <tr key={player.id} className="duration-300 hover:bg-zinc-400/20 dark:hover:bg-zinc-400/20">
                     {playerColumns.map((category) => 
                         <Fragment key={`${player.id}_${category.id}`}>
-                            {category.hasRating && <PlayerTableCell player={player} category={category} isItemApplied={isItemApplied} isShowSimplified={isShowSimplified} />}
+                            {category.hasRating && <PlayerTableCell player={player} category={category} isShowColors={isShowColors} isItemApplied={isItemApplied} isShowSimplified={isShowSimplified} scaleColors={scaleColors} />}
                             {(category.id === "general" || !isShowSimplified) && category.columns.map((column) => 
-                                <PlayerTableCell key={`${player.id}_${column.id}`} player={player} category={category} column={column} isItemApplied={isItemApplied} isShowSimplified={isShowSimplified} />
+                                <PlayerTableCell key={`${player.id}_${column.id}`} player={player} category={category} column={column} isShowColors={isShowColors} isItemApplied={isItemApplied} isShowSimplified={isShowSimplified} scaleColors={scaleColors} />
                             )}
                         </Fragment>
                     )}
@@ -77,9 +84,9 @@ function PlayerTableBody({ header, players, averages, isShowSimplified, isItemAp
             {players.length > 1 && averages && <tr className="duration-300 border-t-2 border-black dark:border-zinc-200 hover:bg-zinc-400/20">
                 {playerColumns.map((category) => 
                     <Fragment key={`average_${category.id}`}>
-                        {category.hasRating && <AverageTableCell header={header} averages={averages} category={category} isItemApplied={isItemApplied} />}
+                        {category.hasRating && <AverageTableCell header={header} averages={averages} category={category} isShowColors={isShowColors} isItemApplied={isItemApplied} scaleColors={scaleColors} />}
                         {(category.id === "general" || !isShowSimplified) && category.columns.map((column) => 
-                            <AverageTableCell key={`average_${column.id}`} header={header} averages={averages} category={category} column={column} isItemApplied={isItemApplied} />
+                            <AverageTableCell key={`average_${column.id}`} header={header} averages={averages} category={category} column={column} isShowColors={isShowColors} isItemApplied={isItemApplied} scaleColors={scaleColors} />
                         )}
                     </Fragment>
                 )}
@@ -88,7 +95,7 @@ function PlayerTableBody({ header, players, averages, isShowSimplified, isItemAp
     )
 }
 
-function AverageTableCell({ header, averages, category, column, isItemApplied }: AverageTableCellProps) {
+function AverageTableCell({ header, averages, category, column, isShowColors, isItemApplied, scaleColors }: AverageTableCellProps) {
     if(column) {
         switch(column.id) {
             case "team":
@@ -103,17 +110,17 @@ function AverageTableCell({ header, averages, category, column, isItemApplied }:
                 )
             default:
                 return (
-                    <TableStatCell header={header} values={averages} statId={column.id} statName={column.name} isRating={column.id === "overall"} />
+                    <TableStatCell header={header} values={averages} statId={column.id} statName={column.name} isRating={column.id === "overall"} isShowColors={isShowColors} scaleColors={scaleColors} />
                 )
         }
     } else {
         return (
-            <TableStatCell header={header} values={averages} statId={category.id} statName={category.name} isRating={true} />
+            <TableStatCell header={header} values={averages} statId={category.id} statName={category.name} isRating={true} isShowColors={isShowColors} scaleColors={scaleColors} />
         )
     }
 }
 
-function PlayerTableCell({ player, category, column, isItemApplied, isShowSimplified }: PlayerTableCellProps) {
+function PlayerTableCell({ player, category, column, isShowColors, isItemApplied, isShowSimplified, scaleColors }: PlayerTableCellProps) {
     if(column) {
         switch(column.id) {
             case "name":
@@ -199,16 +206,16 @@ function PlayerTableCell({ player, category, column, isItemApplied, isShowSimpli
                 )
             case "overall":
                 return (
-                    <TableStatCell header={player.name} values={isShowSimplified ? player.stars : player.attributes} statId={"overall"} statName={"Overall Rating"} isRating={true} />
+                    <TableStatCell header={player.name} values={/*isShowSimplified ? player.stars : */player.attributes} statId={"overall"} statName={"Overall Rating"} isRating={true} isShowColors={isShowColors} scaleColors={scaleColors} />
                 )
             default:
                 return (
-                    <TableStatCell header={player.name} values={player.attributes} statId={column.id} statName={column.name} />
+                    <TableStatCell header={player.name} values={player.attributes} statId={column.id} statName={column.name} isShowColors={isShowColors} scaleColors={scaleColors} />
                 )
         }
     } else {
         return (
-            <TableStatCell header={player.name} values={isShowSimplified ? player.stars : player.attributes} statId={category.id} statName={category.name} isRating={true} />
+            <TableStatCell header={player.name} values={/*isShowSimplified ? player.stars : */player.attributes} statId={category.id} statName={category.name} isRating={true} isShowColors={isShowColors} scaleColors={scaleColors} />
         )
     }
 }
