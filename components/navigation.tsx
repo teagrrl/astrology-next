@@ -19,6 +19,13 @@ export default function Navigation({ isDarkMode }: PageProps) {
             textColor: "#c58585",
             bgColor: "#8f3232",
         },
+        {
+            emoji: "0x1F4DA",
+            text: "The Annex",
+            href: "/annex",
+            textColor: "#da94d4",
+            bgColor: "#885a84",
+        },
     ]
 
     return (

@@ -1,6 +1,6 @@
-import getConfig from "next/config";
-import Head from "next/head";
-import { useRouter } from "next/router";
+import getConfig from "next/config"
+import Head from "next/head"
+import { useRouter } from "next/router"
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -16,9 +16,9 @@ export default function Metadata({ title, description, image }: MetadataProps) {
         ? "http://localhost:3000" 
         : process.env.VERCEL_URL ? ("https://" + process.env.VERCEL_URL) : undefined
 
-    const siteName = "Astrology - A quick look at Blaseball star charts."
+    const siteName = "Astrology - A quick look at Blaseball Star Charts."
     const siteTitle = title ?? siteName
-    const socialDescription = description ?? "Horoscopes for the advanced Blaseball fan. Read simple or detailed star charts for your favorite teams, players, and more!"
+    const socialDescription = description ?? "Horoscopes for the advanced Blaseball fan. Read simple or detailed Star Charts for your favorite Teams, Players, and more!"
     const socialImage = image ?? (absoluteUrl ?? "") + "/astrology_preview.png"
     const twitterHandle = publicRuntimeConfig.twitterHandle
     

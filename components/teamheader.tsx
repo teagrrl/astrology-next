@@ -15,13 +15,13 @@ export default function TeamHeader({ team }: TeamHeaderProps) {
                     <h1 className="text-3xl font-bold">{team.name}</h1>
                     <h3 className="text-xl italic before:content-[open-quote] after:content-[close-quote]">{team.slogan}</h3>
                 </div>
-                <div className="flex flex-grow justify-end">
+                {team.active && <div className="flex flex-grow justify-end">
                     <div className="grid grid-cols-2 gap-x-2">
                         <span className="font-semibold">Shorthand: </span><span>{team.shorthand}</span>
                         <span className="font-semibold">Division: </span><span>{team.division}</span>
                         <span className="font-semibold">Season Record: </span><span>{team.wins}-{team.losses}{team.wins + team.losses > 0 && `, ${convertToWinPercentage(team.wins, team.losses)} W%`}</span>
                     </div>
-                </div>
+                </div>}
             </div>
             {/*<div className="flex flex-row flex-wrap gap-3">
                 {team.standings.map((standings, index) => 

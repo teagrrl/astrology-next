@@ -112,7 +112,7 @@ export default function TeamPage({ teams, error, isShowColors, isItemApplied, is
                     {team.modifications.map((mod, index) =>
                         <Tooltip key={`modification_${index}`} content={mod.description}>
                             <div className="px-3 py-1 border-2 rounded-md font-bold cursor-default" style={{ borderColor: mod.color, backgroundColor: mod.backgroundColor, color: mod.textColor }}>
-                                {mod.name[0].toUpperCase() + mod.name.substring(1) /* why, Joel? */}
+                                {mod.name}
                             </div>
                         </Tooltip>
                     )}

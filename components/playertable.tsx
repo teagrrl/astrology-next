@@ -100,11 +100,12 @@ function AverageTableCell({ header, averages, category, column, isShowColors, is
         switch(column.id) {
             case "team":
                 return (
-                    <td colSpan={4} className="px-1.5 py-1 font-bold">{header} Average</td>
+                    <td colSpan={5} className="px-1.5 py-1 font-bold">{header} Average</td>
                 )
             case "name":
             case "location":
             case "position":
+            case "modifications":
                 return (
                     <></>
                 )
@@ -123,6 +124,39 @@ function AverageTableCell({ header, averages, category, column, isShowColors, is
 function PlayerTableCell({ player, category, column, isShowColors, isItemApplied, isShowSimplified, scaleColors }: PlayerTableCellProps) {
     if(column) {
         switch(column.id) {
+            case "team":
+                return (
+				    <td className="px-1.5 py-1">
+                        <Tooltip content={
+                            <span className="font-semibold">{player.team ? player.team.name : "Black Hole"}</span>
+                        }>
+                            <span className="flex justify-center">
+                                {player.team 
+                                    ? <Link href={{
+                                        pathname: "/team/[id]",
+                                        query: {
+                                            id: player.team.id
+                                        }
+                                    }}>
+                                        <a>
+                                            <Emoji 
+                                                emoji={player.team.emoji} 
+                                                emojiClass="w-4 h-4" 
+                                                className="h-7 w-7 flex justify-center items-center rounded-full"
+                                                style={{ backgroundColor: player.team.primaryColor }}
+                                            />
+                                        </a>
+                                    </Link>
+                                    : <Emoji 
+                                        emoji={"0x1F300"} 
+                                        emojiClass="w-4 h-4 saturate-0 brightness-200" 
+                                        className="h-7 w-7 flex justify-center items-center rounded-full bg-slate-700"
+                                    />
+                                }
+                            </span>
+                        </Tooltip>
+                    </td>
+                )
             case "name":
                 return (
                     <>
@@ -140,29 +174,9 @@ function PlayerTableCell({ player, category, column, isShowColors, isItemApplied
                         </td>
                     </>
                 )
-            case "team":
-                return (
-				    <td className="px-1.5 py-1">
-                        <Link href={{
-                            pathname: "/team/[id]",
-                            query: {
-                                id: player.team.id
-                            }
-                        }}>
-                            <a className="flex justify-center" title={player.team.name}>
-                                <Emoji 
-                                    emoji={player.team.emoji} 
-                                    emojiClass="w-4 h-4" 
-                                    className="h-7 w-7 flex justify-center items-center rounded-full"
-                                    style={{ backgroundColor: player.team.primaryColor }}
-                                />
-                            </a>
-                        </Link>
-                    </td>
-                )
             case "location":
                 return (
-                    <td className="px-1.5 py-1 text-center whitespace-nowrap">{player.rosterSlots.map((slot) => slot.location)}</td>
+                    <td className="px-1.5 py-1 text-center whitespace-nowrap">{player.rosterSlots.length ? player.rosterSlots.map((slot) => `${slot.active ? "" : "SHADOW "}${slot.location}`) : "SOMEWHERE"}</td>
                 )
             case "position":
                 // TODO: draw the triangles out correctly
@@ -195,7 +209,14 @@ function PlayerTableCell({ player, category, column, isShowColors, isItemApplied
             case "modifications":
                 return (
                     <td className="px-1.5 py-1 text-center">
-                        -
+                        {player.modifications.length > 0 
+                            ? player.modifications.map((mod, index) => <Tooltip key={`mod_${index}`} content={mod.description?.length ? mod.description : mod.name}>
+                                <div style={{ borderColor: mod.color, backgroundColor: mod.backgroundColor, color: mod.textColor }}>
+                                    {mod.name}
+                                </div>
+                            </Tooltip>)
+                            : "-"
+                        }
                     </td>
                 )
             case "items":

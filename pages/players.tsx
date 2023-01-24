@@ -1,8 +1,8 @@
-import type { ReactElement } from 'react'
+import React, { ReactElement } from 'react'
 import getConfig from 'next/config'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { PlayerComparator } from '@models/player2'
+import Player, { PlayerComparator } from '@models/player2'
 import { getReverseAttributes, playerColumns } from '@models/columns2'
 import { PageProps } from '@pages/_app'
 import AstrologyError from '@components/error'
@@ -17,9 +17,14 @@ const { publicRuntimeConfig } = getConfig()
 
 const reverseAttributes = getReverseAttributes(playerColumns)
 
+const showPlayerStates = ["ALL", "ACTIVE", "INACTIVE"] as const
+type ShowPlayersState = typeof showPlayerStates[number]
+
 export default function PlayersPage({ players, error, isShowColors, isShowSimplified, isItemApplied, scaleColors }: PageProps) {
     const router = useRouter()
-    const { page, sort, direction } = router.query
+    const { page, sort, direction, filter } = router.query
+    const queryFilter = filter ? filter.toString().toUpperCase() as ShowPlayersState : undefined
+    const playersFilter = queryFilter && showPlayerStates.includes(queryFilter) ? queryFilter : undefined
             
 	if(!players) {
 		return <AstrologyLoader />
@@ -29,15 +34,28 @@ export default function PlayersPage({ players, error, isShowColors, isShowSimpli
     }
 
     const currentPage = page ? parseInt(page.toString()) : 0
-    const currentSort = sort ? sort.toString() : "id"
+    const currentSort = sort ? sort.toString() : undefined
     const currentDirection = direction 
         ? (direction.toString() as "asc" | "desc") 
         : currentSort 
             ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
-            : "desc"
+            : "asc" // sort by id ascending
 
     const pageLimit = publicRuntimeConfig.pageLimit ?? 50
-    const sortedPlayers = currentSort ? Array.from(players).sort(PlayerComparator(currentSort, currentDirection, isItemApplied)) : players
+    let filteredPlayers: Player[]
+    switch(playersFilter) {
+        case "ALL":
+            filteredPlayers = Array.from(players)
+            break
+        case "INACTIVE":
+            filteredPlayers = players.filter((player) => !player.team || !player.rosterSlots.length)
+            break
+        case "ACTIVE":
+        default:
+            filteredPlayers = players.filter((player) => player.team && player.rosterSlots.length > 0)
+            break
+    }
+    const sortedPlayers = filteredPlayers.sort(PlayerComparator(currentSort, currentDirection, isItemApplied))
     const pagePlayers = sortedPlayers.slice(currentPage * pageLimit, Math.min((currentPage + 1) * pageLimit, sortedPlayers.length))
     const numPages = Math.ceil(sortedPlayers.length / pageLimit)
 
@@ -56,6 +74,9 @@ export default function PlayersPage({ players, error, isShowColors, isShowSimpli
             newDirection = reverseAttributes.includes(newSort) ? "asc" : "desc"
         }
         const routerQuery: Record<string, string | string[]> = {}
+        if(playersFilter) {
+            routerQuery["filter"] = playersFilter
+        }
         if(newDirection) {
             routerQuery["sort"] = newSort
             routerQuery["direction"] = newDirection
@@ -80,6 +101,7 @@ export default function PlayersPage({ players, error, isShowColors, isShowSimpli
                 href={{ 
                     pathname: "/players",
                     query: {
+                        filter: playersFilter,
                         sort: currentSort,
                         direction: currentSort ? currentDirection : undefined,
                     },
@@ -108,6 +130,7 @@ export default function PlayersPage({ players, error, isShowColors, isShowSimpli
                 href={{ 
                     pathname: "/players",
                     query: {
+                        filter: playersFilter,
                         sort: currentSort,
                         direction: currentSort ? currentDirection : undefined,
                     },
@@ -131,7 +154,7 @@ PlayersPage.getLayout = function getLayout(page: ReactElement, props?: PageProps
 	return (
 		<Layout 
             title="The Players - Astrology" 
-            description="Compare the star charts and hidden attributes of every player in Blaseball." 
+            description="Compare the Star Charts and hidden attributes of every Player in Blaseball." 
             hasFooter={true} 
             {...props}
         >

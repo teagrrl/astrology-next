@@ -6,6 +6,7 @@ import ExportCSV, { ExportCSVProps } from "@components/legacy/exportcsv"
 const { publicRuntimeConfig } = getConfig()
 
 type PaginationProps = {
+    children?: ReactNode,
     href: LinkHrefProps,
     currentPage: number,
     numPages: number, 
@@ -25,7 +26,7 @@ type PaginationLinkProps = {
     isNumberedPage?: boolean,
 }
 
-export default function Pagination({ href, currentPage, numPages, exportData }: PaginationProps) {
+export default function Pagination({ children, href, currentPage, numPages, exportData }: PaginationProps) {
     const paginationPreview = publicRuntimeConfig.paginationPreview ?? 3;
     let previewStart = Math.max(currentPage - paginationPreview, 0);
     let previewEnd = numPages ? Math.min(currentPage + paginationPreview + 1, numPages) : currentPage + paginationPreview;
@@ -38,6 +39,7 @@ export default function Pagination({ href, currentPage, numPages, exportData }: 
 
     return (
         <div className="flex flex-row justify-end p-2">
+            {children}
             {numPages > 1 && <ul className="flex grow justify-center">
                 {numPages > paginationPreview * 2 + 1 && previewStart !== 0 && 
                     <PaginationLink 

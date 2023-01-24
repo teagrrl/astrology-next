@@ -1,5 +1,5 @@
 type CategoryId = "general" | "batting" | "pitching" | "defense" | "running" | "vibes"
-type GeneralId = "name" | "team" | "location" | "position" | "modifications" | "items" | "overall" | "shorthand" | "division" | "wins" | "losses"
+type GeneralId = "date" | "name" | "team" | "location" | "position" | "modifications" | "items" | "overall" | "shorthand" | "division" | "wins" | "losses"
 type AttributeId = "sight" | "thwack" | "ferocity" | "control" | "stuff" | "guile" | "reach" | "magnet" | "reflex"
     | "hustle" | "stealth" | "dodge" | "thrive" | "survive" | "drama"
 type PlayerGroup = "LINEUP" | "ROTATION" | "ROSTER"
@@ -174,12 +174,12 @@ export const playerColumns: CategoryAttributes[] = [
                 name: "Position",
                 direction: "asc",
             },
-            /*{
+            {
                 id: "modifications",
                 name: "Modifications",
                 direction: "desc",
             },
-            {
+            /*{
                 id: "items",
                 name: "Items",
                 direction: "desc",

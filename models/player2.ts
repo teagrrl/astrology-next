@@ -7,7 +7,7 @@ const reverseAttributes = getReverseAttributes(playerColumns)
 export default class Player {
     public readonly id: string
     public readonly name: string
-    public readonly team: PlayerTeam
+    public readonly team: PlayerTeam | null
 
     public readonly modifications: Modification[] = []
     
@@ -22,7 +22,7 @@ export default class Player {
     constructor(data: BlaseballPlayer) {
         this.id = data.id
         this.name = data.name
-        this.team = new PlayerTeam(data.team)
+        this.team = data.team ? new PlayerTeam(data.team) : null
 
         this.modifications = data.modifications.map((mod) => new Modification(mod.modification))
         
@@ -169,20 +169,24 @@ function getComparatorValue(player: Player, attribute: string, isItemApplied?: b
     switch(attribute) {
         case "id":
             return player.id
+        case "team":
+            return player.team?.name ?? " Black Hole"
         case "name":
             return player.name
         case "location":
             return player.rosterSlots.map((slot) => slot.location).sort().join(",")
         case "position":
             return player.positions.map((position) => position.name).sort().join(",")
-        case "team":
-            return player.team.name
+        case "modifications":
+            return player.modifications.length
+        case "items":
+            return player.id
         default:
             return player.attributes[attribute]
     }
 }
 
-export const PlayerComparator = (column: string, direction?: "asc" | "desc", isItemApplied?: boolean) => {
+export const PlayerComparator = (column: string = "id", direction?: "asc" | "desc", isItemApplied?: boolean) => {
     return (player1: Player, player2: Player) => {
         let comparison = 0;
         let attribute1 = getComparatorValue(player1, column, isItemApplied)

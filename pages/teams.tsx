@@ -1,6 +1,6 @@
 import { ReactElement } from "react"
-import Link from "next/link"
 import { useRouter } from "next/router"
+import Link from "next/link"
 import { getReverseAttributes, teamColumns } from "@models/columns2"
 import { TeamComparator } from "@models/team2"
 import { PageProps } from "@pages/_app"
@@ -26,14 +26,14 @@ export default function TeamsPage({ teams, error, isShowColors, isItemApplied, i
         return <AstrologyError code={400} message={`Astrology encountered an error: ${error}`} />
     }
 
-    const currentSort = sort ? sort.toString() : "id"
+    const currentSort = sort ? sort.toString() : undefined
     const currentDirection = direction 
         ? (direction.toString() as "asc" | "desc") 
         : currentSort 
             ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
-            : "desc"
-
-    const sortedTeams = currentSort ? Array.from(teams).sort(TeamComparator(currentSort, currentDirection, isItemApplied)) : teams
+            : "asc"
+    
+    const sortedTeams = teams.filter((team) => team.active).sort(TeamComparator(currentSort, currentDirection, isItemApplied))
 
     const sortTeams = (newSort: string) => {
         let newDirection: "asc" | "desc" | null = null;
@@ -67,7 +67,7 @@ export default function TeamsPage({ teams, error, isShowColors, isItemApplied, i
                     <div className="text-3xl font-bold">
                         <span>The Teams</span>
                     </div>
-                    <div className="text-xl italic before:content-[open-quote] after:content-[close-quote]">Pick your favorite.</div>
+                    <div className="text-xl italic before:content-[open-quote] after:content-[close-quote]">Play Ball!</div>
                 </div>
             </div>
             <div className="flex flex-row justify-end p-2">
@@ -93,7 +93,12 @@ export default function TeamsPage({ teams, error, isShowColors, isItemApplied, i
 
 TeamsPage.getLayout = function getLayout(page: ReactElement, props?: PageProps) {
 	return (
-		<Layout hasFooter={true} {...props}>
+		<Layout 
+            title="The Teams - Astrology" 
+            description="Compare the Star Charts and hidden attributes of The Teams of Blaseball."
+            hasFooter={true} 
+            {...props}
+        >
 			{page}
 		</Layout>
 	)

@@ -59,11 +59,14 @@ export function exportPlayerData(players: Player[], isItemApplied?: boolean) {
             }
             category.columns.forEach((column) => {
                 switch(column.id) {
+                    case "date":
+                        csvRow.push("")
+                        break
                     case "team":
                         break
                     case "name":
                         csvRow.push(player.name)
-                        csvRow.push(player.team.id)
+                        csvRow.push(player.team?.id ?? "")
                         break
                     case "location":
                         csvRow.push(player.rosterSlots.map((slot) => slot.location).join(","))
@@ -73,6 +76,12 @@ export function exportPlayerData(players: Player[], isItemApplied?: boolean) {
                         csvRow.push(player.positions.map((position) => position.name).join(","))
                         csvRow.push(player.positions.map((position) => position.x).join(","))
                         csvRow.push(player.positions.map((position) => position.y).join(","))
+                        break
+                    case "modifications":
+                        csvRow.push(player.modifications.map((mod) => mod.name).join(","))
+                        break
+                    case "items":
+                        csvRow.push("")
                         break
                     default:
                         csvRow.push(player.attributes[column.id].toString())
@@ -116,7 +125,7 @@ export function exportTeamData(teams: Team[], isItemApplied?: boolean) {
                         csvRow.push(team.shorthand)
                         break
                     case "division":
-                        csvRow.push(team.division)
+                        csvRow.push(team.division ?? "")
                         break
                     case "wins":
                         csvRow.push(team.wins.toString())

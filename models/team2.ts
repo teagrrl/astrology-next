@@ -25,9 +25,14 @@ export default class Team {
     public readonly primaryColor: string
     public readonly secondaryColor: string
 
+    public readonly active: boolean
+    public readonly deceased: boolean
     public readonly modifications: Modification[] = []
+    public readonly activePlayers: number
+    public readonly inactivePlayers: number
+    public readonly totalPlayers: number
 
-    public readonly division: string
+    public readonly division: string | null
     public readonly standings: TeamStandings[]
     public readonly wins: number
     public readonly losses: number
@@ -50,9 +55,11 @@ export default class Team {
         this.primaryColor = data.primaryColor
         this.secondaryColor = data.secondaryColor
 
+        this.active = data.activeTeam
+        this.deceased = data.deceased
         this.modifications = data.modifications.map((mod) => new Modification(mod.modification))
 
-        this.division = data.division.name
+        this.division = data.division ? data.division.name : null
         this.standings = data.standings.map((standings) => new TeamStandings(standings))
         this.wins = this.standings.reduce((wins, standings) => wins + standings.wins, 0)
         this.losses = this.standings.reduce((losses, standings) => losses + standings.losses, 0)
@@ -60,33 +67,44 @@ export default class Team {
         const lineupIds: Record<number, string> = {}
         const rotationIds: Record<number, string> = {}
         const shadowsIds: Record<number, string> = {}
+        const otherIds: string[] = []
         for(const player of data.roster) {
-            for(const slot of player.rosterSlots) {
-                switch(slot.location) {
-                    case "LINEUP":
-                        lineupIds[slot.orderIndex] = player.id
-                        break
-                    case "ROTATION":
-                        rotationIds[slot.orderIndex] = player.id
-                        break
-                    case "SHADOWS":
-                        shadowsIds[slot.orderIndex] = player.id
-                        break
+            if(player.rosterSlots.length) {
+                for(const slot of player.rosterSlots) {
+                    switch(slot.location) {
+                        case "LINEUP":
+                            lineupIds[slot.orderIndex] = player.id
+                            break
+                        case "ROTATION":
+                            rotationIds[slot.orderIndex] = player.id
+                            break
+                        case "SHADOWS":
+                            shadowsIds[slot.orderIndex] = player.id
+                            break
+                    }
                 }
+            } else {
+                otherIds.push(player.id) // any ids here seem to be missing player data
             }
         }
 
+        const usedIds = [...Object.values(lineupIds), ...Object.values(rotationIds), ...Object.values(shadowsIds), otherIds]
         this.lineup = Object.values(lineupIds)
             .map((id) => players.find((player) => player.id === id))
             .filter((player): player is Player => player !== undefined)
         this.rotation = Object.values(rotationIds)
             .map((id) => players.find((player) => player.id === id))
             .filter((player): player is Player => player !== undefined)
-        this.shadows = Object.values(shadowsIds)
+        this.shadows = [...Object.values(shadowsIds), otherIds]
             .map((id) => players.find((player) => player.id === id))
             .filter((player): player is Player => player !== undefined)
+            .concat(players.filter((player) => !usedIds.includes(player.id) && player.team?.id === data.id))
         
-        if(this.lineup.length || this.rotation.length) {
+        this.activePlayers = this.lineup.length + this.rotation.length
+        this.inactivePlayers = this.shadows.length
+        this.totalPlayers = this.activePlayers + this.inactivePlayers
+        
+        if(this.activePlayers > 0) {
             for(const player of [...this.lineup, ...this.rotation]) {
                 for(const [name, value] of Object.entries(player.attributes)) {
                     this.averages[name] = this.averages[name] ?? 0
@@ -109,8 +127,8 @@ export default class Team {
         data.categoryRatings.forEach((category) => {
             this.stars[category.name] = category.stars / 5
         })
-        this.stars["vibes"] = this.averages["vibes"]
-        this.stars["overall"] = this.averages["overall"]
+        this.stars["vibes"] = this.averages["vibes"] ?? 0
+        this.stars["overall"] = this.averages["overall"] ?? 0
     }
 }
 class TeamStandings {
@@ -134,7 +152,7 @@ function getComparatorValue(team: Team, attribute: string, isItemApplied?: boole
         case "shorthand":
             return team.shorthand
         case "division":
-            return team.division
+            return team.division ?? ""
         case "wins":
             return team.wins
         case "losses":
@@ -144,7 +162,7 @@ function getComparatorValue(team: Team, attribute: string, isItemApplied?: boole
     }
 }
 
-export const TeamComparator = (column: string, direction?: "asc" | "desc", isItemApplied?: boolean) => {
+export const TeamComparator = (column: string = "id", direction?: "asc" | "desc", isItemApplied?: boolean) => {
     return (team1: Team, team2: Team) => {
         let comparison = 0;
         let attribute1 = getComparatorValue(team1, column, isItemApplied)
