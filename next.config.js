@@ -14,6 +14,11 @@ module.exports = {
 				permanent: true,
 			},
 			{
+				source: '/player',
+				destination: '/players',
+				permanent: true,
+			},
+			{
 				source: '/legacy/team',
 				destination: '/legacy/teams',
 				permanent: true,

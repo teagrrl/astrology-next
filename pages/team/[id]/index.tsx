@@ -12,6 +12,7 @@ import { getReverseAttributes, playerColumns } from '@models/columns2'
 import TeamHeader from '@components/teamheader'
 import ExportCSV, { exportPlayerData } from '@components/exportcsv'
 import Tooltip from '@components/tooltip'
+import Emoji from '@components/emoji'
 
 type TeamPageProps = PageProps & {}
 
@@ -104,19 +105,25 @@ export default function TeamPage({ teams, error, isShowColors, isItemApplied, is
         <section className="overflow-auto">
 			<Metadata
 				title={`${team.name} - Astrology`} 
-				description={`Read the star charts for the ${team.name}.`} 
+				description={`Read the Star Charts for the ${team.name}.`} 
 			/>
             <TeamHeader team={team} />
             <div className="flex flex-row p-2 gap-2">
                 <div className="flex flex-row flex-grow gap-2 items-center">
                     {team.modifications.map((mod, index) =>
-                        <Tooltip key={`modification_${index}`} content={mod.description}>
+                        <Tooltip key={`modification_${index}`} content={mod.description ? mod.description : mod.name}>
                             <div className="px-3 py-1 border-2 rounded-md font-bold cursor-default" style={{ borderColor: mod.color, backgroundColor: mod.backgroundColor, color: mod.textColor }}>
                                 {mod.name}
                             </div>
                         </Tooltip>
                     )}
                 </div>
+                <Link href={`/team/${team.id}/history`}>
+                    <a className="flex items-center px-3 py-1 rounded whitespace-nowrap bg-zinc-200 dark:bg-zinc-600 hover:bg-zinc-400 dark:hover:bg-zinc-500">
+                        <Emoji emoji="0x1F4CA" className="sm:hidden lg:inline lg:mr-1" emojiClass="w-4 h-4 align-[-0.1em]" />
+                        <span className="hidden sm:inline">View History</span>
+                    </a>
+                </Link>
                 <ExportCSV data={exportPlayerData(rosterData.map((data) => data.players).flat(), isItemApplied)} filename={team.id} />
             </div>
             {rosterData.map((data, index) =>

@@ -195,6 +195,51 @@ export const playerColumns: CategoryAttributes[] = [
     ...playerStatColumns,
 ]
 
+export const playerHistoryColumns: CategoryAttributes[] = [
+    {
+        id: "general",
+        name: "General",
+        isSimple: true,
+        columns: [
+            {
+                id: "date",
+                name: "Date",
+                direction: "asc",
+            },
+            {
+                id: "name",
+                name: "Name",
+            },
+            {
+                id: "team",
+                name: "Team",
+            },
+            {
+                id: "location",
+                name: "Location",
+            },
+            {
+                id: "position",
+                name: "Position",
+            },
+            {
+                id: "modifications",
+                name: "Modifications",
+            },
+            /*{
+                id: "items",
+                name: "Items",
+            },*/
+            {
+                id: "overall",
+                name: "Overall",
+                group: "ROSTER",
+            },
+        ]
+    },
+    ...playerStatColumns,
+]
+
 export const teamColumns: CategoryAttributes[] = [
     {
         id: "general",

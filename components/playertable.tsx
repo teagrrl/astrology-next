@@ -162,15 +162,14 @@ function PlayerTableCell({ player, category, column, isShowColors, isItemApplied
                     <>
                         <td className="px-1.5 py-1 whitespace-nowrap">
                             {/*player.data.deceased && <Emoji emoji="0x1F480" emojiClass="inline min-w-[1em] h-4 mr-1" />*/}
-                            {/*<Link href={{
+                            <Link href={{
                                 pathname: "/player/[id]",
                                 query: {
                                     id: player.id
                                 }
                             }}>
                                 <a className="font-bold">{player.name}</a>
-                            </Link>*/}
-                            <span className="font-bold">{player.name}</span>
+                            </Link>
                         </td>
                     </>
                 )

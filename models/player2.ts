@@ -4,6 +4,15 @@ import Modification from "@models/modification2"
 
 const reverseAttributes = getReverseAttributes(playerColumns)
 
+export const fieldPositions = ["4th Base", "Left Guard", "3rd Base", "Left Liner", "5th Base", "Left Cornerfielder", "Right Guard", "Center Infielder", "Shortstop", "Midstop", "Longstop", "Backstop", "1st Base", "Flanker", "2nd Base", "Left Midfielder", "Left Fielder", "Left Wallrunner", "Right Liner", "Midflanker", "Right Midfielder", "Midfielder", "Left Ranger", "Left Outerfielder", "0th Base", "Longflanker", "Right Fielder", "Right Ranger", "Center Fielder", "Left Highfielder", "Right Cornerfielder", "Backflanker", "Right Wallrunner", "Right Outerfielder", "Right Highfielder", "Mid Highfielder"]
+
+export interface PlayerSnapshot {
+    id: string,
+    date: Date,
+    changes: string[],
+    player: Player,
+}
+
 export default class Player {
     public readonly id: string
     public readonly name: string
@@ -87,82 +96,7 @@ class PlayerRosterSlot {
 
 function calculatePositionName(x: number, y: number) {
     const positionVal = x * 6 + y
-    switch(positionVal) {
-        case 0:
-            return "4th Base"
-        case 1:
-            return "Left Guard"
-        case 2:
-            return "3rd Base"
-        case 3:
-            return "Liner (Left)"
-        case 4:
-            return "5th Base"
-        case 5:
-            return "Corner Fielder (Left)"
-        case 6:
-            return "Right Guard"
-        case 7:
-            return "Center Infielder"
-        case 8:
-            return "Shortstop"
-        case 9:
-            return "Midstop"
-        case 10:
-            return "Longstop"
-        case 11:
-            return "Backstop"
-        case 12:
-            return "1st Base"
-        case 13:
-            return "Flanker"
-        case 14:
-            return "2nd Base"
-        case 15:
-            return "Left Mid Fielder"
-        case 16:
-            return "Left Fielder"
-        case 17:
-            return "Wall Runner (Left)"
-        case 18:
-            return "Liner (Right)"
-        case 19:
-            return "Mid Flanker"
-        case 20:
-            return "Right Mid Fielder"
-        case 21:
-            return "True Mid Fielder"
-        case 22:
-            return "Left Ranger"
-        case 23:
-            return "Outer Fielder (Left)"
-        case 24:
-            return "0th Base"
-        case 25:
-            return "Long Flanker"
-        case 26:
-            return "Right Fielder"
-        case 27:
-            return "Right Ranger"
-        case 28:
-            return "Center Fielder"
-        case 29: 
-            return "High Fielder (Left)"
-        case 30:
-            return "Corner Fielder (Right)"
-        case 31:
-            return "Back Flanker"
-        case 32:
-            return "Wall Runner (Right)"
-        case 33:
-            return "Outer Fielder (Right)"
-        case 34:
-            return "High Fielder (Right)"
-        case 35:
-            return "High Fielder (Mid)" 
-        default:
-            return "Somewhere"
-    }
+    return positionVal < fieldPositions.length ? fieldPositions[positionVal] : "Somewhere"
 }
 
 function getComparatorValue(player: Player, attribute: string, isItemApplied?: boolean) {

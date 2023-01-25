@@ -1,4 +1,4 @@
-import { BlaseballStandings, BlaseballTeam } from "@models/api2"
+import { BlaseballPlayer, BlaseballStandings, BlaseballTeam } from "@models/api2"
 import Player from "@models/player2"
 import { getReverseAttributes, playerStatColumns, teamColumns } from "@models/columns2"
 import Modification from "@models/modification2"
@@ -12,6 +12,16 @@ const rotationStats = ["overall", ...playerStatColumns
     .filter((category) => category.group ? ["ROTATION", "ROSTER"].includes(category.group) : false)
     .map((category) => [category.id, ...category.columns.map((column) => column.id)])
     .flat() as string[]]
+
+export interface TeamSnapshot {
+    id: string,
+    date: Date,
+    changes: string[],
+    team: Team,
+    lineup: BlaseballPlayer[],
+    rotation: BlaseballPlayer[],
+    shadows: BlaseballPlayer[],
+}
 
 export default class Team {
     public readonly id: string

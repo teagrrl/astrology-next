@@ -474,7 +474,23 @@ async function playersFetcher() {
 export interface Historical<T> {
     id: string,
     data: T,
+    roster?: BlaseballPlayer[],
     date: string,
+}
+
+export async function teamHistoryFetcher(id?: string): Promise<Historical<Team>[]> {
+    if(!id) {
+        return []
+    }
+    const data = await pagedFetcher<ChroniclerWrapper<BlaseballTeam>>("versions", "team", id)
+    return data.map((wrapper, index) => {
+        return {
+            id: `${wrapper.entity_id}_${index}`,
+            data: new Team(wrapper.data, []),
+            roster: wrapper.data.roster,
+            date: wrapper.valid_from,
+        }
+    })
 }
 
 export async function playerHistoryFetcher(id?: string): Promise<Historical<Player>[]> {

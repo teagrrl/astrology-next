@@ -84,3 +84,17 @@ a {
 	border-width: 8px 6px 8px 0px;
 	border-color: transparent var(--bg-tooltip) transparent transparent;
 }
+
+.multiSelectContainer li {
+	color: black;
+}
+
+.multiSelectContainer input:focus {
+	box-shadow: none;
+}
+
+.multiSelectContainer span.chip + input {
+	border-top: 1px solid #aaaaaa;
+	margin-top: 4px !important;
+	padding-top: 4px !important;
+}
