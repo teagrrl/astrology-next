@@ -14,6 +14,7 @@ import Tooltip from '@components/tooltip'
 import Player, { PlayerSnapshot } from '@models/player2'
 import PlayerHistoryTable from '@components/playerhistorytable'
 import ExportCSV, { exportPlayerHistoryData } from '@components/exportcsv'
+import ModificationList from '@components/modificationlist'
 
 type PlayerPageProps = PageProps & {
 	
@@ -135,16 +136,9 @@ export default function PlayerPage({ players, error, isShowColors, isShowSimplif
                     <span>&mdash;</span>
                     <span>{player.positions.length > 0 ? player.positions.map((position) => position.name).join(" / ") : "Somewhere"}</span>
                 </div>
-                <div className="flex flex-row gap-2">
-                    <div className="flex flex-row flex-grow gap-2 items-center">
-                        {player.modifications.map((mod, index) =>
-                            <Tooltip key={`modification_${index}`} content={mod.description ? mod.description : mod.name}>
-                                <div className="px-3 py-1 border-2 rounded-md font-bold cursor-default" style={{ borderColor: mod.color, backgroundColor: mod.backgroundColor, color: mod.textColor }}>
-                                    {mod.name}
-                                </div>
-                            </Tooltip>
-                        )}
-                    </div>
+                <div className="flex flex-row flex-wrap gap-2 items-center">
+                    <ModificationList modifications={player.modifications} hasBorder={true} />
+                    <div className="flex-grow">&nbsp;</div>
                     {snapshots.length > 0 && <ExportCSV data={exportPlayerHistoryData(snapshots, isItemApplied)} filename={player.id} />}
                 </div>
             </div>

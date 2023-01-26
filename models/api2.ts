@@ -445,7 +445,7 @@ export interface BlaseballPlayerPosition {
 export interface BlaseballRosterSlot {
     active: boolean,
     location: RosterLocation,
-    orderIndex: number,
+    orderIndex: number | null,
 }
 
 export async function leagueFetcher() {

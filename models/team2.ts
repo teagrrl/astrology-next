@@ -21,6 +21,7 @@ export interface TeamSnapshot {
     lineup: BlaseballPlayer[],
     rotation: BlaseballPlayer[],
     shadows: BlaseballPlayer[],
+    somewhere: BlaseballPlayer[],
 }
 
 export default class Team {
@@ -50,6 +51,7 @@ export default class Team {
     public readonly lineup: Player[] = []
     public readonly rotation: Player[] = []
     public readonly shadows: Player[] = []
+    public readonly somewhere: Player[] = []
     public readonly averages: Record<string, number> = {}
     public readonly stars: Record<string, number> = {}
 
@@ -78,40 +80,43 @@ export default class Team {
         const rotationIds: Record<number, string> = {}
         const shadowsIds: Record<number, string> = {}
         const otherIds: string[] = []
-        for(const player of data.roster) {
+        data.roster.forEach((player, index) => {
             if(player.rosterSlots.length) {
                 for(const slot of player.rosterSlots) {
                     switch(slot.location) {
                         case "LINEUP":
-                            lineupIds[slot.orderIndex] = player.id
+                            lineupIds[slot.orderIndex ?? index] = player.id
                             break
                         case "ROTATION":
-                            rotationIds[slot.orderIndex] = player.id
+                            rotationIds[slot.orderIndex ?? index] = player.id
                             break
                         case "SHADOWS":
-                            shadowsIds[slot.orderIndex] = player.id
+                            shadowsIds[slot.orderIndex ?? index] = player.id
                             break
                     }
                 }
             } else {
                 otherIds.push(player.id) // any ids here seem to be missing player data
             }
-        }
+        })
 
-        const usedIds = [...Object.values(lineupIds), ...Object.values(rotationIds), ...Object.values(shadowsIds), otherIds]
+        const usedIds = [...Object.values(lineupIds), ...Object.values(rotationIds), ...Object.values(shadowsIds), ...otherIds]
         this.lineup = Object.values(lineupIds)
             .map((id) => players.find((player) => player.id === id))
             .filter((player): player is Player => player !== undefined)
         this.rotation = Object.values(rotationIds)
             .map((id) => players.find((player) => player.id === id))
             .filter((player): player is Player => player !== undefined)
-        this.shadows = [...Object.values(shadowsIds), otherIds]
+        this.shadows = Object.values(shadowsIds)
+            .map((id) => players.find((player) => player.id === id))
+            .filter((player): player is Player => player !== undefined)
+        this.somewhere = otherIds
             .map((id) => players.find((player) => player.id === id))
             .filter((player): player is Player => player !== undefined)
             .concat(players.filter((player) => !usedIds.includes(player.id) && player.team?.id === data.id))
         
         this.activePlayers = this.lineup.length + this.rotation.length
-        this.inactivePlayers = this.shadows.length
+        this.inactivePlayers = this.shadows.length + this.somewhere.length
         this.totalPlayers = this.activePlayers + this.inactivePlayers
         
         if(this.activePlayers > 0) {

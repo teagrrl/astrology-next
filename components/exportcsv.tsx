@@ -75,7 +75,7 @@ export function exportPlayerHistoryData(snapshots: PlayerSnapshot[], isItemAppli
                         break
                     case "location":
                         csvRow.push(snapshot.player.rosterSlots.map((slot) => slot.location).join(","))
-                        csvRow.push(snapshot.player.rosterSlots.map((slot) => slot.order).join(","))
+                        csvRow.push(snapshot.player.rosterSlots.map((slot) => slot.order > -1 ? slot.order : "N/A").join(","))
                         break
                     case "position":
                         csvRow.push(snapshot.player.positions.map((position) => position.name).join(","))
@@ -142,7 +142,7 @@ export function exportPlayerData(players: Player[], isItemApplied?: boolean) {
                         break
                     case "location":
                         csvRow.push(player.rosterSlots.map((slot) => slot.location).join(","))
-                        csvRow.push(player.rosterSlots.map((slot) => slot.order).join(","))
+                        csvRow.push(player.rosterSlots.map((slot) => slot.order > -1 ? slot.order : "N/A").join(","))
                         break
                     case "position":
                         csvRow.push(player.positions.map((position) => position.name).join(","))

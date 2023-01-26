@@ -8,6 +8,7 @@ import StatTableHeader, { StatTableHeaderProps } from "@components/stattablehead
 import Tooltip from "@components/tooltip"
 import TableStatCell from "@components/tablestatcell"
 import ExportCSV, { ExportCSVProps } from "@components/exportcsv"
+import ModificationList from "@components/modificationlist"
 
 type PlayerTableProps = PlayerTableBodyProps & StatTableHeaderProps & {
     exportData?: ExportCSVProps,
@@ -175,7 +176,7 @@ function PlayerTableCell({ player, category, column, isShowColors, isItemApplied
                 )
             case "location":
                 return (
-                    <td className="px-1.5 py-1 text-center whitespace-nowrap">{player.rosterSlots.length ? player.rosterSlots.map((slot) => `${slot.active ? "" : "SHADOW "}${slot.location}`) : "SOMEWHERE"}</td>
+                    <td className="px-1.5 py-1 text-center whitespace-nowrap">{player.rosterSlots.length ? player.rosterSlots.map((slot) => slot.name) : "SOMEWHERE"}</td>
                 )
             case "position":
                 // TODO: draw the triangles out correctly
@@ -209,11 +210,7 @@ function PlayerTableCell({ player, category, column, isShowColors, isItemApplied
                 return (
                     <td className="px-1.5 py-1 text-center">
                         {player.modifications.length > 0 
-                            ? player.modifications.map((mod, index) => <Tooltip key={`mod_${index}`} content={mod.description?.length ? mod.description : mod.name}>
-                                <div style={{ borderColor: mod.color, backgroundColor: mod.backgroundColor, color: mod.textColor }}>
-                                    {mod.name}
-                                </div>
-                            </Tooltip>)
+                            ? <ModificationList modifications={player.modifications} />
                             : "-"
                         }
                     </td>

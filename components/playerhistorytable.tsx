@@ -7,6 +7,8 @@ import Emoji from "@components/emoji"
 import Tooltip from "@components/tooltip"
 import TableStatCell from "@components/tablestatcell"
 import TableHeader from "@components/tableheader"
+import ModificationList from "@components/modificationlist"
+import moment from "moment"
 
 type PlayerHistoryTableProps = PlayerHistoryTableBodyProps & {
     sort?: "asc" | "desc",
@@ -95,7 +97,7 @@ function PlayerHistoryTableCell({ snapshot, category, column, isShowColors, isIt
                 return (
                     <td className="px-1.5 py-1 whitespace-nowrap">
                         <Tooltip content={<><span className="font-semibold">Changes:</span> {snapshot.changes.join(", ")}</>}>
-                            <span>{snapshot.date.toLocaleDateString()} {snapshot.date.toLocaleTimeString()}</span>
+                            <span>{moment(snapshot.date).format("LLL")}</span>
                         </Tooltip>
                     </td>
                 )
@@ -138,7 +140,7 @@ function PlayerHistoryTableCell({ snapshot, category, column, isShowColors, isIt
                 )
             case "location":
                 return (
-                    <td className="px-1.5 py-1 text-center whitespace-nowrap">{snapshot.player.rosterSlots.length ? snapshot.player.rosterSlots.map((slot) => `${slot.active ? "" : "INACTIVE "}${slot.location} (${slot.order + 1})`) : "SOMEWHERE"}</td>
+                    <td className="px-1.5 py-1 text-center whitespace-nowrap">{snapshot.player.rosterSlots.length ? snapshot.player.rosterSlots.map((slot) => slot.name) : "SOMEWHERE"}</td>
                 )
             case "position":
                 // TODO: draw the triangles out correctly
@@ -172,11 +174,7 @@ function PlayerHistoryTableCell({ snapshot, category, column, isShowColors, isIt
                 return (
                     <td className="px-1.5 py-1 text-center">
                         {snapshot.player.modifications.length > 0 
-                            ? snapshot.player.modifications.map((mod, index) => <Tooltip key={`mod_${index}`} content={mod.description?.length ? mod.description : mod.name}>
-                                <div style={{ borderColor: mod.color, backgroundColor: mod.backgroundColor, color: mod.textColor }}>
-                                    {mod.name}
-                                </div>
-                            </Tooltip>)
+                            ? <ModificationList modifications={snapshot.player.modifications} />
                             : "-"
                         }
                     </td>

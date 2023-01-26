@@ -1,18 +1,18 @@
-import { ReactElement } from 'react'
+import { ReactElement, useState } from 'react'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { PageProps } from '@pages/_app'
+import { getReverseAttributes, playerColumns } from '@models/columns2'
+import Player, { PlayerComparator } from '@models/player2'
 import Layout from '@components/layout'
 import AstrologyLoader from '@components/loader'
 import AstrologyError from '@components/error'
 import Metadata from '@components/metadata'
-import Link from 'next/link'
 import PlayerTable from '@components/playertable'
-import Player, { PlayerComparator } from '@models/player2'
-import { getReverseAttributes, playerColumns } from '@models/columns2'
 import TeamHeader from '@components/teamheader'
 import ExportCSV, { exportPlayerData } from '@components/exportcsv'
-import Tooltip from '@components/tooltip'
 import Emoji from '@components/emoji'
+import ModificationList from '@components/modificationlist'
 
 type TeamPageProps = PageProps & {}
 
@@ -21,6 +21,7 @@ const reverseAttributes = getReverseAttributes(playerColumns)
 export default function TeamPage({ teams, error, isShowColors, isItemApplied, isShowSimplified, scaleColors }: TeamPageProps) {
     const router = useRouter()
     const { id, sort, direction } = router.query
+    const [combineRosters, setCombineRosters] = useState<boolean>(false)
 
 	if(!teams) {
 		return <AstrologyLoader />
@@ -40,7 +41,7 @@ export default function TeamPage({ teams, error, isShowColors, isItemApplied, is
             ? (reverseAttributes.includes(currentSort) ? "asc" : "desc") 
             : "desc"
 
-    if(!team.lineup.length && !team.rotation.length && !team.shadows.length) {
+    if(!team.totalPlayers) {
         return (
             <section>
 				<TeamHeader team={team} />
@@ -67,6 +68,23 @@ export default function TeamPage({ teams, error, isShowColors, isItemApplied, is
             header: "Shadows",
             players: comparator ? Array.from(team.shadows).sort(comparator) : team.shadows,
             averages: getRosterAverages(team.shadows),
+        },
+        {
+            header: "Somewhere",
+            players: comparator ? Array.from(team.somewhere).sort(comparator) : team.somewhere,
+            averages: getRosterAverages(team.somewhere),
+        },
+    ]
+    const combinedRosterData = [
+        {
+            header: "Active Roster",
+            players: comparator ? [...team.lineup, ...team.rotation].sort(comparator) : [...team.lineup, ...team.rotation],
+            averages: getRosterAverages([...team.lineup, ...team.rotation]),
+        },
+        {
+            header: "Inactive Roster",
+            players: comparator ? [...team.shadows, ...team.somewhere].sort(comparator) : [...team.shadows, ...team.somewhere],
+            averages: getRosterAverages([...team.shadows, ...team.somewhere]),
         },
     ]
 
@@ -108,16 +126,10 @@ export default function TeamPage({ teams, error, isShowColors, isItemApplied, is
 				description={`Read the Star Charts for the ${team.name}.`} 
 			/>
             <TeamHeader team={team} />
-            <div className="flex flex-row p-2 gap-2">
-                <div className="flex flex-row flex-grow gap-2 items-center">
-                    {team.modifications.map((mod, index) =>
-                        <Tooltip key={`modification_${index}`} content={mod.description ? mod.description : mod.name}>
-                            <div className="px-3 py-1 border-2 rounded-md font-bold cursor-default" style={{ borderColor: mod.color, backgroundColor: mod.backgroundColor, color: mod.textColor }}>
-                                {mod.name}
-                            </div>
-                        </Tooltip>
-                    )}
-                </div>
+            <div className="flex flex-row flex-wrap p-2 gap-2 items-center">
+                <ModificationList modifications={team.modifications} hasBorder={true} />
+                <div className="flex-grow">&nbsp;</div>
+                <button className="hidden lg:flex items-center px-3 py-1 rounded whitespace-nowrap bg-zinc-200 dark:bg-zinc-600 hover:bg-zinc-400 dark:hover:bg-zinc-500" onClick={() => setCombineRosters(!combineRosters)}>{combineRosters ? "Uncombine Roster" : "Combine Roster"}</button>
                 <Link href={`/team/${team.id}/history`}>
                     <a className="flex items-center px-3 py-1 rounded whitespace-nowrap bg-zinc-200 dark:bg-zinc-600 hover:bg-zinc-400 dark:hover:bg-zinc-500">
                         <Emoji emoji="0x1F4CA" className="sm:hidden lg:inline lg:mr-1" emojiClass="w-4 h-4 align-[-0.1em]" />
@@ -126,7 +138,7 @@ export default function TeamPage({ teams, error, isShowColors, isItemApplied, is
                 </Link>
                 <ExportCSV data={exportPlayerData(rosterData.map((data) => data.players).flat(), isItemApplied)} filename={team.id} />
             </div>
-            {rosterData.map((data, index) =>
+            {(combineRosters ? combinedRosterData : rosterData).map((data, index) =>
                 <PlayerTable 
                     key={`table_${index}`} 
                     header={data.header}

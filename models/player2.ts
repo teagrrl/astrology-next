@@ -84,19 +84,42 @@ class PlayerPosition {
 
 class PlayerRosterSlot {
     public readonly active: boolean
-    public readonly order: number
     public readonly location: "LINEUP" | "ROTATION" | "SHADOWS"
+    public readonly order: number
+    public readonly name: string
 
     constructor(data: BlaseballRosterSlot) {
         this.active = data.active
-        this.order = data.orderIndex
         this.location = data.location
+        this.order = data.orderIndex ?? -1
+        this.name = getRosterSlotName(this.active, this.location, this.order)
     }
 }
 
 function calculatePositionName(x: number, y: number) {
     const positionVal = x * 6 + y
     return positionVal < fieldPositions.length ? fieldPositions[positionVal] : "Somewhere"
+}
+
+function getRosterSlotName(active: boolean, location: "LINEUP" | "ROTATION" | "SHADOWS", order: number) {
+    let name: string = location
+    if(!active) name = "INACTIVE " + name
+    switch(location) {
+        case "LINEUP":
+            name += " ("
+            if(order === 0) {
+                name += "LEADOFF"
+            } else if (order > 0) {
+                name += (order + 1) + "-HOLE"
+            } else {
+                name += "UNKNOWN"
+            }
+            name += ")"
+            break
+        case "ROTATION":
+            name += " (" + (order + 1) + ")"
+    }
+    return name
 }
 
 function getComparatorValue(player: Player, attribute: string, isItemApplied?: boolean) {
@@ -108,7 +131,7 @@ function getComparatorValue(player: Player, attribute: string, isItemApplied?: b
         case "name":
             return player.name
         case "location":
-            return player.rosterSlots.map((slot) => slot.location).sort().join(",")
+            return player.rosterSlots.map((slot) => slot.location + (slot.order.toString().length < 2 ? "0" : "") + slot.order).sort().join(",")
         case "position":
             return player.positions.map((position) => position.name).sort().join(",")
         case "modifications":
