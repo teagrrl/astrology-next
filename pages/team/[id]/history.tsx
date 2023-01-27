@@ -153,7 +153,7 @@ export default function TeamHistoryPage({ teams, error }: TeamHistoryPageProps) 
                 {historyResponse.data && historyResponse.data.length
                     ? <div className="flex flex-row flex-nowrap gap-4 pb-2">
                         {snapshots.map((snapshot) => 
-                            <div key={snapshot.id} className="flex flex-col border-2 h-fit min-w-[400px]">
+                            <div key={snapshot.id} className="flex flex-col border-2 h-fit min-w-[500px]">
                                 <div className="p-2 border-b-2 whitespace-nowrap">
                                     <span className="font-semibold">Observed: </span>{moment(snapshot.date).format("LLLL")}
                                 </div>

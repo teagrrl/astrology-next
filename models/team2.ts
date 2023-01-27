@@ -83,15 +83,19 @@ export default class Team {
         data.roster.forEach((player, index) => {
             if(player.rosterSlots.length) {
                 for(const slot of player.rosterSlots) {
+                    let slotIndex = slot.orderIndex ?? index
                     switch(slot.location) {
                         case "LINEUP":
-                            lineupIds[slot.orderIndex ?? index] = player.id
+                            while(lineupIds[slotIndex]) slotIndex++
+                            lineupIds[slotIndex] = player.id
                             break
                         case "ROTATION":
-                            rotationIds[slot.orderIndex ?? index] = player.id
+                            while(rotationIds[slotIndex]) slotIndex++
+                            rotationIds[slotIndex] = player.id
                             break
                         case "SHADOWS":
-                            shadowsIds[slot.orderIndex ?? index] = player.id
+                            while(shadowsIds[slotIndex]) slotIndex++
+                            shadowsIds[slotIndex] = player.id
                             break
                     }
                 }
