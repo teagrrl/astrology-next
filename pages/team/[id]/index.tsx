@@ -13,6 +13,7 @@ import TeamHeader from '@components/teamheader'
 import ExportCSV, { exportPlayerData } from '@components/exportcsv'
 import Emoji from '@components/emoji'
 import ModificationList from '@components/modificationlist'
+import FieldPositions from '@components/fieldpositions'
 
 type TeamPageProps = PageProps & {}
 
@@ -153,6 +154,10 @@ export default function TeamPage({ teams, error, isShowColors, isItemApplied, is
                     scaleColors={scaleColors}
                 />
             )}
+            <div className="flex flex-col gap-2 items-center">
+                <h1 className="text-2xl font-bold">On the Field</h1>
+                <FieldPositions players={team.lineup} />
+            </div>
             <div className="px-2 py-1 mt-4">
                 <span>Don&apos;t see what you&apos;re looking for? </span> 
                 <Link href={`/legacy/team/${team.id}`}>Maybe try the legacy version.</Link>

@@ -8,7 +8,8 @@ import { PlayerCard } from '@components/legacy/playercard'
 import Tooltip from '@components/tooltip'
 import { playerStatColumns } from '@models/columns'
 import PlayerStats, { reverseAttributes } from '@models/playerstats'
-import { PageProps, removeDiacritics } from '@pages/_app'
+import { PageProps } from '@pages/_app'
+import { removeDiacritics } from '@models/helpers'
 
 type PlayerPageProps = PageProps & {
 	

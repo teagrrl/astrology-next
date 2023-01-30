@@ -12,7 +12,8 @@ import TeamHeader from '@components/legacy/teamheader'
 import Player, { PlayerComparator } from '@models/player'
 import { reverseAttributes } from '@models/playerstats'
 import Team, { AllPlayers, groupTeams } from '@models/team'
-import { PageProps, removeDiacritics } from '@pages/_app'
+import { PageProps } from '@pages/_app'
+import { removeDiacritics } from '@models/helpers'
 
 const { publicRuntimeConfig } = getConfig()
 

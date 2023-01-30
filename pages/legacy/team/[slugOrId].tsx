@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 import Layout from '@components/legacy/layout'
 import PlayerTable from '@components/legacy/playertable'
-import { PageProps, removeDiacritics } from '@pages/_app'
+import { PageProps } from '@pages/_app'
 import TeamHeader from '@components/legacy/teamheader'
 import { reverseAttributes } from '@models/playerstats'
 import { PlayerComparator } from '@models/player'
@@ -10,6 +10,7 @@ import AstrologyLoader from '@components/loader'
 import AstrologyError from '@components/error'
 import Metadata from '@components/metadata'
 import { exportPlayerData } from '@components/legacy/exportcsv'
+import { removeDiacritics } from '@models/helpers'
 
 type TeamPageProps = PageProps & {
 	

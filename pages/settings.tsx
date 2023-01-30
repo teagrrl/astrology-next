@@ -1,6 +1,7 @@
 import React, { ChangeEvent, ReactElement, useEffect, useState } from 'react'
+import { defaultScaleColors, hexToRGBA, scaleColorNames } from '@models/helpers'
 import Layout from '@components/layout'
-import { defaultScaleColors, hexToRGBA, PageProps, scaleColorNames } from '@pages/_app'
+import { PageProps } from '@pages/_app'
 
 export default function SettingsPage({ scaleColors, changeColors }: PageProps) {
     const savedColors = scaleColorNames.map((name, index) => {

@@ -1,6 +1,6 @@
 import React from "react"
 import Tooltip from "@components/tooltip"
-import { defaultScaleColors, hexToRGBA, range } from "@pages/_app"
+import { defaultScaleColors, hexToRGBA, range } from "@models/helpers"
 
 type TableStatCellProps = {
     header?: string,

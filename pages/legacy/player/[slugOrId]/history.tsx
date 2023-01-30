@@ -9,7 +9,8 @@ import AstrologyLoader from '@components/loader'
 import Metadata from '@components/metadata'
 import PlayerHistoryTable from '@components/legacy/playerhistorytable'
 import { useChroniclerToFetchPlayerHistory } from '@models/api'
-import { PageProps, removeDiacritics } from '@pages/_app'
+import { PageProps } from '@pages/_app'
+import { removeDiacritics } from '@models/helpers'
 
 type PlayerHistoryPageProps = PageProps & {
 	

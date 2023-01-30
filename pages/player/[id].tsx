@@ -11,10 +11,11 @@ import useSWR from 'swr'
 import { Historical, playerHistoryFetcher } from '@models/api2'
 import moment from 'moment'
 import Tooltip from '@components/tooltip'
-import Player, { PlayerSnapshot } from '@models/player2'
+import Player, { fieldPositions, PlayerSnapshot } from '@models/player2'
 import PlayerHistoryTable from '@components/playerhistorytable'
 import ExportCSV, { exportPlayerHistoryData } from '@components/exportcsv'
 import ModificationList from '@components/modificationlist'
+import HeatMap from '@components/heatmap'
 
 type PlayerPageProps = PageProps & {
 	
@@ -68,6 +69,9 @@ export default function PlayerPage({ players, error, isShowColors, isShowSimplif
                     !== lastPlayer.modifications.map((modification) =>modification.name).sort().join(",")) {
                 snapshot.changes.push("modifications")
             }
+            if(currentPlayer.heatMaps.slice(0, 36).join(",") !== lastPlayer.heatMaps.slice(0, 36).join(",")) {
+                snapshot.changes.push("zone")
+            }
             const attributesToCheck = Array.from(new Set([...Object.keys(currentPlayer.attributes), ...Object.keys(lastPlayer.attributes)]))
             attributesToCheck.forEach((attribute) => {
                 if(currentPlayer.attributes[attribute] !== lastPlayer.attributes[attribute]) {
@@ -119,22 +123,27 @@ export default function PlayerPage({ players, error, isShowColors, isShowSimplif
                 description={`Check out the historical star charts for ${player.name}.`} 
             />
             <div className="flex flex-col gap-2 p-5">
-                <h1 className="text-3xl font-bold">{player.name}</h1>
-                <div className="flex flex-row items-center gap-2">
-                    {player.team 
-                        ? <Link href={{ pathname: "/team/[id]", query: { id: player.team.id }}}><a><Emoji className="h-7 w-7 flex justify-center items-center rounded-full" style={{ backgroundColor: player.team.primaryColor }} emoji={player.team.emoji} emojiClass="h-4 w-4" /></a></Link>
-                        : <Emoji 
-                            emoji={"0x1F300"} 
-                            emojiClass="w-4 h-4 saturate-0 brightness-200" 
-                            className="h-7 w-7 flex justify-center items-center rounded-full bg-slate-700"
-                        />
-                    }
-                    <span className="text-xl font-semibold">{player.team ? player.team.name : "Black Hole"}</span>
-                </div>
                 <div className="flex flex-row gap-2">
-                    <span>{player.rosterSlots.length > 0? player.rosterSlots.map((slot) => (slot.active ? "" : "SHADOW ") + slot.location).join(" / ") : "SOMEWHERE"}</span>
-                    <span>&mdash;</span>
-                    <span>{player.positions.length > 0 ? player.positions.map((position) => position.name).join(" / ") : "Somewhere"}</span>
+                    <div className="flex flex-col flex-grow gap-2">
+                        <h1 className="text-3xl font-bold">{player.name}</h1>
+                        <div className="flex flex-row items-center gap-2">
+                            {player.team 
+                                ? <Link href={{ pathname: "/team/[id]", query: { id: player.team.id }}}><a><Emoji className="h-7 w-7 flex justify-center items-center rounded-full" style={{ backgroundColor: player.team.primaryColor }} emoji={player.team.emoji} emojiClass="h-4 w-4" /></a></Link>
+                                : <Emoji 
+                                    emoji={"0x1F300"} 
+                                    emojiClass="w-4 h-4 saturate-0 brightness-200" 
+                                    className="h-7 w-7 flex justify-center items-center rounded-full bg-slate-700"
+                                />
+                            }
+                            <span className="text-xl font-semibold">{player.team ? player.team.name : "Black Hole"}</span>
+                        </div>
+                        <div className="flex flex-row gap-2">
+                            <span>{player.rosterSlots.length > 0? player.rosterSlots.map((slot) => (slot.active ? "" : "SHADOW ") + slot.location).join(" / ") : "SOMEWHERE"}</span>
+                            <span>&mdash;</span>
+                            <span>{player.positions.length > 0 ? player.positions.map((position) => position.name).join(" / ") : "Somewhere"}</span>
+                        </div>
+                    </div>
+                    <HeatMap header="Heat Map" values={player.heatMaps} />
                 </div>
                 <div className="flex flex-row flex-wrap gap-2 items-center">
                     <ModificationList modifications={player.modifications} hasBorder={true} />

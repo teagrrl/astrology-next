@@ -9,6 +9,7 @@ import TableStatCell from "@components/tablestatcell"
 import TableHeader from "@components/tableheader"
 import ModificationList from "@components/modificationlist"
 import moment from "moment"
+import HeatMap from "./heatmap"
 
 type PlayerHistoryTableProps = PlayerHistoryTableBodyProps & {
     sort?: "asc" | "desc",
@@ -140,7 +141,11 @@ function PlayerHistoryTableCell({ snapshot, category, column, isShowColors, isIt
                 )
             case "location":
                 return (
-                    <td className="px-1.5 py-1 text-center whitespace-nowrap">{snapshot.player.rosterSlots.length ? snapshot.player.rosterSlots.map((slot) => slot.name) : "SOMEWHERE"}</td>
+                    <td className="px-1.5 py-1 text-center whitespace-nowrap">
+                        <Tooltip content={<div><HeatMap header="Heat Map" values={snapshot.player.heatMaps} /></div>}>
+                            <span>{snapshot.player.rosterSlots.length ? snapshot.player.rosterSlots.map((slot) => slot.name) : "SOMEWHERE"}</span>
+                        </Tooltip>
+                    </td>
                 )
             case "position":
                 // TODO: draw the triangles out correctly

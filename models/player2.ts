@@ -18,15 +18,14 @@ export default class Player {
     public readonly name: string
     public readonly team: PlayerTeam | null
 
+    public readonly heatMaps: number[] = []
     public readonly modifications: Modification[] = []
+    //public readonly items: Item[] = []
     
     public readonly attributes: Record<string, number> = {}
     public readonly stars: Record<string, number> = {}
     public readonly positions: PlayerPosition[] = []
     public readonly rosterSlots: PlayerRosterSlot[] = []
-
-    //public readonly modifications: Modification[] = []
-    //public readonly items: Item[] = []
 
     constructor(data: BlaseballPlayer) {
         this.id = data.id
@@ -34,6 +33,7 @@ export default class Player {
         this.team = data.team ? new PlayerTeam(data.team) : null
 
         this.modifications = data.modifications.map((mod) => new Modification(mod.modification))
+        this.heatMaps = data.playerHeatMaps.map((map) => map.currentValue)
         
         this.stars["overall"] = data.overallRating / 5
         data.categoryRatings.forEach((category) => {

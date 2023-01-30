@@ -1,8 +1,9 @@
 import { ReactNode, useState } from "react";
-import { defaultScaleColors, hexToRGBA, PageProps, range, scaleColorNames } from "@pages/_app";
+import { PageProps } from "@pages/_app";
 import Emoji from "@components/emoji";
 import Tooltip from "@components/tooltip";
 import Link from "next/link";
+import { defaultScaleColors, hexToRGBA, scaleColorNames } from "@models/helpers";
 
 type FooterProps = PageProps & {
     isSimpleFooter?: boolean,

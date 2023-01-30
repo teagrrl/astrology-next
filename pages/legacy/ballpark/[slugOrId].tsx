@@ -6,7 +6,8 @@ import AstrologyLoader from '@components/loader'
 import Metadata from '@components/metadata'
 import { BallparkCard } from '@components/legacy/ballparkcard'
 import { useChroniclerToFetchBallparks } from '@models/api'
-import { PageProps, removeDiacritics } from '@pages/_app'
+import { PageProps } from '@pages/_app'
+import { removeDiacritics } from '@models/helpers'
 
 type BallparkPageProps = PageProps & {
 	
