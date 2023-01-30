@@ -17,10 +17,10 @@ export default function FieldPositions({ players }: FieldPositions) {
     })
     return (
         <div className="flex flex-col">
-            <div className="w-[450px] h-[450px] flex items-center justify-center">
+            <div className="w-[340px] h-[340px] md:w-[450px] md:h-[450px] flex items-center justify-center">
                 <div className="grid grid-cols-6 rotate-[225deg] border-t-2 border-l-2 text-xs border-zinc-300">
                     {fieldPositions.map((position, index) =>
-                        <div key={`position_${index}`} className={`flex w-[50px] h-[50px] items-center justify-center text-center border-b-2 border-r-2 border-zinc-300 $`}>
+                        <div key={`position_${index}`} className={`flex w-[40px] h-[40px] md:w-[50px] md:h-[50px] items-center justify-center text-center border-b-2 border-r-2 border-zinc-300 $`}>
                             <Tooltip content={
                                 <div className="flex flex-col items-center">
                                     <span className="font-semibold">{position}</span>

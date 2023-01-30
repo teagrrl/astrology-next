@@ -29,9 +29,13 @@ export default function HeatMap({ header, values }: HeatMapProps) {
 }
 
 function getHeatMapColor(value: number) {
-    if(value < 0) value = 0
-    if(value > 1) value = 1
-    const low = [243, 64, 26]
-    const high = [213, 220, 243]
-    return [(high[0] - low[0]) * value + low[0], (high[1] - low[1]) * value + low[1], (high[2] - low[2]) * value + low[2]]
+    const low = [255, 64, 52]
+    const high = [195, 245, 255]
+    return [colorAverage(low[0], high[0], value), colorAverage(low[1], high[1], value), colorAverage(low[2], high[2], value)]
+}
+
+function colorAverage(color1: number, color2: number, scale: number) {
+    if(scale < 0) scale = 0
+    if(scale > 1) scale = 1
+    return Math.sqrt(Math.pow(color1, 2) * scale + Math.pow(color2, 2) * (1 - scale))
 }
