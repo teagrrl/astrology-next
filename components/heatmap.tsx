@@ -37,5 +37,5 @@ function getHeatMapColor(value: number) {
 function colorAverage(color1: number, color2: number, scale: number) {
     if(scale < 0) scale = 0
     if(scale > 1) scale = 1
-    return Math.sqrt(Math.pow(color1, 2) * scale + Math.pow(color2, 2) * (1 - scale))
+    return Math.sqrt(Math.pow(color1, 2) * (1 - scale) + Math.pow(color2, 2) * scale)
 }

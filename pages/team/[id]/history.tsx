@@ -41,18 +41,23 @@ export default function TeamHistoryPage({ teams, error }: TeamHistoryPageProps) 
         const shadows: Record<number, BlaseballPlayer> = {}
         const somewhere: BlaseballPlayer[] = []
         if(data.roster) {
-            data.roster.forEach((player, index) => {
+            // doing all sorts of hacks because of can't lose players i hate them
+            Array.from(data.roster).sort((p1, p2) => p1.id < p2.id ? -1 : 1).forEach((player, index) => {
                 if(player.rosterSlots.length) {
                     for(const slot of player.rosterSlots) {
+                        let slotIndex = slot.orderIndex ?? index
                         switch(slot.location) {
                             case "LINEUP":
-                                lineup[slot.orderIndex ?? index] = player
+                                while(lineup[slotIndex]) slotIndex++
+                                lineup[slotIndex] = player
                                 break
                             case "ROTATION":
-                                rotation[slot.orderIndex ?? index] = player
+                                while(rotation[slotIndex]) slotIndex++
+                                rotation[slotIndex] = player
                                 break
                             case "SHADOWS":
-                                shadows[slot.orderIndex ?? index] = player
+                                while(shadows[slotIndex]) slotIndex++
+                                shadows[slotIndex] = player
                                 break
                         }
                     }
