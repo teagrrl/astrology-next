@@ -61,8 +61,8 @@ export default function TeamsPage({ teams, error, isShowColors, isItemApplied, i
 
     return (
         <div className="overflow-auto">
-            <div className="flex justify-center items-center text-center p-5">
-                <Emoji className="h-14 w-14 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: "#8f3232" }} emoji={"0x1FA78"} emojiClass="h-8 w-8" />
+            <div className="flex justify-center items-center text-center p-5 gap-2">
+                <Emoji className="h-14 w-14 flex justify-center items-center rounded-full" style={{ backgroundColor: "#8f3232" }} emoji={"0x1FA78"} emojiClass="h-8 w-8" />
                 <div>
                     <div className="text-3xl font-bold">
                         <span>The Teams</span>
@@ -84,8 +84,10 @@ export default function TeamsPage({ teams, error, isShowColors, isItemApplied, i
                 scaleColors={scaleColors}
             />}
             <div className="px-2 py-1 mt-4">
-                <span>Don&apos;t see what you&apos;re looking for? </span> 
-                <Link href="/legacy/teams">Maybe try the legacy version.</Link>
+                <div>
+                    <span>Don&apos;t see what you&apos;re looking for? </span> 
+                    <Link href={`/legacy/teams`}><a className="py-0.5 rounded-md transition-all hover:px-1.5 hover:font-semibold hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white">Try the legacy version.</a></Link>
+                </div>
             </div>
         </div>
     )

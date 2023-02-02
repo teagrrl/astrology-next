@@ -1,21 +1,21 @@
 import React, { ReactElement } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import useSWR from 'swr'
+import moment from 'moment'
+import { PageProps } from '@pages/_app'
+import { Historical, playerHistoryFetcher } from '@models/api2'
+import Player, { PlayerSnapshot } from '@models/player2'
 import Layout from '@components/layout'
 import Metadata from '@components/metadata'
 import AstrologyLoader from '@components/loader'
 import AstrologyError from '@components/error'
 import Emoji from '@components/emoji'
-import { PageProps } from '@pages/_app'
-import useSWR from 'swr'
-import { Historical, playerHistoryFetcher } from '@models/api2'
-import moment from 'moment'
-import Tooltip from '@components/tooltip'
-import Player, { fieldPositions, PlayerSnapshot } from '@models/player2'
 import PlayerHistoryTable from '@components/playerhistorytable'
 import ExportCSV, { exportPlayerHistoryData } from '@components/exportcsv'
 import ModificationList from '@components/modificationlist'
 import HeatMap from '@components/heatmap'
+import PlayerTable from '@components/playertable'
 
 type PlayerPageProps = PageProps & {
 	
@@ -25,7 +25,7 @@ export default function PlayerPage({ players, error, isShowColors, isShowSimplif
     const router = useRouter()
     const { id, sort } = router.query
 	const player = players?.find((player) => player.id === id)
-    const historyResponse = useSWR(`history/${id}`, () => playerHistoryFetcher(player?.id))
+    const historyResponse = useSWR(id, playerHistoryFetcher)
     const playerHistory: Historical<Player>[] = historyResponse.data ?? []
 
 	if(!players) {
@@ -151,18 +151,35 @@ export default function PlayerPage({ players, error, isShowColors, isShowSimplif
                     {snapshots.length > 0 && <ExportCSV data={exportPlayerHistoryData(snapshots, isItemApplied)} filename={player.id} />}
                 </div>
             </div>
-            <PlayerHistoryTable 
-                snapshots={historyResponse.data?.length ? sortedSnapshots : undefined} 
-                sort={currentSort} 
-                triggerSort={sortSnapshots}
-                isShowColors={isShowColors}
-                isShowSimplified={isShowSimplified} 
-                isItemApplied={isItemApplied} 
-                scaleColors={scaleColors}
-            />
+            {historyResponse.data?.length 
+                ? <PlayerHistoryTable 
+                    snapshots={sortedSnapshots} 
+                    sort={currentSort} 
+                    triggerSort={sortSnapshots}
+                    isShowColors={isShowColors}
+                    isShowSimplified={isShowSimplified} 
+                    isItemApplied={isItemApplied} 
+                    scaleColors={scaleColors}
+                /> 
+                : <div>
+                    <PlayerTable 
+                        players={[player]} 
+                        isShowColors={isShowColors}
+                        isShowSimplified={isShowSimplified} 
+                        isItemApplied={isItemApplied} 
+                        scaleColors={scaleColors}
+                    />
+                    <h2 className="p-5 text-2xl font-bold text-center">Loading historical data for {player.name}...</h2>
+                </div>
+            }
             <div className="px-2 py-1 mt-4">
-                <span>Don&apos;t see what you&apos;re looking for? </span> 
-                <Link href={`/legacy/player/${player.id}/history`}>Maybe try the legacy version.</Link>
+                <div>
+                    <span>Don&apos;t see what you&apos;re looking for? </span> 
+                    <Link href={`/legacy/player/${player.id}/history`}><a className="py-0.5 rounded-md transition-all hover:px-1.5 hover:font-semibold hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white">Try the legacy version.</a></Link>
+                </div>
+                <div>
+                    <a href={`https://blaseball.com/player/${player.id}`} className="py-0.5 rounded-md transition-all hover:px-1.5 hover:font-semibold hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white">Looking for the official page?</a>
+                </div>
             </div>
         </section>
 	)

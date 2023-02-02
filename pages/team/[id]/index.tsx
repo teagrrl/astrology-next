@@ -159,8 +159,13 @@ export default function TeamPage({ teams, error, isShowColors, isItemApplied, is
                 <FieldPositions players={team.lineup} />
             </div>
             <div className="px-2 py-1 mt-4">
-                <span>Don&apos;t see what you&apos;re looking for? </span> 
-                <Link href={`/legacy/team/${team.id}`}>Maybe try the legacy version.</Link>
+                <div>
+                    <span>Don&apos;t see what you&apos;re looking for? </span> 
+                    <Link href={`/legacy/team/${team.id}`}><a className="py-0.5 rounded-md transition-all hover:px-1.5 hover:font-semibold hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white">Try the legacy version.</a></Link>
+                </div>
+                <div>
+                    <a href={`https://blaseball.com/team/${team.id}`} className="py-0.5 rounded-md transition-all hover:px-1.5 hover:font-semibold hover:text-white hover:bg-black dark:hover:text-black dark:hover:bg-white">Looking for the official page?</a>
+                </div>
             </div>
 		</section>
 	)

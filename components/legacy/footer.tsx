@@ -7,12 +7,31 @@ type FooterProps = PageProps & {
 }
 
 export default function Footer({ isSimpleFooter, isDarkMode, isItemApplied, isShowSimplified, toggleItemAdjustments, toggleLights, toggleSimpleStats }: FooterProps) {
+
+    function onToggleLights() {
+        if(toggleLights) {
+            toggleLights()
+        }
+    }
+
+    function onToggleSimpleStats() {
+        if(toggleSimpleStats) {
+            toggleSimpleStats()
+        }
+    }
+
+    function onToggleItemAdjustments() {
+        if(toggleItemAdjustments) {
+            toggleItemAdjustments()
+        }
+    }
+
     return (
         <footer className="flex flex-row flex-wrap justify-end gap-1 p-2">
             {isSimpleFooter && <>
                 <div className="flex items-center">
-                    <label><input type="checkbox" className="m-1" defaultChecked={isItemApplied} onClick={() => toggleItemAdjustments} /><span>Items Adjustments</span></label>
-                    <label><input type="checkbox" className="m-1" defaultChecked={isShowSimplified} onClick={() => toggleSimpleStats} /><span>Simplify Stats</span></label>
+                    <label><input type="checkbox" className="m-1" defaultChecked={isItemApplied} onClick={onToggleItemAdjustments} /><span>Items Adjustments</span></label>
+                    <label><input type="checkbox" className="m-1" defaultChecked={isShowSimplified} onClick={onToggleSimpleStats} /><span>Simplify Stats</span></label>
                 </div>
             </>}
             <div className="flex flex-row gap-1 justify-end">
@@ -29,7 +48,7 @@ export default function Footer({ isSimpleFooter, isDarkMode, isItemApplied, isSh
                     <ColorReference color="bg-fuchsia-400/50">Super Elite</ColorReference>
                 </div>
                 <button 
-                    className="bg-zinc-300 dark:bg-zinc-700 px-1.5 py-1 rounded-md cursor-pointer transition hover:bg-zinc-400 dark:hover:bg-zinc-600" onClick={() => toggleLights}
+                    className="bg-zinc-300 dark:bg-zinc-700 px-1.5 py-1 rounded-md cursor-pointer transition hover:bg-zinc-400 dark:hover:bg-zinc-600" onClick={onToggleLights}
                 >
                     <Emoji emoji={isDarkMode ? "0x1F506" : "0x1F311"} emojiClass="w-4 h-4 align-[-1px]" />
                 </button>

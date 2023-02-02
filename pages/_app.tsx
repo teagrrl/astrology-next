@@ -2,12 +2,12 @@ import { ReactElement, ReactNode, useCallback, useEffect, useState } from 'react
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import useSWR from 'swr'
+import { defaultScaleColors } from '@models/helpers'
 import { LeagueData, useChroniclerToFetchLeagueData } from '@models/api'
 import { leagueFetcher } from '@models/api2'
 import Player from '@models/player2'
 import Team from '@models/team2'
 import '../styles/globals.css'
-import { defaultScaleColors } from '@models/helpers'
 
 type NextPageWithLayout = NextPage & {
 	getLayout?: (page: ReactElement, props?: PageProps) => ReactNode

@@ -20,7 +20,7 @@ export default function TeamHistoryPage({ teams, error }: TeamHistoryPageProps) 
     const router = useRouter()
     const { id } = router.query
 	const team = teams?.find((team) => team.id === id)
-    const historyResponse = useSWR(`history/${id}`, () => teamHistoryFetcher(team?.id))
+    const historyResponse = useSWR(id, teamHistoryFetcher)
     const teamHistory: Historical<Team>[] = historyResponse.data ?? []
 
 	if(!teams) {
@@ -211,7 +211,7 @@ export default function TeamHistoryPage({ teams, error }: TeamHistoryPageProps) 
                             </div>
                         )}
                     </div>
-                : <AstrologyLoader />}
+                : <AstrologyLoader message={`Loading historical data for the ${team.name}...`} />}
             </div>
 		</section>
 	)

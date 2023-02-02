@@ -30,8 +30,8 @@ export default function TeamsPage({ teams, error, isDarkMode }: PageProps) {
 	
 	return (
         <section className="overflow-auto">
-            <div className="flex justify-center items-center text-center p-5">
-                <Emoji className="h-14 w-14 flex justify-center items-center rounded-full mr-2" style={{ backgroundColor: "#885a84" }} emoji={"0x1F4DA"} emojiClass="h-8 w-8" />
+            <div className="flex justify-center items-center text-center p-5 gap-2">
+                <Emoji className="h-14 w-14 flex justify-center items-center rounded-full" style={{ backgroundColor: "#885a84" }} emoji={"0x1F4DA"} emojiClass="h-8 w-8" />
                 <div>
                     <div className="text-3xl font-bold">
                         <span>The Annex</span>
